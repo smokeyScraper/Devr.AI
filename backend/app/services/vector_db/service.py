@@ -3,6 +3,7 @@ import os
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from embedding_service.service import EmbeddingItem
 
 load_dotenv()
 
