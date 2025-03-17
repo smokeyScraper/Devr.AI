@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import ContributorCard from './ContributorCard';
+import axios from 'axios';
 
 export default function ContributorsPage() {
+  const [contributors, setContributors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch contributors data on mount
+  useEffect(() => {
+    const fetchContributors = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.post('http://localhost:8000/api/repo-stats', {
+          repo_url: 'https://github.com/AOSSIE-Org/Devr.AI/',
+        });
+        setContributors(response.data.contributors); // Extract contributors from response
+      } catch (err) {
+        setError('Failed to fetch contributors. Please check the backend server.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContributors();
+  }, []);
+
   const handleExportReport = () => {
     toast.success('Generating contributor report...');
   };
@@ -11,6 +35,14 @@ export default function ContributorsPage() {
   const handleInviteContributor = () => {
     toast.success('Opening invitation dialog...');
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
 
   return (
     <motion.div
@@ -43,50 +75,19 @@ export default function ContributorsPage() {
         </div>
       </div>
 
+      {/* Contributors Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <ContributorCard 
-          name="Sarah Chen"
-          avatar="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100"
-          role="Core Maintainer"
-          contributions="234"
-          lastActive="2 hours ago"
-        />
-        <ContributorCard 
-          name="Alex Kumar"
-          avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100"
-          role="Documentation Lead"
-          contributions="156"
-          lastActive="1 day ago"
-        />
-        <ContributorCard 
-          name="Maria Garcia"
-          avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100"
-          role="Security Team"
-          contributions="198"
-          lastActive="3 hours ago"
-        />
-        <ContributorCard 
-          name="James Wilson"
-          avatar="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100"
-          role="Feature Developer"
-          contributions="145"
-          lastActive="5 hours ago"
-        />
-        <ContributorCard 
-          name="Emily Zhang"
-          avatar="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100"
-          role="UI/UX Designer"
-          contributions="167"
-          lastActive="Just now"
-        />
-        <ContributorCard 
-          name="David Park"
-          avatar="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100"
-          role="Testing Lead"
-          contributions="123"
-          lastActive="2 days ago"
-        />
+        {contributors.map((contributor) => (
+          <ContributorCard 
+            key={contributor.login}
+            name={contributor.login}
+            avatar={contributor.avatar_url}
+            role="Contributor" // You can add roles dynamically if available
+            contributions={contributor.contributions}
+            lastActive="N/A" // Replace with actual last active data if available
+          />
+        ))}
       </div>
     </motion.div>
   );
-};
+}

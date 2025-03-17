@@ -1,51 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 interface PullRequest {
-  id: number;
+  number: number;
   title: string;
-  author: string;
-  status: string;
-  comments: number;
-  created: string;
+  author: {
+    login: string;
+    avatar_url: string;
+    profile_url: string;
+  };
+  state: string;
+  url: string; // URL of the pull request
 }
 
 export default function PullRequestsPage() {
-  const [prs] = useState<PullRequest[]>([
-    {
-      id: 1,
-      title: "Add new authentication flow",
-      author: "Sarah Chen",
-      status: "open",
-      comments: 5,
-      created: "2 hours ago"
-    },
-    {
-      id: 2,
-      title: "Fix responsive layout issues",
-      author: "Alex Kumar",
-      status: "review",
-      comments: 3,
-      created: "5 hours ago"
-    },
-    {
-      id: 3,
-      title: "Update documentation",
-      author: "Maria Garcia",
-      status: "merged",
-      comments: 2,
-      created: "1 day ago"
-    }
-  ]);
+  const [prs, setPrs] = useState<PullRequest[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'text-yellow-500';
-      case 'review': return 'text-blue-500';
-      case 'merged': return 'text-green-500';
-      default: return 'text-gray-500';
+  // Fetch pull request data on mount
+  useEffect(() => {
+    const fetchPullRequests = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.post('http://localhost:8000/api/repo-stats', {
+          repo_url: 'https://github.com/AOSSIE-Org/Devr.AI',
+        });
+
+        // Extract pull request details from the response
+        const pullRequests = response.data.pull_requests.details.map((pr: any) => ({
+          number: pr.number,
+          title: pr.title,
+          author: pr.author,
+          state: pr.state,
+          url: pr.url, // Add the PR URL
+        }));
+
+        setPrs(pullRequests);
+      } catch (err) {
+        setError('Failed to fetch pull requests. Please check the backend server.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPullRequests();
+  }, []);
+
+  const getStatusColor = (state: string) => {
+    switch (state) {
+      case 'open':
+        return 'text-yellow-500';
+      case 'closed':
+        return 'text-red-500';
+      case 'merged':
+        return 'text-green-500';
+      default:
+        return 'text-gray-500';
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
 
   return (
     <motion.div
@@ -71,23 +93,55 @@ export default function PullRequestsPage() {
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Comments
+                PR Number
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Created
+                Link
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
             {prs.map((pr) => (
-              <tr key={pr.id} className="hover:bg-gray-800">
+              <tr key={pr.number} className="hover:bg-gray-800">
+                {/* Title */}
                 <td className="px-6 py-4 whitespace-nowrap text-white">{pr.title}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-300">{pr.author}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`${getStatusColor(pr.status)} capitalize`}>{pr.status}</span>
+
+                {/* Author */}
+                <td className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
+                  <img
+                    src={pr.author.avatar_url}
+                    alt={pr.author.login}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <a
+                    href={pr.author.profile_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300"
+                  >
+                    {pr.author.login}
+                  </a>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-300">{pr.comments}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-300">{pr.created}</td>
+
+                {/* Status */}
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`${getStatusColor(pr.state)} capitalize`}>{pr.state}</span>
+                </td>
+
+                {/* PR Number */}
+                <td className="px-6 py-4 whitespace-nowrap text-gray-300">#{pr.number}</td>
+
+                {/* PR Link */}
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <a
+                    href={pr.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline"
+                  >
+                    View PR
+                  </a>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -95,4 +149,4 @@ export default function PullRequestsPage() {
       </div>
     </motion.div>
   );
-};
+}
