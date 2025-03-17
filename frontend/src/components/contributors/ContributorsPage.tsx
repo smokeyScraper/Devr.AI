@@ -2,31 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import ContributorCard from './ContributorCard';
-import axios from 'axios';
 
-export default function ContributorsPage() {
-  const [contributors, setContributors] = useState<any[]>([]);
+interface Props {
+  repoData: any; // Fetched repository stats
+}
+
+const ContributorsPage: React.FC<Props> = ({ repoData }) => {
+  if (!repoData) {
+    
+    return <div>No data available. Please analyze a repository first.</div>;
+  }
+  console.log(repoData);
+  const [contributors, setContributors] = useState<any[]>(repoData.contributors || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch contributors data on mount
-  useEffect(() => {
-    const fetchContributors = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.post('http://localhost:8000/api/repo-stats', {
-          repo_url: 'https://github.com/AOSSIE-Org/Devr.AI/',
-        });
-        setContributors(response.data.contributors); // Extract contributors from response
-      } catch (err) {
-        setError('Failed to fetch contributors. Please check the backend server.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContributors();
-  }, []);
 
   const handleExportReport = () => {
     toast.success('Generating contributor report...');
@@ -91,3 +82,5 @@ export default function ContributorsPage() {
     </motion.div>
   );
 }
+
+export default ContributorsPage;
