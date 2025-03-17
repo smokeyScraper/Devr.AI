@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { Users, GitPullRequest, MessageSquare, Activity } from 'lucide-react';
