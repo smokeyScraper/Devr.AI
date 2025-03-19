@@ -41,16 +41,18 @@ class EventBus:
     async def dispatch(self, event: BaseEvent):
         """Dispatch an event to all registered handlers"""
         logger.info(f"Dispatching event {event.id} of type {event.event_type}")
+        logger.info("event in event bus" + str(event))
 
         # Call global handlers first
         for handler in self.global_handlers:
+            logger.info(f"Calling global handler: {handler.__name__}")
             asyncio.create_task(handler(event))
 
         # Call event-specific handlers
         if event.event_type in self.handlers:
             for handler in self.handlers[event.event_type]:
+                logger.info(f"Calling handler: {handler.__name__} for event type: {event.event_type}")
                 asyncio.create_task(handler(event))
-
         else:
             logger.info(f"No handlers registered for event type {event.event_type}")
             pass
