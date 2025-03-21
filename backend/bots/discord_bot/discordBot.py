@@ -84,6 +84,8 @@ async def on_message(message):
         return
 
     logger.info(f"Message received: {message.content} from {message.author.name}")
+    logger.info(f"Dispatching event with channel_id: {str(message.channel.id)}")
+    channel_id = str(message.channel.id)
 
     is_faq, faq_response = await faq_handler.is_faq(message.content)
     event_type = EventType.FAQ_REQUESTED if is_faq else EventType.MESSAGE_CREATED
@@ -95,11 +97,12 @@ async def on_message(message):
         actor_id=str(message.author.id),
         actor_name=message.author.name,
         guild_id=str(message.guild.id) if message.guild else None,
-        channel_id=str(message.channel.id),
+        channel_id=(channel_id),
         message_id=str(message.id),
         raw_data={
             "id": str(message.id),
             "content": message.content,
+            "actor_id": str(message.author.id),
             "attachments": [attachment.url for attachment in message.attachments],
             "mentions": [user.id for user in message.mentions],
         },

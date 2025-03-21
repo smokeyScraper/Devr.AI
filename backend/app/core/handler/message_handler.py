@@ -15,7 +15,6 @@ class MessageHandler(BaseHandler):
 
     async def handle(self, event: BaseEvent) -> Dict[str, Any]:
         logger.info(f"Handling message event from {event.platform}: {event.event_type}")
-
         if event.event_type == EventType.MESSAGE_CREATED:
             return await self._handle_message_created(event)
         elif event.event_type == EventType.MESSAGE_UPDATED:
@@ -35,10 +34,11 @@ class MessageHandler(BaseHandler):
         # Check if it's a FAQ request
         if await self.faq_handler.is_faq(user_message):
             faq_event = BaseEvent(
+                id=event.id,
                 event_type=EventType.FAQ_REQUESTED,
                 platform=event.platform,
-                channel_id=event.channel_id,
-                user_id=event.user_id,
+                channel_id=event.raw_data.get("channel_id"),
+                actor_id=event.actor_id,
                 data={"content": user_message},
             )
             return await self.faq_handler.handle(faq_event)

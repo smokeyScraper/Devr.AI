@@ -22,7 +22,6 @@ class EventBus:
                 self._add_handler(et, handler_func)
         else:
             self._add_handler(event_type, handler_func)
-        logger.info(f"Handler {handler_func.__name__} registered for event type {event_type}")
         pass
 
     def _add_handler(self, event_type: EventType, handler_func: callable):
@@ -35,13 +34,10 @@ class EventBus:
     def register_global_handler(self, handler_func):
         """Register a handler that will receive all events"""
         self.global_handlers.append(handler_func)
-        logger.info(f"Global handler {handler_func._name_} registered")
         pass
 
     async def dispatch(self, event: BaseEvent):
         """Dispatch an event to all registered handlers"""
-        logger.info(f"Dispatching event {event.id} of type {event.event_type}")
-        logger.info("event in event bus" + str(event))
 
         # Call global handlers first
         for handler in self.global_handlers:
