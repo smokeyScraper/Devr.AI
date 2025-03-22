@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import List, Dict, Any, Optional
 from uuid import UUID
@@ -10,8 +9,6 @@ load_dotenv()
 
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-
-
 
 
 logger = logging.getLogger(__name__)
@@ -212,3 +209,4 @@ class EmbeddingService:
 class VectorDBService:
     """Service for interacting with Supabase Vector DB"""
     
+
