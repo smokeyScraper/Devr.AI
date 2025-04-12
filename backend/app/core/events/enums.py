@@ -10,7 +10,6 @@ class PlatformType(str, Enum):
 class EventType(str, Enum):
     ISSUE_CREATED = "issue.created"
     ISSUE_CLOSED = "issue.closed"
-
     ISSUE_UPDATED = "issue.updated"
     ISSUE_COMMENTED = "issue.commented"
     PR_CREATED = "pr.created"
@@ -22,6 +21,7 @@ class EventType(str, Enum):
     
     MESSAGE_CREATED = "message.created"
     MESSAGE_UPDATED = "message.updated"
+    MESSAGE_DELETED = "message.deleted"
     REACTION_ADDED = "reaction.added"
     USER_JOINED = "user.joined"
     

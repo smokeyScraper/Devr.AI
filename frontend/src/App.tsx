@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 
 import Sidebar from './components/layout/Sidebar';
 import Dashboard from './components/dashboard/Dashboard';
+
 import BotIntegrationPage from './components/integration/BotIntegrationPage';
 import ContributorsPage from './components/contributors/ContributorsPage';
 import PullRequestsPage from './components/pages/PullRequestsPage';
@@ -36,11 +37,13 @@ function App() {
         return <SettingsPage />;
       default:
         return <Dashboard repoData={repoData} />;
+
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+
       {activePage !== 'landing' && (
         <Sidebar 
           isOpen={isSidebarOpen} 
@@ -51,6 +54,7 @@ function App() {
       )}
       
       <main className={`transition-all duration-300 ${isSidebarOpen && activePage !== 'landing' ? 'ml-64' : 'ml-20'}`}>
+
         <div className="p-8">
           <AnimatePresence mode="wait">
             {renderPage()}
@@ -62,3 +66,4 @@ function App() {
 }
 
 export default App;
+

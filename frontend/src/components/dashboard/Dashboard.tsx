@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { Users, GitPullRequest, MessageSquare, Activity, Github, Slack } from 'lucide-react';
@@ -37,34 +37,32 @@ const Dashboard: React.FC<Props> = ({ repoData }) => {
       </div>
 
       {/* Stats Section */}
-      {repoData && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard 
-            icon={<Users size={24} />}
-            title="Active Contributors"
-            value={repoData.contributors.length}
-            trend={12} // Example trend value
-          />
-          <StatCard 
-            icon={<GitPullRequest size={24} />}
-            title="Open PRs"
-            value={repoData.pull_requests.open} 
-            trend={repoData.pull_requests.open} // Example trend value
-          />
-          <StatCard 
-            icon={<MessageSquare size={24} />}
-            title="Community Posts"
-            value="892" // Replace with actual backend data if available
-            trend={8} // Example trend value
-          />
-          <StatCard 
-            icon={<Activity size={24} />}
-            title="Response Rate"
-            value="94%" // Replace with actual backend data if available
-            trend={5} // Example trend value
-          />
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard 
+          icon={<Users size={24} />}
+          title="Active Contributors"
+          value={repoData.contributors?.length || 0}
+          trend={12}
+        />
+        <StatCard 
+          icon={<GitPullRequest size={24} />}
+          title="Open PRs"
+          value={repoData.pull_requests?.open || 0}
+          trend={repoData.pull_requests?.open || 0}
+        />
+        <StatCard 
+          icon={<MessageSquare size={24} />}
+          title="Community Posts"
+          value="892" // Placeholder, replace with dynamic if available
+          trend={8}
+        />
+        <StatCard 
+          icon={<Activity size={24} />}
+          title="Response Rate"
+          value="94%" // Placeholder, replace with dynamic if available
+          trend={5}
+        />
+      </div>
 
       {/* Quick Actions */}
       <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>

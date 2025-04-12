@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
 interface PullRequest {
@@ -11,6 +11,8 @@ interface PullRequest {
   };
   state: string;
   url: string;
+  comments?: number;
+  created_at?: string;
 }
 
 interface Props {
@@ -25,13 +27,15 @@ const PullRequestsPage: React.FC<Props> = ({ repoData }) => {
   const prs = repoData.pull_requests.details;
 
   const getStatusColor = (state: string) => {
-    switch (state) {
+    switch (state.toLowerCase()) {
       case 'open':
         return 'text-yellow-500';
       case 'closed':
         return 'text-red-500';
       case 'merged':
         return 'text-green-500';
+      case 'review':
+        return 'text-blue-500';
       default:
         return 'text-gray-500';
     }

@@ -8,16 +8,15 @@ interface Props {
 }
 
 const ContributorsPage: React.FC<Props> = ({ repoData }) => {
-  if (!repoData) {
-    
-    return <div>No data available. Please analyze a repository first.</div>;
-  }
-  console.log(repoData);
-  const [contributors, setContributors] = useState<any[]>(repoData.contributors || []);
+  const [contributors, setContributors] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch contributors data on mount
+  useEffect(() => {
+    if (repoData?.contributors) {
+      setContributors(repoData.contributors);
+    }
+  }, [repoData]);
 
   const handleExportReport = () => {
     toast.success('Generating contributor report...');
@@ -26,6 +25,10 @@ const ContributorsPage: React.FC<Props> = ({ repoData }) => {
   const handleInviteContributor = () => {
     toast.success('Opening invitation dialog...');
   };
+
+  if (!repoData) {
+    return <div>No data available. Please analyze a repository first.</div>;
+  }
 
   if (loading) {
     return <div>Loading...</div>;
@@ -73,14 +76,14 @@ const ContributorsPage: React.FC<Props> = ({ repoData }) => {
             key={contributor.login}
             name={contributor.login}
             avatar={contributor.avatar_url}
-            role="Contributor" // You can add roles dynamically if available
+            role="Contributor"
             contributions={contributor.contributions}
-            lastActive="N/A" // Replace with actual last active data if available
+            lastActive="N/A"
           />
         ))}
       </div>
     </motion.div>
   );
-}
+};
 
 export default ContributorsPage;

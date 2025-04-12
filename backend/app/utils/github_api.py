@@ -72,6 +72,7 @@ async def get_repo_stats(repo_url: str):
                     "profile_url": pr["user"]["html_url"]
                 },
         } for pr in prs]     
+
         
         return {
             "name": repo_info["full_name"],
@@ -124,6 +125,14 @@ async def get_repo_stats(repo_url: str):
                 **pull_requests_by_state,
                 "total": len(prs),
                 "details": pr_details
+                "total": len(prs),
+                "merged": sum(1 for pr in prs if pr["merged_at"]),
+                "draft": sum(1 for pr in prs if pr["draft"]),
+                "by_state": {
+                    "open": sum(1 for pr in prs if pr["state"] == "open"),
+                    "closed": sum(1 for pr in prs if pr["state"] == "closed")
+                }
+
             },
         }
         
