@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import List, Dict, Any, Optional
 from uuid import UUID
@@ -15,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class EmbeddingItem(BaseModel):
     id: str
+
     collection: str
     content: str
     metadata: Dict[str, Any] = Field(default_factory=dict)
