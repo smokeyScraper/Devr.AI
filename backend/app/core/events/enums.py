@@ -16,6 +16,7 @@ class EventType(str, Enum):
     PR_UPDATED = "pr.updated"
     PR_COMMENTED = "pr.commented"
     PR_MERGED = "pr.merged"
+
     PR_REVIEWED = "pr.reviewed"
     
     MESSAGE_CREATED = "message.created"
@@ -28,4 +29,8 @@ class EventType(str, Enum):
     ONBOARDING_COMPLETED = "onboarding.completed"
     FAQ_REQUESTED = "faq.requested"
     KNOWLEDGE_UPDATED = "knowledge.updated"
+
     ANALYTICS_COLLECTED = "analytics.collected"
+
+    ANALYTICS_COLLECTED = "analytics.collected"
+
