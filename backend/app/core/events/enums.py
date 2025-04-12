@@ -32,5 +32,3 @@ class EventType(str, Enum):
 
     ANALYTICS_COLLECTED = "analytics.collected"
 
-    ANALYTICS_COLLECTED = "analytics.collected"
-
