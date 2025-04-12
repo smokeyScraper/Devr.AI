@@ -7,6 +7,8 @@ import  BotIntegrationPage from './components/integration/BotIntegrationPage';
 import ContributorsPage from './components/contributors/ContributorsPage';
 import PullRequestsPage from './components/pages/PullRequestsPage';
 import Settings from './components/pages/SettingsPage';
+import AnalyticsPage from './components/pages/AnalyticsPage'
+import SupportPage from './components/pages/SupportPage';
 
 
 function App() {
@@ -15,18 +17,22 @@ function App() {
 
   const renderPage = () => {
     switch (activePage) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'integration':
-        return <BotIntegrationPage />;
-      case 'contributors':
-        return <ContributorsPage />;
-      case 'prs':
-        return <PullRequestsPage />;
-      case 'settings':
-        return <Settings/>;
-      default:
-        return <Dashboard />;
+        case 'dashboard':
+            return <Dashboard />;
+        case 'integration':
+            return <BotIntegrationPage />;
+        case 'contributors':
+            return <ContributorsPage />;
+        case 'analytics':
+            return <AnalyticsPage/>
+        case 'prs':
+            return <PullRequestsPage />;
+        case 'support':
+            return <SupportPage/>
+        case 'settings':
+            return <Settings />;
+        default:
+            return <Dashboard />;
     }
   };
 
