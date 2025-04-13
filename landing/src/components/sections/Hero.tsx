@@ -1,17 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import {
-    Bot,
-    Github,
-    MessageSquare,
-    Users,
-    GitBranch,
-    GitMerge,
-    GitPullRequest,
-    Slack,
-    Code,
-    MessagesSquare
-} from 'lucide-react';
+import { Users } from 'lucide-react';
 
 const Hero: React.FC = () => {
     const container = {
@@ -30,187 +19,54 @@ const Hero: React.FC = () => {
     };
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16">
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/3 left-1/4 w-96 h-96 radial-gradient-bg"></div>
-                <div className="absolute bottom-1/4 right-1/3 w-96 h-96 radial-gradient-bg"></div>
-                <div className="absolute top-1/4 right-1/4 w-64 h-64 radial-gradient-bg opacity-70"></div>
-                <div className="absolute bottom-1/3 left-1/3 w-64 h-64 radial-gradient-bg opacity-50"></div>
+        <section className="relative min-h-screen flex items-center justify-center pt-24 pb-36 overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none hidden md:block">
+                <div className="absolute inset-0 bg-gradient-to-br from-dark via-dark to-gray-900 opacity-90"></div>
 
+                <div className="absolute top-0 left-0 w-[1500px] h-[1500px] rounded-full bg-green-600/5 blur-[100px] -translate-x-1/3 -translate-y-1/3"></div>
+                <div className="absolute bottom-0 right-0 w-[1200px] h-[1200px] rounded-full bg-blue-600/5 blur-[100px] translate-x-1/4 translate-y-1/4"></div>
+                <div className="absolute top-1/2 right-1/4 w-[1000px] h-[1000px] rounded-full bg-purple-600/5 blur-[80px] -translate-y-1/2"></div>
 
-                <motion.div
-                    animate={{
-                        y: [10, -10, 10],
-                        rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                        duration: 6,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute top-[10%] left-[15%] text-green-500/20"
-                >
-                    <Bot size={120} />
-                </motion.div>
-                <motion.div
-                    animate={{
-                        y: [-8, 8, -8],
-                        rotate: [0, -3, 3, 0],
-                    }}
-                    transition={{
-                        duration: 6.5,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute top-[15%] right-[15%] text-teal-500/20"
-                >
-                    <GitBranch size={70} />
-                </motion.div>
+                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center opacity-[0.15]"></div>
 
-                <motion.div
-                    animate={{
-                        y: [-15, 15, -15],
-                        x: [5, -5, 5],
-                    }}
-                    transition={{
-                        duration: 9,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute top-[40%] right-[25%] text-pink-500/15"
-                >
-                    <GitPullRequest size={65} />
-                </motion.div>
-                <motion.div
-                    animate={{
-                        y: [8, -8, 8],
-                    }}
-                    transition={{
-                        duration: 7.2,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute top-[35%] left-[25%] text-blue-500/15"
-                >
-                    <MessagesSquare size={60} />
-                </motion.div>
-                <motion.div
-                    animate={{
-                        y: [7, -7, 7],
-                        rotate: [0, 3, -3, 0],
-                    }}
-                    transition={{
-                        duration: 5.5,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute top-[30%] right-[10%] text-orange-500/15"
-                >
-                    <Code size={50} />
-                </motion.div>
-                <motion.div
-                    animate={{
-                        y: [-5, 5, -5],
-                        rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                        duration: 5,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute top-[45%] left-[10%] text-amber-500/15"
-                >
-                    <GitMerge size={75} />
-                </motion.div>
+                <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-green-500/10 to-transparent"></div>
 
-                <motion.div
-                    animate={{
-                        y: [-10, 10, -10],
-                        rotate: [0, -5, 5, 0],
-                    }}
-                    transition={{
-                        duration: 7,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute bottom-[25%] right-[20%] text-blue-500/20"
-                >
-                    <Github size={80} />
-                </motion.div>
-                <motion.div
-                    animate={{
-                        y: [5, -15, 5],
-                    }}
-                    transition={{
-                        duration: 8,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute bottom-[20%] left-[20%] text-purple-500/20"
-                >
-                    <MessageSquare size={100} />
-                </motion.div>
-                <motion.div
-                    animate={{
-                        y: [12, -12, 12],
-                        rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                        duration: 7.5,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute bottom-[30%] center mx-auto text-indigo-500/20"
-                >
-                    <Slack size={90} />
-                </motion.div>
-                <motion.div
-                    animate={{
-                        y: [-10, 10, -10],
-                        rotate: [0, -5, 5, 0],
-                    }}
-                    transition={{
-                        duration: 6.8,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                    }}
-                    className="absolute bottom-[15%] right-[40%] text-green-500/15"
-                >
-                    <Bot size={110} />
-                </motion.div>
+                <div className="absolute inset-0 bg-radial-gradient"></div>
             </div>
+
+            <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-b from-transparent to-dark pointer-events-none"></div>
 
             <div className="container mx-auto px-6 z-10">
                 <motion.div
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="max-w-4xl mx-auto text-center"
+                    className="max-w-5xl mx-auto text-center"
                 >
                     <motion.div variants={item} className="mb-6">
-                        <span className="px-4 py-2 rounded-full bg-green-500/10 text-green-500 text-sm font-medium">
+                        <span className="px-5 py-2.5 rounded-full bg-green-500/10 text-green-500 text-base font-medium">
                             Developer Experience Reimagined
                         </span>
                     </motion.div>
                     <motion.h1
                         variants={item}
-                        className="text-4xl md:text-6xl font-bold mb-6"
+                        className="text-5xl md:text-7xl font-bold mb-8"
                     >
                         AI-Powered <span className="gradient-text">Developer Relations</span> Assistant
                     </motion.h1>
 
                     <motion.div
                         variants={item}
-                        className="mb-6"
+                        className="mb-8"
                     >
-                        <span className="inline-block px-5 py-2 bg-amber-500/20 text-amber-300 font-semibold rounded-md border border-amber-500/30 animate-pulse">
+                        <span className="inline-block px-6 py-3 bg-amber-500/20 text-amber-300 font-semibold text-lg rounded-md border border-amber-500/30 animate-pulse">
                             Coming Soon — Join the Waitlist for Early Access
                         </span>
                     </motion.div>
 
                     <motion.p
                         variants={item}
-                        className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto"
+                        className="text-xl md:text-2xl text-gray-400 mb-10 max-w-4xl mx-auto"
                     >
                         Devr.AI revolutionizes open-source community management by automating engagement,
                         streamlining onboarding, and delivering real-time project updates across Discord,
@@ -218,19 +74,22 @@ const Hero: React.FC = () => {
                     </motion.p>
                     <motion.div
                         variants={item}
-                        className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+                        className="flex flex-col sm:flex-row gap-5 justify-center mb-16"
                     >
-                        <a href="#waitlist" className="btn-primary flex items-center justify-center gap-2">
-                            <Users size={18} />
+                        <a href="#waitlist" className="btn-primary flex items-center justify-center gap-2 text-lg py-4 px-8">
+                            <Users size={20} />
                             Join the Waitlist
                         </a>
-                        <a href="#features" className="btn-secondary">
+                        <a href="#features" className="btn-secondary text-lg py-4 px-8">
                             Explore Features
                         </a>
                     </motion.div>
 
-                    <motion.div variants={item}>
-                        <div className="relative rounded-xl overflow-hidden border border-gray-800">
+                    <motion.div
+                        variants={item}
+                        className="max-w-6xl mx-auto"
+                    >
+                        <div className="relative rounded-xl overflow-hidden border border-gray-800 shadow-2xl">
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark z-10"></div>
                             <img
                                 src="/dashboard_preview.png"
