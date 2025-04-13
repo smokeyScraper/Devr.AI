@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Github } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Navbar: React.FC = () => {
@@ -21,7 +21,6 @@ const Navbar: React.FC = () => {
         { name: 'Features', href: '#features' },
         { name: 'How It Works', href: '#how-it-works' },
         { name: 'Integrations', href: '#integrations' },
-        { name: 'Join Waitlist', href: '#waitlist' },
     ];
 
     return (
@@ -41,27 +40,37 @@ const Navbar: React.FC = () => {
                         </a>
                     </motion.div>
 
-                    {/* Desktop Nav */}
                     <motion.nav
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="hidden md:flex items-center space-x-8"
+                        className="hidden md:flex items-center space-x-4"
                     >
                         {navLinks.map((link) => (
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className={`text-sm font-medium transition-colors hover:text-primary ${link.name === 'Join Waitlist'
-                                        ? 'px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white'
-                                        : 'text-gray-300 hover:text-white'
-                                    }`}
+                                className="text-sm font-medium text-gray-300 transition-colors hover:text-white"
                             >
                                 {link.name}
                             </a>
                         ))}
+                        <a
+                            href="https://github.com/AOSSIE-Org/Devr.AI/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white border border-gray-700 transition-colors"
+                        >
+                            <Github size={16} />
+                            GitHub
+                        </a>
+                        <a
+                            href="#waitlist"
+                            className="text-sm font-medium px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors"
+                        >
+                            Join Waitlist
+                        </a>
                     </motion.nav>
 
-                    {/* Mobile Nav Toggle */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
                         className="md:hidden text-gray-300 hover:text-white"
@@ -71,7 +80,6 @@ const Navbar: React.FC = () => {
                 </div>
             </div>
 
-            {/* Mobile Nav */}
             <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{
@@ -91,6 +99,23 @@ const Navbar: React.FC = () => {
                             {link.name}
                         </a>
                     ))}
+                    <a
+                        href="https://github.com/AOSSIE-Org/Devr.AI/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2 py-3 text-gray-300 hover:text-white"
+                    >
+                        <Github size={18} />
+                        GitHub
+                    </a>
+                    <a
+                        href="#waitlist"
+                        onClick={() => setIsOpen(false)}
+                        className="block py-3 text-primary hover:text-primary-hover font-medium"
+                    >
+                        Join Waitlist
+                    </a>
                 </div>
             </motion.div>
         </header>
