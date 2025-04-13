@@ -29,6 +29,5 @@ class EventType(str, Enum):
     ONBOARDING_COMPLETED = "onboarding.completed"
     FAQ_REQUESTED = "faq.requested"
     KNOWLEDGE_UPDATED = "knowledge.updated"
-
     ANALYTICS_COLLECTED = "analytics.collected"
 
