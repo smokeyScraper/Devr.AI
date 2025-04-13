@@ -29,7 +29,6 @@ body {
   @apply py-16 md:py-24;
 }
 
-/* Acenity-inspired effects */
 .hover-lift {
   @apply transition-transform duration-300;
 }

@@ -1,6 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Bot, Github, MessageSquare, Users } from 'lucide-react';
+import {
+    Bot,
+    Github,
+    MessageSquare,
+    Users,
+    GitBranch,
+    GitMerge,
+    GitPullRequest,
+    Slack,
+    Code,
+    MessagesSquare
+} from 'lucide-react';
 
 const Hero: React.FC = () => {
     const container = {
@@ -20,12 +31,13 @@ const Hero: React.FC = () => {
 
     return (
         <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16">
-            {/* Background decorations */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-1/3 left-1/4 w-96 h-96 radial-gradient-bg"></div>
                 <div className="absolute bottom-1/4 right-1/3 w-96 h-96 radial-gradient-bg"></div>
+                <div className="absolute top-1/4 right-1/4 w-64 h-64 radial-gradient-bg opacity-70"></div>
+                <div className="absolute bottom-1/3 left-1/3 w-64 h-64 radial-gradient-bg opacity-50"></div>
 
-                {/* Floating icons */}
+
                 <motion.div
                     animate={{
                         y: [10, -10, 10],
@@ -36,10 +48,81 @@ const Hero: React.FC = () => {
                         repeat: Infinity,
                         repeatType: 'reverse',
                     }}
-                    className="absolute top-1/4 left-1/5 text-green-500/20"
+                    className="absolute top-[10%] left-[15%] text-green-500/20"
                 >
                     <Bot size={120} />
                 </motion.div>
+                <motion.div
+                    animate={{
+                        y: [-8, 8, -8],
+                        rotate: [0, -3, 3, 0],
+                    }}
+                    transition={{
+                        duration: 6.5,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                    }}
+                    className="absolute top-[15%] right-[15%] text-teal-500/20"
+                >
+                    <GitBranch size={70} />
+                </motion.div>
+
+                <motion.div
+                    animate={{
+                        y: [-15, 15, -15],
+                        x: [5, -5, 5],
+                    }}
+                    transition={{
+                        duration: 9,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                    }}
+                    className="absolute top-[40%] right-[25%] text-pink-500/15"
+                >
+                    <GitPullRequest size={65} />
+                </motion.div>
+                <motion.div
+                    animate={{
+                        y: [8, -8, 8],
+                    }}
+                    transition={{
+                        duration: 7.2,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                    }}
+                    className="absolute top-[35%] left-[25%] text-blue-500/15"
+                >
+                    <MessagesSquare size={60} />
+                </motion.div>
+                <motion.div
+                    animate={{
+                        y: [7, -7, 7],
+                        rotate: [0, 3, -3, 0],
+                    }}
+                    transition={{
+                        duration: 5.5,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                    }}
+                    className="absolute top-[30%] right-[10%] text-orange-500/15"
+                >
+                    <Code size={50} />
+                </motion.div>
+                <motion.div
+                    animate={{
+                        y: [-5, 5, -5],
+                        rotate: [0, 5, -5, 0],
+                    }}
+                    transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                    }}
+                    className="absolute top-[45%] left-[10%] text-amber-500/15"
+                >
+                    <GitMerge size={75} />
+                </motion.div>
+
                 <motion.div
                     animate={{
                         y: [-10, 10, -10],
@@ -50,7 +133,7 @@ const Hero: React.FC = () => {
                         repeat: Infinity,
                         repeatType: 'reverse',
                     }}
-                    className="absolute bottom-1/3 right-1/6 text-blue-500/20"
+                    className="absolute bottom-[25%] right-[20%] text-blue-500/20"
                 >
                     <Github size={80} />
                 </motion.div>
@@ -63,9 +146,37 @@ const Hero: React.FC = () => {
                         repeat: Infinity,
                         repeatType: 'reverse',
                     }}
-                    className="absolute top-2/3 left-1/6 text-purple-500/20"
+                    className="absolute bottom-[20%] left-[20%] text-purple-500/20"
                 >
                     <MessageSquare size={100} />
+                </motion.div>
+                <motion.div
+                    animate={{
+                        y: [12, -12, 12],
+                        rotate: [0, 5, -5, 0],
+                    }}
+                    transition={{
+                        duration: 7.5,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                    }}
+                    className="absolute bottom-[30%] center mx-auto text-indigo-500/20"
+                >
+                    <Slack size={90} />
+                </motion.div>
+                <motion.div
+                    animate={{
+                        y: [-10, 10, -10],
+                        rotate: [0, -5, 5, 0],
+                    }}
+                    transition={{
+                        duration: 6.8,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                    }}
+                    className="absolute bottom-[15%] right-[40%] text-green-500/15"
+                >
+                    <Bot size={110} />
                 </motion.div>
             </div>
 
@@ -87,6 +198,16 @@ const Hero: React.FC = () => {
                     >
                         AI-Powered <span className="gradient-text">Developer Relations</span> Assistant
                     </motion.h1>
+
+                    <motion.div
+                        variants={item}
+                        className="mb-6"
+                    >
+                        <span className="inline-block px-5 py-2 bg-amber-500/20 text-amber-300 font-semibold rounded-md border border-amber-500/30 animate-pulse">
+                            Coming Soon — Join the Waitlist for Early Access
+                        </span>
+                    </motion.div>
+
                     <motion.p
                         variants={item}
                         className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto"
@@ -112,7 +233,7 @@ const Hero: React.FC = () => {
                         <div className="relative rounded-xl overflow-hidden border border-gray-800">
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark z-10"></div>
                             <img
-                                src="https://placehold.co/1200x675/27272a/e5e5e5/png?text=Devr.AI+Dashboard+Preview"
+                                src="/dashboard_preview.png"
                                 alt="Devr.AI Dashboard"
                                 className="w-full h-auto"
                             />

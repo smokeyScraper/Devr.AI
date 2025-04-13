@@ -40,7 +40,7 @@ const Footer: React.FC = () => {
                         &copy; {currentYear} Devr.AI. All rights reserved.
                     </p>
                     <div className="flex space-x-6">
-                        <a href="#" className="text-gray-400 hover:text-primary">
+                        <a href="https://github.com/AOSSIE-Org/Devr.AI/" className="text-gray-400 hover:text-primary" target='_blank'>
                             <Github size={20} />
                         </a>
                         <a href="#" className="text-gray-400 hover:text-primary">
