@@ -1,49 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
 interface PullRequest {
-  id: number;
+  number: number;
   title: string;
-  author: string;
-  status: string;
-  comments: number;
-  created: string;
+  author: {
+    login: string;
+    avatar_url: string;
+    profile_url: string;
+  };
+  state: string;
+  url: string;
+  comments?: number;
+  created_at?: string;
 }
 
-export default function PullRequestsPage() {
-  const [prs] = useState<PullRequest[]>([
-    {
-      id: 1,
-      title: "Add new authentication flow",
-      author: "Sarah Chen",
-      status: "open",
-      comments: 5,
-      created: "2 hours ago"
-    },
-    {
-      id: 2,
-      title: "Fix responsive layout issues",
-      author: "Alex Kumar",
-      status: "review",
-      comments: 3,
-      created: "5 hours ago"
-    },
-    {
-      id: 3,
-      title: "Update documentation",
-      author: "Maria Garcia",
-      status: "merged",
-      comments: 2,
-      created: "1 day ago"
-    }
-  ]);
+interface Props {
+  repoData: { pull_requests: { details: PullRequest[] } } | null;
+}
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'text-yellow-500';
-      case 'review': return 'text-blue-500';
-      case 'merged': return 'text-green-500';
-      default: return 'text-gray-500';
+const PullRequestsPage: React.FC<Props> = ({ repoData }) => {
+  if (!repoData || !repoData.pull_requests) {
+    return <div>No data available. Please analyze a repository first.</div>;
+  }
+
+  const prs = repoData.pull_requests.details;
+
+  const getStatusColor = (state: string) => {
+    switch (state.toLowerCase()) {
+      case 'open':
+        return 'text-yellow-500';
+      case 'closed':
+        return 'text-red-500';
+      case 'merged':
+        return 'text-green-500';
+      case 'review':
+        return 'text-blue-500';
+      default:
+        return 'text-gray-500';
     }
   };
 
@@ -61,33 +55,32 @@ export default function PullRequestsPage() {
         <table className="w-full">
           <thead className="bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Title
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Author
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Comments
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Created
-              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Title</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Author</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">PR Number</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Link</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
             {prs.map((pr) => (
-              <tr key={pr.id} className="hover:bg-gray-800">
+              <tr key={pr.number} className="hover:bg-gray-800">
                 <td className="px-6 py-4 whitespace-nowrap text-white">{pr.title}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-300">{pr.author}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`${getStatusColor(pr.status)} capitalize`}>{pr.status}</span>
+                <td className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
+                  <img src={pr.author.avatar_url} alt={pr.author.login} className="w-8 h-8 rounded-full" />
+                  <a href={pr.author.profile_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                    {pr.author.login}
+                  </a>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-300">{pr.comments}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-300">{pr.created}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`${getStatusColor(pr.state)} capitalize`}>{pr.state}</span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-gray-300">#{pr.number}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <a href={pr.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">
+                    View PR
+                  </a>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -96,3 +89,5 @@ export default function PullRequestsPage() {
     </motion.div>
   );
 };
+
+export default PullRequestsPage;
