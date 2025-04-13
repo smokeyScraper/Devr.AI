@@ -1,3 +1,5 @@
+import logging
+
 import os
 from typing import List, Dict, Any, Optional
 from uuid import UUID
@@ -195,3 +197,4 @@ class VectorDBService:
         except Exception as e:
             logger.error(f"Connection check failed: {str(e)}")
             return False
+

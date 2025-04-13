@@ -54,6 +54,25 @@ async def get_repo_stats(repo_url: str):
         commits = github_api_request(f"/repos/{owner}/{repo_name}/commits?per_page=5")
 
         code_frequency = github_api_request(f"/repos/{owner}/{repo_name}/stats/code_frequency")
+
+        pull_requests_by_state = {
+            "open": sum(1 for pr in prs if pr["state"] == "open"),
+            "closed": sum(1 for pr in prs if pr["state"] == "closed"),
+            "draft": sum(1 for pr in prs if pr.get("draft", False)),
+            "merged": sum(1 for pr in prs if pr.get("merged_at"))
+        }
+        pr_details = [{
+                "title": pr["title"],
+                "number": pr["number"],
+                "state": pr["state"],
+                "url": pr["html_url"],
+                "author": {
+                    "login": pr["user"]["login"],
+                    "avatar_url": pr["user"]["avatar_url"],
+                    "profile_url": pr["user"]["html_url"]
+                },
+        } for pr in prs]     
+
         
         return {
             "name": repo_info["full_name"],
@@ -103,6 +122,9 @@ async def get_repo_stats(repo_url: str):
 
              # Pull Requests
             "pull_requests": {
+                **pull_requests_by_state,
+                "total": len(prs),
+                "details": pr_details
                 "total": len(prs),
                 "merged": sum(1 for pr in prs if pr["merged_at"]),
                 "draft": sum(1 for pr in prs if pr["draft"]),
@@ -110,6 +132,7 @@ async def get_repo_stats(repo_url: str):
                     "open": sum(1 for pr in prs if pr["state"] == "open"),
                     "closed": sum(1 for pr in prs if pr["state"] == "closed")
                 }
+
             },
         }
         

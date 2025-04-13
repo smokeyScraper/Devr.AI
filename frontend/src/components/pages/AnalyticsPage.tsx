@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
     BarChart3,
@@ -113,7 +114,14 @@ const pieData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
-export default function Analytics() {
+interface Props {
+  repoData: any;
+}
+
+const AnalyticsPage: React.FC<Props> = ({ repoData }) => {
+  if (!repoData || !repoData.pull_requests) {
+    return <div>No data available. Please analyze a repository first.</div>;
+  }
     const [selectedRange, setSelectedRange] = React.useState('Last Week');
     const [activeIndex, setActiveIndex] = React.useState(0);
 
@@ -372,3 +380,5 @@ const renderActiveShape = (props: any) => {
         </g>
     );
 };
+
+export default AnalyticsPage;
