@@ -6,3 +6,11 @@ publish = "dist"
 from = "/*"
 to = "/index.html"
 status = 200
+
+[[plugins]]
+package = "@netlify/plugin-functions"
+
+[dev]
+command = "npm run dev"
+port = 3001
+publish = "dist"
