@@ -93,7 +93,6 @@ const Waitlist: React.FC = () => {
                             data-netlify="true"
                             netlify-honeypot="bot-field"
                         >
-                            {/* Netlify Forms hidden fields */}
                             <input type="hidden" name="form-name" value="waitlist" />
                             <p className="hidden">
                                 <label>
