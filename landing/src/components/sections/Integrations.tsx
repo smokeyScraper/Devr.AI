@@ -9,10 +9,10 @@ const Integrations: React.FC = () => {
             name: 'GitHub',
             description: 'Automate issue triage, PR reviews, and contributor onboarding directly on GitHub.',
             features: [
-                'Automated issue labeling',
-                'PR review assistance',
-                'Release notes generation',
-                'Welcome messages for first-time contributors'
+                'Integration via GitHub Apps and Webhooks',
+                'Automated issue labeling and PR review',
+                'Contributor onboarding automation',
+                'Repository insights and analytics'
             ]
         },
         {
@@ -20,10 +20,10 @@ const Integrations: React.FC = () => {
             name: 'Slack',
             description: 'Streamline team communication and project updates within your Slack workspace.',
             features: [
-                'Real-time notifications',
-                'Command center for quick actions',
-                'Channel monitoring and insights',
-                'Integration with CI/CD pipeline'
+                'Integration via Slack Events API and Bot Users',
+                'Real-time notifications and command center',
+                'Interactive project management tools',
+                'Automated knowledge sharing'
             ]
         },
         {
@@ -31,10 +31,10 @@ const Integrations: React.FC = () => {
             name: 'Discord',
             description: 'Build an engaging community space for developers with automated assistance.',
             features: [
-                'Support channel automation',
-                'Role-based access management',
-                'Event notifications',
-                'Documentation search'
+                'Integration via Discord Bot API and Webhooks',
+                'Community support and moderation',
+                'Developer onboarding and guidance',
+                'Knowledge base access and retrieval'
             ]
         },
         {
@@ -42,10 +42,10 @@ const Integrations: React.FC = () => {
             name: 'Discourse',
             description: 'Enhance your community forum experience with AI-powered assistance.',
             features: [
-                'Topic categorization',
-                'Automated responses',
-                'Content moderation',
-                'Knowledge base management'
+                'Integration via Discourse API and Webhooks',
+                'Automated topic categorization',
+                'Knowledge management and FAQs',
+                'Community engagement tools'
             ]
         }
     ];
@@ -106,9 +106,9 @@ const Integrations: React.FC = () => {
                             <p className="text-gray-400 mb-4">{integration.description}</p>
                             <ul className="space-y-2">
                                 {integration.features.map((feature, featIndex) => (
-                                    <li key={featIndex} className="flex items-start gap-2 text-sm text-gray-300">
-                                        <span className="text-primary mt-1">•</span>
-                                        {feature}
+                                    <li key={featIndex} className="flex items-center gap-2 text-sm text-gray-300">
+                                        <span className="text-primary text-lg leading-none">•</span>
+                                        <span>{feature}</span>
                                     </li>
                                 ))}
                             </ul>
