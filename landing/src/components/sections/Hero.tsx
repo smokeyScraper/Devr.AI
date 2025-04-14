@@ -19,7 +19,8 @@ const Hero: React.FC = () => {
     };
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center pt-24 pb-36 overflow-hidden">
+        <section className="relative min-h-screen flex items-center justify-center pt-24 pb-0 overflow-hidden">
+            {/* Background elements */}
             <div className="absolute inset-0 pointer-events-none hidden md:block">
                 <div className="absolute inset-0 bg-gradient-to-br from-dark via-dark to-gray-900 opacity-90"></div>
 
@@ -55,6 +56,26 @@ const Hero: React.FC = () => {
                         AI-Powered <span className="gradient-text">Developer Relations</span> Assistant
                     </motion.h1>
 
+                    {/* Powered by AOSSIE - now placed in main content area */}
+                    <motion.div
+                        variants={item}
+                        className="mb-8 flex justify-center"
+                    >
+                        <a
+                            href="https://aossie.org/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 bg-dark/80 backdrop-blur-sm py-3 px-5 rounded-full hover:bg-dark-lighter transition-all border border-gray-800 group"
+                        >
+                            <span className="text-sm text-gray-300 group-hover:text-white">Powered by AOSSIE</span>
+                            <img
+                                src="/aossie_logo.png"
+                                alt="AOSSIE"
+                                className="h-7 w-auto"
+                            />
+                        </a>
+                    </motion.div>
+
                     <motion.div
                         variants={item}
                         className="mb-8"
@@ -66,7 +87,7 @@ const Hero: React.FC = () => {
 
                     <motion.p
                         variants={item}
-                        className="text-xl md:text-2xl text-gray-400 mb-10 max-w-4xl mx-auto"
+                        className="text-xl md:text-2xl text-gray-400 mb-6 max-w-4xl mx-auto"
                     >
                         Devr.AI revolutionizes open-source community management by automating engagement,
                         streamlining onboarding, and delivering real-time project updates across Discord,
@@ -74,7 +95,7 @@ const Hero: React.FC = () => {
                     </motion.p>
                     <motion.div
                         variants={item}
-                        className="flex flex-col sm:flex-row gap-5 justify-center mb-16"
+                        className="flex flex-col sm:flex-row gap-5 justify-center mb-6"
                     >
                         <a href="#waitlist" className="btn-primary flex items-center justify-center gap-2 text-lg py-4 px-8">
                             <Users size={20} />

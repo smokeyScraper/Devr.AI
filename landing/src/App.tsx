@@ -1,13 +1,9 @@
 import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Lenis from '@studio-freight/lenis';
-import Hero from './components/sections/Hero';
-import Features from './components/sections/Features';
-import HowItWorks from './components/sections/HowItWorks';
-import Integrations from './components/sections/Integrations';
-import Waitlist from './components/sections/Waitlist';
-import Footer from './components/layout/Footer';
-import Navbar from './components/layout/Navbar';
+import Landing from './pages/Landing';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
   useEffect(() => {
@@ -26,18 +22,14 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-dark">
-      <Navbar />
-      <main>
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <Integrations />
-        <Waitlist />
-      </main>
-      <Footer />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="*" element={<Landing />} />
+      </Routes>
       <Toaster position="top-right" />
-    </div>
+    </BrowserRouter>
   );
 }
 

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Github } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const location = useLocation();
+    const isHomePage = location.pathname === '/';
 
     useEffect(() => {
         const handleScroll = () => {
@@ -18,9 +21,9 @@ const Navbar: React.FC = () => {
     }, []);
 
     const navLinks = [
-        { name: 'Features', href: '#features' },
-        { name: 'How It Works', href: '#how-it-works' },
-        { name: 'Integrations', href: '#integrations' },
+        { name: 'Features', href: isHomePage ? '#features' : '/#features' },
+        { name: 'How It Works', href: isHomePage ? '#how-it-works' : '/#how-it-works' },
+        { name: 'Integrations', href: isHomePage ? '#integrations' : '/#integrations' },
     ];
 
     return (
@@ -35,9 +38,9 @@ const Navbar: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="flex items-center"
                     >
-                        <a href="#" className="flex items-center">
+                        <Link to="/" className="flex items-center">
                             <span className="text-2xl font-bold gradient-text">Devr.AI</span>
-                        </a>
+                        </Link>
                     </motion.div>
 
                     <motion.nav
@@ -64,7 +67,7 @@ const Navbar: React.FC = () => {
                             Contribute
                         </a>
                         <a
-                            href="#waitlist"
+                            href={isHomePage ? "#waitlist" : "/#waitlist"}
                             className="text-sm font-medium px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors"
                         >
                             Join Waitlist
@@ -110,7 +113,7 @@ const Navbar: React.FC = () => {
                         GitHub
                     </a>
                     <a
-                        href="#waitlist"
+                        href={isHomePage ? "#waitlist" : "/#waitlist"}
                         onClick={() => setIsOpen(false)}
                         className="block py-3 text-primary hover:text-primary-hover font-medium"
                     >

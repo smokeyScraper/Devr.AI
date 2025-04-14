@@ -60,14 +60,14 @@ const Features: React.FC = () => {
     };
 
     return (
-        <section id="features" className="section relative">
+        <section id="features" className="section pt-0 pb-12 md:pb-20 relative">
             <div className="container mx-auto px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
-                    className="text-center mb-16"
+                    className="text-center mb-10 md:mb-16"
                 >
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         Powerful <span className="gradient-text">Features</span>
