@@ -86,7 +86,7 @@ const HowItWorks: React.FC = () => {
                             className="relative"
                         >
                             <div className="flex gap-4 items-start">
-                                <div className={`relative p-3 rounded-lg bg-gradient-to-br ${step.color} text-white shadow-lg`}>
+                                <div className={`relative z-10 p-3 rounded-lg bg-gradient-to-br ${step.color} text-white shadow-lg`}>
                                     {step.icon}
                                 </div>
                                 <div>
@@ -95,23 +95,36 @@ const HowItWorks: React.FC = () => {
                                 </div>
                             </div>
 
-                            {index < steps.length - 2 && (
-                                <div className="hidden md:block">
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        whileInView={{ opacity: 1, height: '100%' }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 0.8, delay: 0.4 + index * 0.1 }}
-                                        className={`absolute top-[46px] left-6 w-px bg-gradient-to-b ${step.color} opacity-70`}
-                                        style={{ maxHeight: '120px' }}
-                                    />
-                                </div>
-                            )}
-
                             {index < steps.length - 1 && (
-                                <div className={`md:hidden absolute left-6 h-full`} style={{ top: '46px' }}>
-                                    <div className={`h-full w-px bg-gradient-to-b ${step.color} opacity-70`}></div>
-                                </div>
+                                <>
+                                    <div className="hidden md:block">
+                                        {step.title !== "Contributor Management" && step.title !== "Maintainer Support" && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                whileInView={{ opacity: 1, height: '100%' }}
+                                                viewport={{ once: true }}
+                                                transition={{ duration: 0.8, delay: 0.4 + index * 0.1 }}
+                                                className={`absolute top-[46px] left-[24px] w-px bg-gradient-to-b ${step.color} opacity-70`}
+                                                style={{ maxHeight: '120px', zIndex: 1 }}
+                                            />
+                                        )}
+
+                                        {step.title === "Knowledge Retrieval" && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                whileInView={{ opacity: 1, height: '100%' }}
+                                                viewport={{ once: true }}
+                                                transition={{ duration: 0.8, delay: 0.4 + index * 0.1 }}
+                                                className={`absolute top-[46px] left-[24px] w-px bg-gradient-to-b ${step.color} opacity-70`}
+                                                style={{ maxHeight: '120px', zIndex: 1 }}
+                                            />
+                                        )}
+                                    </div>
+
+                                    <div className="md:hidden absolute left-[24px] top-[46px] h-full">
+                                        <div className={`h-full w-px bg-gradient-to-b ${step.color} opacity-70`} style={{ zIndex: 1 }}></div>
+                                    </div>
+                                </>
                             )}
                         </motion.div>
                     ))}
