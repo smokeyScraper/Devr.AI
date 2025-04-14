@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
                             className="text-sm font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white border border-gray-700 transition-colors"
                         >
                             <Github size={16} />
-                            GitHub
+                            Contribute
                         </a>
                         <a
                             href="#waitlist"
