@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Lenis from '@studio-freight/lenis';
 import Landing from './pages/Landing';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 function App() {
   useEffect(() => {
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="*" element={<Landing />} />
       </Routes>
       <Toaster position="top-right" />

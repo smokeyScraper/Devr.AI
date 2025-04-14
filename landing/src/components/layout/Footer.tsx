@@ -45,10 +45,10 @@ const Footer: React.FC = () => {
                         <a href="https://github.com/AOSSIE-Org/Devr.AI/" className="text-gray-400 hover:text-primary" target='_blank' rel="noreferrer">
                             <Github size={20} />
                         </a>
-                        <a href="#" className="text-gray-400 hover:text-primary">
+                        <a href="https://x.com/aossie_org?lang=en" className="text-gray-400 hover:text-primary" target='_blank'>
                             <Twitter size={20} />
                         </a>
-                        <a href="#" className="text-gray-400 hover:text-primary">
+                        <a href="https://www.linkedin.com/company/aossie/?originalSubdomain=au" className="text-gray-400 hover:text-primary" target='_blank'>
                             <Linkedin size={20} />
                         </a>
                     </div>
