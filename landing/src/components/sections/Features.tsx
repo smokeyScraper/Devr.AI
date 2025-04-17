@@ -13,33 +13,33 @@ const Features: React.FC = () => {
     const features = [
         {
             icon: <Users size={24} />,
-            title: 'Contributor Engagement',
-            description: 'Automate onboarding for new contributors with personalized welcome messages and guidance through first contribution steps.'
+            title: 'Personalized Experience',
+            description: 'Context-aware recommendations, tailored notifications, and synchronized experience across all platforms including CLI and web widget.'
         },
         {
             icon: <GitPullRequest size={24} />,
-            title: 'Issue Triage & PR Assistance',
-            description: 'Automatically categorize issues, identify duplicates, and provide initial code review comments for PRs.'
+            title: 'Automated Issue Triage & PR Assistance',
+            description: 'AI-powered issue classification, duplicate detection, PR review suggestions, and contributor guidance.'
         },
         {
             icon: <BookOpen size={24} />,
-            title: 'Knowledge Base Automation',
-            description: 'Extract FAQs from conversations, maintain project wikis, and provide instant answers to common questions.'
+            title: 'Knowledge Base & FAQ Automation',
+            description: 'Dynamic documentation, code explanations, and instant answers with knowledge preservation.'
         },
         {
             icon: <BarChart3 size={24} />,
-            title: 'Community Analytics',
-            description: 'Track engagement metrics, analyze contribution patterns, and monitor community health across platforms.'
+            title: 'Advanced Community Analytics',
+            description: 'Real-time engagement metrics, contribution analysis, diversity tracking, and sentiment monitoring.'
         },
         {
             icon: <MessageSquareQuote size={24} />,
-            title: 'Multi-Platform Support',
-            description: 'Seamlessly integrate with Discord, Slack, GitHub, and Discourse to provide unified experiences.'
+            title: 'Multi-Platform & CLI Integration',
+            description: 'Unified experience across Discord, Slack, GitHub, Discourse, CLI, and web widget.'
         },
         {
             icon: <Code2 size={24} />,
-            title: 'Code Understanding',
-            description: 'Leverage AI to understand code context, provide meaningful suggestions, and assist with documentation.'
+            title: 'Technical Education & Advocacy',
+            description: 'Interactive tutorials, live code assistance, and contextual code explanations for all skill levels.'
         }
     ];
 

@@ -91,7 +91,8 @@ const Hero: React.FC = () => {
                     >
                         Devr.AI revolutionizes open-source community management by automating engagement,
                         streamlining onboarding, and delivering real-time project updates across Discord,
-                        Slack, GitHub, and more.
+                        Slack, GitHub, CLI, Web Widget, and more. <br />
+                        <span className="text-primary font-semibold">Personalized, multi-platform, and analytics-driven.</span>
                     </motion.p>
                     <motion.div
                         variants={item}
