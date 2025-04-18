@@ -76,15 +76,6 @@ const Hero: React.FC = () => {
                         </a>
                     </motion.div>
 
-                    <motion.div
-                        variants={item}
-                        className="mb-8"
-                    >
-                        <span className="inline-block px-6 py-3 bg-amber-500/20 text-amber-300 font-semibold text-lg rounded-md border border-amber-500/30 animate-pulse">
-                            Coming Soon — Join the Waitlist for Early Access
-                        </span>
-                    </motion.div>
-
                     <motion.p
                         variants={item}
                         className="text-xl md:text-2xl text-gray-400 mb-6 max-w-4xl mx-auto"

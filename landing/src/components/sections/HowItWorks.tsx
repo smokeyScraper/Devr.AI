@@ -388,10 +388,10 @@ const HowItWorks: React.FC = () => {
                             </div>
 
                             {/* AI Service Layer */}
-                            <SectionTitle title="AI Service Layer (Groq APIs)" color="text-blue-400" />
+                            <SectionTitle title="AI Service Layer" color="text-blue-400" />
                             {/* Desktop view - all 5 in one row */}
                             <div className="hidden md:grid md:grid-cols-5 gap-3">
-                                <TooltipBox tooltip="Large Language Model service powered by Groq for AI interactions.">
+                                <TooltipBox tooltip="Large Language Model service powered by LangChain for AI interactions.">
                                     <div className="bg-blue-900/40 border border-blue-500/60 rounded-lg p-4 text-center hover:border-blue-400 transition-colors shadow-md">
                                         <div className="flex justify-center mb-1">
                                             <Brain className="text-blue-400" size={20} />
@@ -436,7 +436,7 @@ const HowItWorks: React.FC = () => {
                             {/* Mobile view - split into two rows (3+2) */}
                             <div className="md:hidden">
                                 <div className="grid grid-cols-3 gap-2 mb-2">
-                                    <TooltipBox tooltip="Large Language Model service powered by Groq for AI interactions.">
+                                    <TooltipBox tooltip="Large Language Model service powered by LangChain for AI interactions.">
                                         <div className="bg-blue-900/40 border border-blue-500/60 rounded-lg p-2 text-center hover:border-blue-400 transition-colors shadow-md">
                                             <div className="flex justify-center mb-1">
                                                 <Brain className="text-blue-400" size={16} />
