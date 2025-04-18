@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Github, MessageSquare, Slack, MessageCircle } from 'lucide-react';
+import { Github, MessageSquare, Slack, MessageCircle, Code2, BookOpen } from 'lucide-react';
 
 const Integrations: React.FC = () => {
     const integrations = [
@@ -46,6 +46,28 @@ const Integrations: React.FC = () => {
                 'Automated topic categorization',
                 'Knowledge management and FAQs',
                 'Community engagement tools'
+            ]
+        },
+        {
+            icon: <Code2 size={28} />,
+            name: 'CLI',
+            description: 'Command-line interface for direct access to documentation, tutorials, and project health checks.',
+            features: [
+                'API key authentication',
+                'Interactive tutorials and guided workflows',
+                'Local environment setup assistance',
+                'Contextual help based on current project'
+            ]
+        },
+        {
+            icon: <BookOpen size={28} />,
+            name: 'Web Widget',
+            description: 'Embeddable widget for documentation search, contextual help, and onboarding on your website.',
+            features: [
+                'Easy snippet integration',
+                'Customizable appearance and behavior',
+                'Documentation search and contextual help',
+                'Analytics for common queries'
             ]
         }
     ];
