@@ -56,26 +56,6 @@ const Hero: React.FC = () => {
                         AI-Powered <span className="gradient-text">Developer Relations</span> Assistant
                     </motion.h1>
 
-                    {/* Powered by AOSSIE - now placed in main content area */}
-                    <motion.div
-                        variants={item}
-                        className="mb-8 flex justify-center"
-                    >
-                        <a
-                            href="https://aossie.org/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 bg-dark/80 backdrop-blur-sm py-3 px-5 rounded-full hover:bg-dark-lighter transition-all border border-gray-800 group"
-                        >
-                            <span className="text-sm text-gray-300 group-hover:text-white">Powered by AOSSIE</span>
-                            <img
-                                src="/aossie_logo.png"
-                                alt="AOSSIE"
-                                className="h-7 w-auto"
-                            />
-                        </a>
-                    </motion.div>
-
                     <motion.p
                         variants={item}
                         className="text-xl md:text-2xl text-gray-400 mb-6 max-w-4xl mx-auto"
