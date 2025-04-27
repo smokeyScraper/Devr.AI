@@ -94,16 +94,6 @@ const Navbar: React.FC = () => {
                         </a>
                     ))}
                     <a
-                        href="https://github.com/AOSSIE-Org/Devr.AI/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 py-3 text-gray-300 hover:text-white"
-                    >
-                        <Github size={18} />
-                        GitHub
-                    </a>
-                    <a
                         href={isHomePage ? "#waitlist" : "/#waitlist"}
                         onClick={() => setIsOpen(false)}
                         className="block py-3 text-primary hover:text-primary-hover font-medium"
