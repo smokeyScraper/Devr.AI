@@ -58,15 +58,6 @@ const Navbar: React.FC = () => {
                             </a>
                         ))}
                         <a
-                            href="https://github.com/AOSSIE-Org/Devr.AI/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white border border-gray-700 transition-colors"
-                        >
-                            <Github size={16} />
-                            Contribute
-                        </a>
-                        <a
                             href={isHomePage ? "#waitlist" : "/#waitlist"}
                             className="text-sm font-medium px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors"
                         >
