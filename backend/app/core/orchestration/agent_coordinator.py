@@ -2,7 +2,8 @@ import logging
 import uuid
 from typing import Dict, Any
 from app.agents.devrel.agent import DevRelAgent
-from app.agents.github.agent import GitHubAgent
+# TODO: Implement GitHub agent
+# from app.agents.github.agent import GitHubAgent
 from app.agents.shared.base_agent import AgentState
 from app.core.orchestration.queue_manager import AsyncQueueManager
 
@@ -14,7 +15,7 @@ class AgentCoordinator:
     def __init__(self, queue_manager: AsyncQueueManager):
         self.queue_manager = queue_manager
         self.devrel_agent = DevRelAgent()
-        self.github_agent = GitHubAgent()
+        # self.github_agent = GitHubAgent()
         self.active_sessions: Dict[str, AgentState] = {}
 
         # Register handlers
@@ -23,7 +24,8 @@ class AgentCoordinator:
     def _register_handlers(self):
         """Register message handlers"""
         self.queue_manager.register_handler("devrel_request", self._handle_devrel_request)
-        self.queue_manager.register_handler("github_request", self._handle_github_request)
+        # TODO: Register GitHub agent handler after implementation
+        # self.queue_manager.register_handler("github_request", self._handle_github_request)
 
     async def _handle_devrel_request(self, message_data: Dict[str, Any]):
         """Handle DevRel agent requests"""
@@ -56,30 +58,31 @@ class AgentCoordinator:
             logger.error(f"Error handling DevRel request: {str(e)}")
             await self._send_error_response(message_data, "I'm having trouble processing your request. Please try again.")
 
-    async def _handle_github_request(self, message_data: Dict[str, Any]):
-        """Handle GitHub agent requests"""
-        try:
-            # Implementation for GitHub agent
-            session_id = str(uuid.uuid4())
+    # TODO: Implement GitHub agent
+    # async def _handle_github_request(self, message_data: Dict[str, Any]):
+    #     """Handle GitHub agent requests"""
+    #     try:
+    #         # Implementation for GitHub agent
+    #         session_id = str(uuid.uuid4())
 
-            initial_state = AgentState(
-                session_id=session_id,
-                user_id=message_data.get("user_id", ""),
-                platform="github",
-                context={
-                    "github_event": message_data.get("github_event", {}),
-                    "event_type": message_data.get("event_type", "")
-                }
-            )
+    #         initial_state = AgentState(
+    #             session_id=session_id,
+    #             user_id=message_data.get("user_id", ""),
+    #             platform="github",
+    #             context={
+    #                 "github_event": message_data.get("github_event", {}),
+    #                 "event_type": message_data.get("event_type", "")
+    #             }
+    #         )
 
-            # Run GitHub agent
-            logger.info(f"Running GitHub agent for session {session_id}")
-            result_state = await self.github_agent.run(initial_state)
+    #         # Run GitHub agent
+    #         logger.info(f"Running GitHub agent for session {session_id}")
+    #         result_state = await self.github_agent.run(initial_state)
 
-            logger.info(f"GitHub agent completed for session {session_id}")
+    #         logger.info(f"GitHub agent completed for session {session_id}")
 
-        except Exception as e:
-            logger.error(f"Error handling GitHub request: {str(e)}")
+    #     except Exception as e:
+    #         logger.error(f"Error handling GitHub request: {str(e)}")
 
     async def _send_response_to_platform(self, original_message: Dict[str, Any], response: str):
         """Send agent response back to the originating platform"""
