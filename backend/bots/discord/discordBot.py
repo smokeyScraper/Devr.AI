@@ -44,6 +44,7 @@ class DiscordBot(commands.Bot):
             return
 
         # Skip if message is a command (starts with !)
+        # TODO: Add support for commands
         if message.content.startswith('!'):
             await self.process_commands(message)
             return
@@ -69,6 +70,7 @@ class DiscordBot(commands.Bot):
             logger.error(f"Error processing message: {str(e)}")
 
         # Process commands
+        # TODO: Add support for commands preferably role based commands
         await self.process_commands(message)
 
     async def _handle_devrel_message(self, message, classification: Dict[str, Any]):
