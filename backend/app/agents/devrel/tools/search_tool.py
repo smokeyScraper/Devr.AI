@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import List, Dict, Any
 from tavily import TavilyClient
@@ -18,7 +19,8 @@ class TavilySearchTool:
                 logger.warning("Tavily API key not configured")
                 return []
 
-            response = self.client.search(
+            response = await asyncio.to_thread(
+                self.client.search,
                 query=query,
                 search_depth="basic",
                 max_results=max_results
@@ -33,9 +35,16 @@ class TavilySearchTool:
                     "score": result.get("score", 0)
                 })
 
-            logger.info(f"Search for '{query}' returned {len(results)} results")
+            logger.info(
+                "Search for '%s' returned %d results",
+                query,
+                len(results)
+            )
             return results
 
-        except Exception as e:
-            logger.error(f"Error performing search: {str(e)}")
+        except AttributeError as e:
+            logger.error("Tavily client not initialized: %s", str(e))
+            return []
+        except (ConnectionError, TimeoutError) as e:
+            logger.error("Network error during search: %s", str(e))
             return []
