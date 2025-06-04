@@ -87,8 +87,11 @@ class AsyncQueueManager:
             except asyncio.CancelledError:
                 logger.info(f"Worker {worker_name} cancelled")
                 break
+            except (ConnectionError, TimeoutError) as e:
+                logger.error(f"Connection error in worker {worker_name}: {str(e)}")
+                await asyncio.sleep(5)  # Longer pause for connection issues
             except Exception as e:
-                logger.error(f"Error in worker {worker_name}: {str(e)}")
+                logger.error(f"Unexpected error in worker {worker_name}: {str(e)}")
                 await asyncio.sleep(1)  # Brief pause on error
 
     async def _get_next_item(self) -> Optional[Dict[str, Any]]:

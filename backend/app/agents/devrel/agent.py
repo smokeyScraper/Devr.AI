@@ -4,7 +4,7 @@ from langgraph.graph import StateGraph, END
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from ..shared.base_agent import BaseAgent, AgentState
-from ..shared.classification_router import MessageCategory
+from ..shared.classification_router import MessageCategory, ClassificationRouter
 from .tools.search_tool import TavilySearchTool
 from .tools.faq_tool import FAQTool
 from app.core.config import settings
@@ -75,7 +75,6 @@ class DevRelAgent(BaseAgent):
             latest_message = state.context["original_message"]
 
         # Use classification router
-        from ..shared.classification_router import ClassificationRouter
         router = ClassificationRouter(self.llm)
 
         classification = await router.classify_message(latest_message, state.context)

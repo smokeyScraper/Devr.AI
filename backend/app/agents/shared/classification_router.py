@@ -31,7 +31,7 @@ class ClassificationRouter:
 
     def __init__(self, llm_client=None):
         self.llm = llm_client or ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model=settings.classification_agent_model,
             temperature=0.1,
             google_api_key=settings.gemini_api_key
         )
@@ -169,14 +169,13 @@ class ClassificationRouter:
                 json_str = response[json_start:json_end]
                 parsed = json.loads(json_str)
                 return parsed
-            else:
-                raise ValueError("No JSON found in response")
+            raise ValueError("No JSON found in response")
 
         except Exception as e:
             logger.error(f"Error parsing LLM response: {str(e)}")
             return self._fallback_classification(original_message)
 
-    def _fallback_classification(self, message: str) -> Dict[str, Any]:
+    def _fallback_classification(self, original_message: str) -> Dict[str, Any]:
         """Fallback classification when other methods fail"""
         return {
             "category": MessageCategory.TECHNICAL_SUPPORT,
@@ -185,5 +184,5 @@ class ClassificationRouter:
             "suggested_agent": "devrel",
             "priority": "low",
             "confidence": 0.5,
-            "reasoning": "Fallback classification"
+            "reasoning": "Fallback classification for message: {original_message[:50]}..."
         }

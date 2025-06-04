@@ -36,7 +36,7 @@ class AgentState(BaseModel):
     # Error handling
     errors: List[str] = Field(default_factory=list)
     retry_count: int = 0
-    max_retries: int = 3
+    max_retries: int = Field(default=3)
 
     # Response
     final_response: Optional[str] = None
@@ -60,11 +60,15 @@ class BaseAgent:
     async def run(self, initial_state: AgentState) -> AgentState:
         """Execute the agent workflow"""
         try:
-            logger.info(f"Starting {self.agent_name} for session {initial_state.session_id}")
+            logger.info("Starting %s for session %s", self.agent_name, initial_state.session_id)
             result = await self.graph.ainvoke(initial_state.model_dump())
             return AgentState(**result)
+        except AttributeError as e:
+            logger.error("Graph not properly initialized for %s: %s", self.agent_name, str(e))
+            initial_state.errors.append(f"Agent initialization error: {str(e)}")
+            return initial_state
         except Exception as e:
-            logger.error(f"Error in {self.agent_name}: {str(e)}")
+            logger.error("Error in %s: %s", self.agent_name, str(e))
             initial_state.errors.append(str(e))
             return initial_state
 

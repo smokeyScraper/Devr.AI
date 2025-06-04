@@ -5,7 +5,7 @@ import signal
 from app.core.config import settings
 from app.core.orchestration.queue_manager import AsyncQueueManager
 from app.core.orchestration.agent_coordinator import AgentCoordinator
-from bots.discord.discordBot import DiscordBot
+from bots.discord.discord_bot import DiscordBot
 
 # Configure logging
 logging.basicConfig(
@@ -69,12 +69,14 @@ async def main():
     """Main entry point"""
 
     # Setup signal handlers for graceful shutdown
-    def signal_handler(signum, frame):
-        logger.info(f"Received signal {signum}")
-        asyncio.create_task(app.stop())
+    loop = asyncio.get_running_loop()
 
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+    def signal_handler(signum):
+        logger.info(f"Received signal {signum}")
+        loop.create_task(app.stop())
+
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, lambda s=sig: signal_handler(s), sig)
 
     try:
         await app.start()
@@ -87,7 +89,7 @@ async def main():
 
 if __name__ == "__main__":
     # Check required environment variables
-    required_vars = ["DISCORD_BOT_TOKEN", "GEMINI_API_KEY"]
+    required_vars = ["DISCORD_BOT_TOKEN", "GEMINI_API_KEY", "TAVILY_API_KEY"]
     missing_vars = [var for var in required_vars if not os.getenv(var)]
 
     if missing_vars:
