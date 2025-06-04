@@ -69,10 +69,6 @@ class DiscordBot(commands.Bot):
         except Exception as e:
             logger.error(f"Error processing message: {str(e)}")
 
-        # Process commands
-        # TODO: Add support for commands preferably role based commands
-        await self.process_commands(message)
-
     async def _handle_devrel_message(self, message, classification: Dict[str, Any]):
         """Handle messages that need DevRel intervention"""
         try:
