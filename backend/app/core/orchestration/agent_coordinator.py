@@ -4,7 +4,7 @@ from typing import Dict, Any
 from app.agents.devrel.agent import DevRelAgent
 # TODO: Implement GitHub agent
 # from app.agents.github.agent import GitHubAgent
-from app.agents.shared.base_agent import AgentState
+from app.agents.shared.state import AgentState
 from app.core.orchestration.queue_manager import AsyncQueueManager
 
 logger = logging.getLogger(__name__)
