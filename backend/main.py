@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import signal
+import sys
 from app.core.config import settings
 from app.core.orchestration.queue_manager import AsyncQueueManager
 from app.core.orchestration.agent_coordinator import AgentCoordinator
@@ -53,8 +54,11 @@ class DevRAIApplication:
         self.running = False
 
         # Stop Discord bot
-        if not self.discord_bot.is_closed():
-            await self.discord_bot.close()
+        try:
+            if not self.discord_bot.is_closed():
+                await self.discord_bot.close()
+        except Exception as e:
+            logger.error(f"Error closing Discord bot: {str(e)}")
 
         # Stop queue manager
         await self.queue_manager.stop()
@@ -94,7 +98,7 @@ if __name__ == "__main__":
 
     if missing_vars:
         logger.error(f"Missing required environment variables: {missing_vars}")
-        exit(1)
+        sys.exit(1)
 
     # Run the application
     asyncio.run(main())
