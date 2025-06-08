@@ -1,10 +1,11 @@
-from typing import Dict, Any
+from typing import Dict, Any, AsyncGenerator
+from abc import ABC, abstractmethod
 import logging
 from .state import AgentState
 
 logger = logging.getLogger(__name__)
 
-class BaseAgent:
+class BaseAgent(ABC):
     """Base class for all LangGraph agents"""
 
     def __init__(self, agent_name: str, config: Dict[str, Any]):
@@ -13,9 +14,10 @@ class BaseAgent:
         self.graph = None
         self._build_graph()
 
+    @abstractmethod
     def _build_graph(self):
         """Build the LangGraph workflow - to be implemented by subclasses"""
-        raise NotImplementedError("Subclasses must implement _build_graph")
+        pass
 
     async def run(self, initial_state: AgentState) -> AgentState:
         """Execute the agent workflow"""
@@ -25,14 +27,22 @@ class BaseAgent:
             return AgentState(**result)
         except AttributeError as e:
             logger.error("Graph not properly initialized for %s: %s", self.agent_name, str(e))
-            initial_state.errors.append(f"Agent initialization error: {str(e)}")
-            return initial_state
+            state_dict = initial_state.model_dump()
+            state_dict['errors'].append(f"Agent initialization error: {str(e)}")
+            return AgentState(**state_dict)
         except Exception as e:
             logger.error("Error in %s: %s", self.agent_name, str(e))
-            initial_state.errors.append(str(e))
-            return initial_state
+            state_dict = initial_state.model_dump()
+            state_dict['errors'].append(str(e))
+            return AgentState(**state_dict)
 
-    async def stream_run(self, initial_state: AgentState):
+    async def stream_run(self, initial_state: AgentState) -> AsyncGenerator[Dict[str, Any], None]:
         """Stream the agent execution for real-time updates"""
-        async for step in self.graph.astream(initial_state.model_dump()):
-            yield step
+        try:
+            if not self.graph:
+                raise AttributeError("Graph not properly initialized")
+            async for step in self.graph.astream(initial_state.model_dump()):
+                yield step
+        except Exception as e:
+            logger.error("Error in %s stream: %s", self.agent_name, str(e))
+            yield {"error": str(e)}
