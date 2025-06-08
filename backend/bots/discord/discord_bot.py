@@ -95,12 +95,12 @@ class DiscordBot(commands.Bot):
             }
 
             # Determine priority based on classification
-            priority = {
+            priority_map = {
                 "high": QueuePriority.HIGH,
                 "medium": QueuePriority.MEDIUM,
                 "low": QueuePriority.LOW
             }
-            priority = priority.get(classification.get("priority"), QueuePriority.MEDIUM)
+            priority = priority_map.get(classification.get("priority"), QueuePriority.MEDIUM)
 
             # Enqueue for agent processing
             await self.queue_manager.enqueue(agent_message, priority)
@@ -125,6 +125,9 @@ class DiscordBot(commands.Bot):
                 # Verify thread still exists and is active
                 if thread and not thread.archived:
                     return thread_id
+                else:
+                    del self.active_threads[user_id]
+                    logger.info(f"Cleaned up archived thread for user {user_id}")
 
             # Create new thread
             thread_name = f"DevRel Chat - {message.author.display_name}"
