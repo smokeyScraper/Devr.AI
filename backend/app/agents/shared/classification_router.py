@@ -168,7 +168,25 @@ class ClassificationRouter:
             if json_start != -1 and json_end != -1:
                 json_str = response[json_start:json_end]
                 parsed = json.loads(json_str)
+                if "category" in parsed:
+                    category_str = parsed["category"].lower()
+                    try:
+                        category_mapping = {
+                            "faq": MessageCategory.FAQ,
+                            "web_search": MessageCategory.WEB_SEARCH,
+                            "onboarding": MessageCategory.ONBOARDING,
+                            "technical_support": MessageCategory.TECHNICAL_SUPPORT,
+                            "community_engagement": MessageCategory.COMMUNITY_ENGAGEMENT,
+                            "documentation": MessageCategory.DOCUMENTATION,
+                            "bug_report": MessageCategory.BUG_REPORT,
+                            "feature_request": MessageCategory.FEATURE_REQUEST,
+                            "not_devrel": MessageCategory.NOT_DEVREL
+                        }
+                        parsed["category"] = category_mapping.get(category_str, MessageCategory.TECHNICAL_SUPPORT)
+                    except (KeyError, AttributeError):
+                        parsed["category"] = MessageCategory.TECHNICAL_SUPPORT
                 return parsed
+
             raise ValueError("No JSON found in response")
 
         except Exception as e:
@@ -184,5 +202,5 @@ class ClassificationRouter:
             "suggested_agent": "devrel",
             "priority": "low",
             "confidence": 0.5,
-            "reasoning": "Fallback classification for message: {original_message[:50]}..."
+            "reasoning": f"Fallback classification for message: {original_message[:50]}..."
         }

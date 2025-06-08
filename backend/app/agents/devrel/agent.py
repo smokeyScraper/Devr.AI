@@ -8,7 +8,6 @@ from ..shared.classification_router import MessageCategory
 from .tools.search_tool import TavilySearchTool
 from .tools.faq_tool import FAQTool
 from app.core.config import settings
-from .nodes.classify_intent_node import classify_intent_node
 from .nodes.gather_context_node import gather_context_node
 from .nodes.handle_faq_node import handle_faq_node
 from .nodes.handle_web_search_node import handle_web_search_node
@@ -37,7 +36,6 @@ class DevRelAgent(BaseAgent):
         workflow = StateGraph(AgentState)
 
         # Add nodes
-        workflow.add_node("classify_intent", partial(classify_intent_node, llm=self.llm))
         workflow.add_node("gather_context", gather_context_node)
         workflow.add_node("handle_faq", partial(handle_faq_node, faq_tool=self.faq_tool))
         workflow.add_node("handle_web_search", partial(
@@ -47,7 +45,6 @@ class DevRelAgent(BaseAgent):
         workflow.add_node("generate_response", partial(generate_response_node, llm=self.llm))
 
         # Add edges
-        workflow.add_edge("classify_intent", "gather_context")
         workflow.add_conditional_edges(
             "gather_context",
             self._route_to_handler,
@@ -60,7 +57,7 @@ class DevRelAgent(BaseAgent):
                 MessageCategory.DOCUMENTATION: "handle_technical_support",
                 MessageCategory.BUG_REPORT: "handle_technical_support",
                 MessageCategory.FEATURE_REQUEST: "handle_technical_support",
-                "default": "handle_technical_support"
+                MessageCategory.NOT_DEVREL: "handle_technical_support"
             }
         )
 
@@ -71,25 +68,33 @@ class DevRelAgent(BaseAgent):
         workflow.add_edge("generate_response", END)
 
         # Set entry point
-        workflow.set_entry_point("classify_intent")
+        workflow.set_entry_point("gather_context")
 
         self.graph = workflow.compile()
 
     def _route_to_handler(self, state: AgentState) -> str:
         """Route to the appropriate handler based on intent"""
-        intent = state.context.get("intent", MessageCategory.TECHNICAL_SUPPORT)
+        classification = state.context.get("classification", {})
+        intent = classification.get("category")
+
+        if isinstance(intent, str):
+            try:
+                intent = MessageCategory(intent.lower())
+            except ValueError:
+                logger.warning(f"Unknown intent string '{intent}', defaulting to TECHNICAL_SUPPORT")
+                intent = MessageCategory.TECHNICAL_SUPPORT
+
         logger.info(f"Routing based on intent: {intent} for session {state.session_id}")
 
         # Mapping from MessageCategory enum to string keys used in add_conditional_edges
-        route_map = {
-            MessageCategory.FAQ: "faq",
-            MessageCategory.WEB_SEARCH: "web_search",
-            MessageCategory.ONBOARDING: "onboarding",
-            MessageCategory.TECHNICAL_SUPPORT: "technical_support",
-            MessageCategory.COMMUNITY_ENGAGEMENT: "technical_support",
-            MessageCategory.DOCUMENTATION: "technical_support",
-            MessageCategory.BUG_REPORT: "technical_support",
-            MessageCategory.FEATURE_REQUEST: "technical_support"
-        }
+        if intent in [MessageCategory.FAQ, MessageCategory.WEB_SEARCH,
+                      MessageCategory.ONBOARDING, MessageCategory.TECHNICAL_SUPPORT,
+                      MessageCategory.COMMUNITY_ENGAGEMENT, MessageCategory.DOCUMENTATION,
+                      MessageCategory.BUG_REPORT, MessageCategory.FEATURE_REQUEST,
+                      MessageCategory.NOT_DEVREL]:
+            logger.info(f"Routing to handler for: {intent}")
+            return intent
 
-        return route_map.get(intent, "technical_support")
+        # Later to be changed to handle anomalies
+        logger.info(f"Unknown intent '{intent}', routing to technical support")
+        return MessageCategory.TECHNICAL_SUPPORT

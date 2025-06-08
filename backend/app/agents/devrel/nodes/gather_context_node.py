@@ -1,5 +1,6 @@
 import logging
 from app.agents.shared.state import AgentState
+from app.agents.shared.classification_router import MessageCategory
 
 logger = logging.getLogger(__name__)
 
