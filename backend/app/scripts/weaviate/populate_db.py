@@ -2,7 +2,6 @@ from app.db.weaviate.weaviate_client import get_client
 
 
 async def populate_Weaviate_code_chunk(client):
-    weaviate_code_chunk = client.collections.get("weaviate_code_chunk")
     code_chunks = [
         {
             "supabaseChunkId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
@@ -94,11 +93,17 @@ async def populate_Weaviate_code_chunk(client):
             "functionNames": ["function"]
         }
     ]
-    response = await weaviate_code_chunk.data.insert_many(code_chunks)
-    print(response)
-    print("Populated: weaviate_code_chunk with sample data.")
+    try:
+        with client.batch.dynamic() as batch:
+            for chunk in code_chunks:
+                batch.add_object(
+                    collection="weaviate_code_chunk",
+                    properties=chunk
+                )
+        print("Populated: weaviate_code_chunk with sample data.")
+    except Exception as e:
+        print(f"Error populating weaviate_code_chunk: {e}")
 async def populate_Weaviate_interaction(client):
-    weaviate_interaction = client.collections.get("weaviate_interaction")
     interactions = [
         {
             "userId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
@@ -151,11 +156,17 @@ async def populate_Weaviate_interaction(client):
             "timestamp": "2023-01-01T12:09:00Z"
         }
     ]
-    response = await weaviate_interaction.data.insert_many(interactions)
-    print(response)
-    print("Populated: weaviate_interaction with sample data.")
+    try:
+        with client.batch.dynamic() as batch:
+            for interaction in interactions:
+                batch.add_object(
+                    collection="weaviate_interaction",
+                    properties=interaction
+                )
+        print("Populated: weaviate_interaction with sample data.")
+    except Exception as e:
+        print(f"Error populating weaviate_interaction: {e}")
 async def populate_Weaviate_user_profile(client):
-    weaviate_user_profile = client.collections.get("weaviate_user_profile")
     user_profiles = [
         {
             "supabaseUserId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
@@ -218,9 +229,16 @@ async def populate_Weaviate_user_profile(client):
             "expertiseAreas": ["Frontend", "User Experience"]
         }
     ]
-    response = await weaviate_user_profile.data.insert_many(user_profiles)
-    print(response)
-    print("Populated: weaviate_user_profile with sample data.")
+    try:
+        with client.batch.dynamic() as batch:
+            for profile in user_profiles:
+                batch.add_object(
+                    collection="weaviate_user_profile",
+                    properties=profile
+                )
+        print("Populated: weaviate_user_profile with sample data.")
+    except Exception as e:
+        print(f"Error populating weaviate_user_profile: {e}")
 async def populate_all_collections():
     client = get_client()
     print("Populating Weaviate collections with sample data...")

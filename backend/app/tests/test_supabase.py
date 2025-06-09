@@ -1,11 +1,9 @@
 from app.model.supabase.models import User, Interaction, CodeChunk, Repository
 from uuid import uuid4
-from app.db.weaviate.weaviate_client import get_client
+from app.db.supabase.supabase_client import get_supabase_client
 from datetime import datetime  # Your User model import
 
-client = get_client()
-
-client = get_client()
+client = get_supabase_client()
 
 def insert_user_into_supabase(user: User):
     # Convert Pydantic User model to dict to send to Supabase

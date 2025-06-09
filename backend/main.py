@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.core.orchestration.queue_manager import AsyncQueueManager
 from app.core.orchestration.agent_coordinator import AgentCoordinator
 from bots.discord.discord_bot import DiscordBot
+from app.db.weaviate.weaviate_client import get_client
 
 # Configure logging
 logging.basicConfig(
@@ -17,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 class DevRAIApplication:
     """Main application class"""
+    weaviate_client = get_client()
+    print(f"Weaviate client initialized: {weaviate_client.is_ready()}")
 
     def __init__(self):
         self.queue_manager = AsyncQueueManager()
@@ -71,7 +74,6 @@ app = DevRAIApplication()
 
 async def main():
     """Main entry point"""
-
     # Setup signal handlers for graceful shutdown
     loop = asyncio.get_running_loop()
 
