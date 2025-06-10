@@ -112,7 +112,7 @@ def test_user():
     print(f"Deleted User: {deleted_user}")
 
 
-def insert_Intercation(interaction: Interaction):
+def insert_interaction(interaction: Interaction):
     interaction_dict = interaction.dict()
     for key in ['created_at', 'updated_at']:
         if interaction_dict.get(key):
@@ -157,7 +157,7 @@ def test_interaction():
         platform_specific_id="gh-interaction-5678",
         weaviate_interaction_id="weaviate-interaction-1234"
     )
-    inserted_interaction = insert_Intercation(interaction)
+    inserted_interaction = insert_interaction(interaction)
     print(f"Inserted Interaction: {inserted_interaction}")
     get_interaction = read_interaction_by_id(inserted_interaction['id'])
     print(f"Fetched Interaction: {get_interaction}")
@@ -168,7 +168,7 @@ def test_interaction():
 
 def insert_code_chunk(code_chunk: CodeChunk):
     code_chunk_dict = code_chunk.dict()
-    for key in ['created_at', 'lines_start', 'lines_end']:
+    for key in ['created_at']:
         if code_chunk_dict.get(key):
             code_chunk_dict[key] = code_chunk_dict[key].isoformat()
 

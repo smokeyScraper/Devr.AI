@@ -32,8 +32,10 @@ def insert_user_profile():
             class_name="Weaviate_user_profile"
         )
         print("User profile inserted successfully.")
+        return user_profile
     except Exception as e:
         print(f"Error inserting user profile: {e}")
+        return None
 
 
 def get_user_profile_by_id(user_id: str):
@@ -62,10 +64,13 @@ def update_user_profile(user_id: str):
             user_profile[0]["profileSummary"] = "Updated profile summary"
             questions.update(user_profile[0])
             print("User profile updated successfully.")
+            return user_profile[0]
         else:
             print("User profile not found.")
+            return None
     except Exception as e:
         print(f"Error updating user profile: {e}")
+        return None
 
 def delete_user_profile(user_id: str):
     questions = get_client().collections.get("Weaviate_user_profile")
@@ -73,10 +78,13 @@ def delete_user_profile(user_id: str):
         deleted = questions.data.delete_by_id(user_id)
         if deleted:
             print("User profile deleted successfully.")
+            return True
         else:
             print("User profile not found.")
+            return False
     except Exception as e:
         print(f"Error deleting user profile: {e}")
+        return False
 
 def test_user_profile():
     inserted_user = insert_user_profile()
@@ -101,8 +109,10 @@ def insert_code_chunk():
             class_name="Weaviate_code_chunk"
         )
         print("Code chunk inserted successfully.")
+        return code_chunk
     except Exception as e:
         print(f"Error inserting code chunk: {e}")
+        return None
 def get_code_chunk_by_id(code_chunk_id: str):
     client = get_client()
     try:
@@ -129,10 +139,13 @@ def update_code_chunk(code_chunk_id: str):
                 class_name="Weaviate_code_chunk"
             )
             print("Code chunk updated successfully.")
+            return WeaviateCodeChunk(**code_chunk)
         else:
             print("Code chunk not found.")
+            return None
     except Exception as e:
         print(f"Error updating code chunk: {e}")
+        return None
 def delete_code_chunk(code_chunk_id: str):
     client = get_client()
     try:
@@ -142,10 +155,13 @@ def delete_code_chunk(code_chunk_id: str):
         )
         if deleted:
             print("Code chunk deleted successfully.")
+            return True
         else:
             print("Code chunk not found.")
+            return False
     except Exception as e:
         print(f"Error deleting code chunk: {e}")
+        return False
 def test_code_chunk():
     inserted_chunk = insert_code_chunk()
     assert inserted_chunk is not None, "Code chunk insertion failed"
@@ -167,8 +183,11 @@ def insert_interaction():
             class_name="Weaviate_interaction"
         )
         print("Interaction inserted successfully.")
+        return interaction
     except Exception as e:
         print(f"Error inserting interaction: {e}")
+        return None
+
 def get_interaction_by_id(interaction_id: str):
     client = get_client()
     try:
@@ -195,10 +214,13 @@ def update_interaction(interaction_id: str):
                 class_name="Weaviate_interaction"
             )
             print("Interaction updated successfully.")
+            return WeaviateInteraction(**interaction)
         else:
             print("Interaction not found.")
+            return None
     except Exception as e:
         print(f"Error updating interaction: {e}")
+        return None
 def delete_interaction(interaction_id: str):
     client = get_client()
     try:
@@ -208,10 +230,13 @@ def delete_interaction(interaction_id: str):
         )
         if deleted:
             print("Interaction deleted successfully.")
+            return True
         else:
             print("Interaction not found.")
+            return False
     except Exception as e:
         print(f"Error deleting interaction: {e}")
+        return False
 
 def test_interaction():
     inserted_interaction = insert_interaction()

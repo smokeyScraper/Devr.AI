@@ -1,24 +1,28 @@
 from app.db.supabase.supabase_client import supabase_client
+import os
+async def login_with_oauth(provider: str):
+    try:
+        result = supabase_client.auth.sign_in_with_oauth({
+            "provider": provider,
+            "options": {
+                "redirect_to": os.getenv("SUPABASE_REDIRECT_URL")
+            }
+        })
+        return {"url": result.url}
+    except Exception as e:
+        raise Exception(f"OAuth login failed for {provider}: {str(e)}")
+
 
 async def login_with_github():
-    result = supabase_client.auth.sign_in_with_oauth({
-        "provider": "github",
-        "options": {
-            "redirect_to": "http://localhost:3000/home"
-        }
-    })
-    return {"url": result.url}
+    return await login_with_oauth("github")
 
 async def login_with_discord():
-    result = supabase_client.auth.sign_in_with_oauth({
-        "provider": "discord",
-        "options": {
-            "redirect_to": "http://localhost:3000/home"
-        }
-    })
-    return {"url": result.url}
+    return await login_with_oauth("discord")
 
 async def logout(access_token: str):
-    supabase_client.auth.set_session(access_token, refresh_token="")
-    supabase_client.auth.sign_out()
-    return {"message": "User logged out successfully"}
+    try:
+        supabase_client.auth.set_session(access_token, refresh_token="")
+        supabase_client.auth.sign_out()
+        return {"message": "User logged out successfully"}
+    except Exception as e:
+        raise Exception(f"Logout failed: {str(e)}")

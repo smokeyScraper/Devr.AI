@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
 from typing import Optional, List
 from datetime import datetime
@@ -52,13 +52,13 @@ class User(BaseModel):
     is_verified: bool = False
     verification_token: Optional[str] = None
     verified_at: Optional[datetime] = None
-    skills: Optional[List[str]] = []
-    github_stats: Optional[dict] = {}
+    skills: Optional[List[str]] = None
+    github_stats: Optional[dict] = None
     last_active_discord: Optional[datetime] = None
     last_active_github: Optional[datetime] = None
     last_active_slack: Optional[datetime] = None
     total_interactions_count: int = 0
-    preferred_languages: List[str] = []
+    preferred_languages: List[str] = Field(default_factory=list)
     weaviate_user_id: Optional[str] = None
 
 class Repository(BaseModel):
@@ -99,7 +99,7 @@ class Repository(BaseModel):
     forks_count: int = 0
     open_issues_count: int = 0
     language: Optional[str] = None
-    topics: List[str] = []
+    topics: List[str] = Field(default_factory=list)
     is_indexed: bool = False
     indexed_at: Optional[datetime] = None
     indexing_status: Optional[str] = None
@@ -178,6 +178,6 @@ class Interaction(BaseModel):
     interaction_type: str
     sentiment_score: Optional[float] = None
     intent_classification: Optional[str] = None
-    topics_discussed: List[str] = []
+    topics_discussed: List[str] = Field(default_factory=list)
     metadata: Optional[dict] = None
     weaviate_interaction_id: Optional[str] = None

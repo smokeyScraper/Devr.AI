@@ -106,54 +106,74 @@ async def populate_Weaviate_code_chunk(client):
 async def populate_Weaviate_interaction(client):
     interactions = [
         {
-            "userId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
-            "message": "Hi, can you explain the code chunk with ID 095a5ff0-545a-48ff-83ad-2ea3566f5674?",
-            "timestamp": "2023-01-01T12:00:00Z"
+            "supabaseInteractionId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
+            "conversationSummary": "User asked about C++ code chunk.",
+            "platform": "web",
+            "topics": ["C++", "Code Chunk"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         },
         {
-            "userId": "b6bbdb5a-deb1-43c7-bf99-b9f88e4af1ed",
-            "message": "What does the function in Go do?",
-            "timestamp": "2023-01-01T12:01:00Z"
+            "supabaseInteractionId": "b6bbdb5a-deb1-43c7-bf99-b9f88e4af1ed",
+            "conversationSummary": "User inquired about Go function.",
+            "platform": "mobile",
+            "topics": ["Go", "Function"],
+            "embedding": [0.4, 0.5, 0.6]  # Example embedding vector
         },
         {
-            "userId": "1f787967-316c-4232-b251-64bcf8e3251b",
-            "message": "Can you summarize the module in C++?",
-            "timestamp": "2023-01-01T12:02:00Z"
+            "supabaseInteractionId": "1f787967-316c-4232-b251-64bcf8e3251b",
+            "conversationSummary": "User asked for a summary of the C++ module.",
+            "platform": "web",
+            "topics": ["C++", "Module"],
+            "embedding": [0.7, 0.8, 0.9]  # Example embedding vector
         },
         {
-            "userId": "233530b2-d89f-416d-a73c-40b4ebb33c50",
-            "message": "What is the purpose of the import in this C++ chunk?",
-            "timestamp": "2023-01-01T12:03:00Z"
+            "supabaseInteractionId": "233530b2-d89f-416d-a73c-40b4ebb33c50",
+            "conversationSummary": "User inquired about the import statement in C++.",
+            "platform": "web",
+            "topics": ["C++", "Import"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         },
         {
-            "userId": "b3103899-d683-422a-9072-2ad26050d8f5",
-            "message": "Is this function in C++ recursive?",
-            "timestamp": "2023-01-01T12:04:00Z"
+            "supabaseInteractionId": "b3103899-d683-422a-9072-2ad26050d8f5",
+            "conversationSummary": "User asked if this function in C++ is recursive.",
+            "platform": "web",
+            "topics": ["C++", "Function", "Recursion"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         },
         {
-            "userId": "28ea68b7-1f26-472c-b568-319e1d41732b",
-            "message": "What does this module handle in the codebase?",
-            "timestamp": "2023-01-01T12:05:00Z"
+            "supabaseInteractionId": "28ea68b7-1f26-472c-b568-319e1d41732b",
+            "conversationSummary": "User inquired about what this module handles in the codebase.",
+            "platform": "web",
+            "topics": ["C++", "Module"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         },
         {
-            "userId": "1cb8ccc0-db27-49c5-8dff-8d535d5a37d3",
-            "message": "Can you explain the logic in this C++ module?",
-            "timestamp": "2023-01-01T12:06:00Z"
+            "supabaseInteractionId": "1cb8ccc0-db27-49c5-8dff-8d535d5a37d3",
+            "conversationSummary": "User asked about the logic in this C++ module.",
+            "platform": "web",
+            "topics": ["C++", "Module"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         },
         {
-            "userId": "9edaae8a-3d6c-47c1-8777-ff0b0002b85a",
-            "message": "What does the import statement in Java do?",
-            "timestamp": "2023-01-01T12:07:00Z"
+            "supabaseInteractionId": "9edaae8a-3d6c-47c1-8777-ff0b0002b85a",
+            "conversationSummary": "User inquired about the import statement in Java.",
+            "platform": "web",
+            "topics": ["Java", "Import"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         },
         {
-            "userId": "d1927881-d0e7-4df3-a97a-18521db08ff4",
-            "message": "Is this a comment or code in Rust?",
-            "timestamp": "2023-01-01T12:08:00Z"
+            "supabaseInteractionId": "d1927881-d0e7-4df3-a97a-18521db08ff4",
+            "conversationSummary": "User asked if this is a comment or code in Rust.",
+            "platform": "web",
+            "topics": ["Rust", "Comment", "Code"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         },
         {
-            "userId": "fdda052a-ca4f-40b5-ae99-a711e2161d85",
-            "message": "What is the output of this JavaScript function?",
-            "timestamp": "2023-01-01T12:09:00Z"
+            "supabaseInteractionId": "fdda052a-ca4f-40b5-ae99-a711e2161d85",
+            "conversationSummary": "User inquired about the output of this JavaScript function.",
+            "platform": "web",
+            "topics": ["JavaScript", "Function", "Output"],
+            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
         }
     ]
     try:

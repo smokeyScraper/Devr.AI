@@ -1,7 +1,6 @@
-import os
 import weaviate
 
-# Connect to Weaviate Cloud
+# Connect to local Weaviate instance
 client = weaviate.connect_to_local()
 
 
