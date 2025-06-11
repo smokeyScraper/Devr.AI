@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.core.orchestration.queue_manager import AsyncQueueManager
 from app.core.orchestration.agent_coordinator import AgentCoordinator
 from bots.discord.discord_bot import DiscordBot
+from app.db.weaviate.weaviate_client import get_client
 
 # Configure logging
 logging.basicConfig(
@@ -19,6 +20,12 @@ class DevRAIApplication:
     """Main application class"""
 
     def __init__(self):
+        try:
+            self.weaviate_client = get_client()
+            logger.info(f"Weaviate client initialized: {self.weaviate_client.is_ready()}")
+        except Exception as e:
+            logger.error(f"Error initializing Weaviate client: {str(e)}")
+            self.weaviate_client = None
         self.queue_manager = AsyncQueueManager()
         self.agent_coordinator = AgentCoordinator(self.queue_manager)
         self.discord_bot = DiscordBot(self.queue_manager)
@@ -52,18 +59,24 @@ class DevRAIApplication:
         logger.info("Stopping Devr.AI Application...")
 
         self.running = False
+        # Close Weaviate client
+        try:
+            if hasattr(self, 'weaviate_client') and self.weaviate_client is not None:
+                self.weaviate_client.close()
+                logger.info("Weaviate client closed")
+        except Exception as e:
+            logger.error(f"Error closing Weaviate client: {str(e)}")
 
-        # Stop Discord bot
+    # Stop Discord bot
         try:
             if not self.discord_bot.is_closed():
                 await self.discord_bot.close()
         except Exception as e:
             logger.error(f"Error closing Discord bot: {str(e)}")
-
-        # Stop queue manager
+    # Stop queue manager
         await self.queue_manager.stop()
 
-        logger.info("Devr.AI Application stopped")
+    logger.info("Devr.AI Application stopped")
 
 
 # Global application instance
@@ -71,7 +84,6 @@ app = DevRAIApplication()
 
 async def main():
     """Main entry point"""
-
     # Setup signal handlers for graceful shutdown
     loop = asyncio.get_running_loop()
 
