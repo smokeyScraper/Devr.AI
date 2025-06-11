@@ -106,7 +106,7 @@ def insert_code_chunk():
     try:
         client.data_object.create(
             data_object=code_chunk.dict(by_alias=True),
-            class_name="Weaviate_code_chunk"
+            class_name="weaviate_code_chunk"
         )
         print("Code chunk inserted successfully.")
         return code_chunk
@@ -118,7 +118,7 @@ def get_code_chunk_by_id(code_chunk_id: str):
     try:
         code_chunk = client.data_object.get(
             id=code_chunk_id,
-            class_name="Weaviate_code_chunk"
+            class_name="weaviate_code_chunk"
         )
         if code_chunk:
             return WeaviateCodeChunk(**code_chunk)
@@ -130,13 +130,13 @@ def update_code_chunk(code_chunk_id: str):
     try:
         code_chunk = client.data_object.get(
             id=code_chunk_id,
-            class_name="Weaviate_code_chunk"
+            class_name="weaviate_code_chunk"
         )
         if code_chunk:
             code_chunk["codeContent"] = "Updated code content"
             client.data_object.update(
                 data_object=code_chunk,
-                class_name="Weaviate_code_chunk"
+                class_name="weaviate_code_chunk"
             )
             print("Code chunk updated successfully.")
             return WeaviateCodeChunk(**code_chunk)
@@ -151,7 +151,7 @@ def delete_code_chunk(code_chunk_id: str):
     try:
         deleted = client.data_object.delete(
             id=code_chunk_id,
-            class_name="Weaviate_code_chunk"
+            class_name="weaviate_code_chunk"
         )
         if deleted:
             print("Code chunk deleted successfully.")
@@ -180,7 +180,7 @@ def insert_interaction():
     try:
         client.data_object.create(
             data_object=interaction.dict(by_alias=True),
-            class_name="Weaviate_interaction"
+            class_name="weaviate_interaction"
         )
         print("Interaction inserted successfully.")
         return interaction
@@ -193,7 +193,7 @@ def get_interaction_by_id(interaction_id: str):
     try:
         interaction = client.data_object.get(
             id=interaction_id,
-            class_name="Weaviate_interaction"
+            class_name="weaviate_interaction"
         )
         if interaction:
             return WeaviateInteraction(**interaction)
@@ -205,13 +205,13 @@ def update_interaction(interaction_id: str):
     try:
         interaction = client.data_object.get(
             id=interaction_id,
-            class_name="Weaviate_interaction"
+            class_name="weaviate_interaction"
         )
         if interaction:
             interaction["conversationSummary"] = "Updated interaction summary"
             client.data_object.update(
                 data_object=interaction,
-                class_name="Weaviate_interaction"
+                class_name="weaviate_interaction"
             )
             print("Interaction updated successfully.")
             return WeaviateInteraction(**interaction)
@@ -226,7 +226,7 @@ def delete_interaction(interaction_id: str):
     try:
         deleted = client.data_object.delete(
             id=interaction_id,
-            class_name="Weaviate_interaction"
+            class_name="weaviate_interaction"
         )
         if deleted:
             print("Interaction deleted successfully.")

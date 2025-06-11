@@ -1,6 +1,6 @@
 from app.db.supabase.supabase_client import supabase_client
 import os
-async def login_with_oauth(provider: str):
+def login_with_oauth(provider: str):
     try:
         result = supabase_client.auth.sign_in_with_oauth({
             "provider": provider,
@@ -13,13 +13,13 @@ async def login_with_oauth(provider: str):
         raise Exception(f"OAuth login failed for {provider}: {str(e)}")
 
 
-async def login_with_github():
+def login_with_github():
     return login_with_oauth("github")
 
-async def login_with_discord():
+def login_with_discord():
     return login_with_oauth("discord")
 
-async def logout(access_token: str):
+def logout(access_token: str):
     try:
         supabase_client.auth.set_session(access_token, refresh_token="")
         supabase_client.auth.sign_out()
