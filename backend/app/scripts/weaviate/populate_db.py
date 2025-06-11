@@ -1,7 +1,7 @@
 from app.db.weaviate.weaviate_client import get_client
 
 
-async def populate_Weaviate_code_chunk(client):
+def populate_Weaviate_code_chunk(client):
     code_chunks = [
         {
             "supabaseChunkId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
@@ -103,7 +103,7 @@ async def populate_Weaviate_code_chunk(client):
         print("Populated: weaviate_code_chunk with sample data.")
     except Exception as e:
         print(f"Error populating weaviate_code_chunk: {e}")
-async def populate_Weaviate_interaction(client):
+def populate_Weaviate_interaction(client):
     interactions = [
         {
             "supabaseInteractionId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
@@ -186,7 +186,7 @@ async def populate_Weaviate_interaction(client):
         print("Populated: weaviate_interaction with sample data.")
     except Exception as e:
         print(f"Error populating weaviate_interaction: {e}")
-async def populate_Weaviate_user_profile(client):
+def populate_Weaviate_user_profile(client):
     user_profiles = [
         {
             "supabaseUserId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
@@ -259,10 +259,10 @@ async def populate_Weaviate_user_profile(client):
         print("Populated: weaviate_user_profile with sample data.")
     except Exception as e:
         print(f"Error populating weaviate_user_profile: {e}")
-async def populate_all_collections():
+def populate_all_collections():
     client = get_client()
     print("Populating Weaviate collections with sample data...")
-    await populate_Weaviate_code_chunk(client)
-    await populate_Weaviate_interaction(client)
-    await populate_Weaviate_user_profile(client)
+    populate_Weaviate_code_chunk(client)
+    populate_Weaviate_interaction(client)
+    populate_Weaviate_user_profile(client)
     print("✅ All collections populated with sample data.")

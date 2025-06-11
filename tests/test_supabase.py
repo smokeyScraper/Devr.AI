@@ -1,6 +1,6 @@
-from app.model.supabase.models import User, Interaction, CodeChunk, Repository
+from ..backend.app.model.supabase.models import User, Interaction, CodeChunk, Repository
 from uuid import uuid4
-from app.db.supabase.supabase_client import get_supabase_client
+from ..backend.app.db.supabase.supabase_client import get_supabase_client
 from datetime import datetime  # Your User model import
 
 client = get_supabase_client()
@@ -23,7 +23,7 @@ def insert_user_into_supabase(user: User):
 
 def test_create_and_save_user():
     user = User(
-        id=uuid4(),
+        id=str(uuid4()),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
         discord_id="1234567890",
@@ -76,7 +76,7 @@ def delete_user(user_id: str):
 # Test the user creation and saving functionality
 def test_user():
     user = User(
-        id=uuid4(),
+        id=str(uuid4()),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
         discord_id="1234567890",
@@ -145,11 +145,11 @@ def delete_interaction(interaction_id: str):
 
 def test_interaction():
     interaction = Interaction(
-        id=uuid4(),
+        id=str(uuid4()),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
-        user_id=uuid4(),
-        repository_id=uuid4(),
+        user_id=str(uuid4()),
+        repository_id=str(uuid4()),
         interaction_type="comment",
         content="Hello, this is a test interaction.",
         metadata={"source": "test_script"},
@@ -196,8 +196,8 @@ def delete_code_chunk(code_chunk_id: str):
     return response.data[0]
 def test_code_chunk():
     code_chunk = CodeChunk(
-        id=uuid4(),
-        repository_id=uuid4(),
+        id=str(uuid4()),
+        repository_id=str(uuid4()),
         created_at=datetime.utcnow(),
         file_path="/path/to/file.py",
         file_name="file.py",
@@ -250,7 +250,7 @@ def delete_repository(repository_id: str):
     return response.data[0]
 def test_repository():
     repository = Repository(
-        id=uuid4(),
+        id=str(uuid4()),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
         github_id=123456789,

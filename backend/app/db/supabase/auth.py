@@ -5,7 +5,7 @@ async def login_with_oauth(provider: str):
         result = supabase_client.auth.sign_in_with_oauth({
             "provider": provider,
             "options": {
-                "redirect_to": os.getenv("SUPABASE_REDIRECT_URL")
+                "redirect_to": os.getenv("SUPABASE_REDIRECT_URL", "http://localhost:3000/home")
             }
         })
         return {"url": result.url}
@@ -14,10 +14,10 @@ async def login_with_oauth(provider: str):
 
 
 async def login_with_github():
-    return await login_with_oauth("github")
+    return login_with_oauth("github")
 
 async def login_with_discord():
-    return await login_with_oauth("discord")
+    return login_with_oauth("discord")
 
 async def logout(access_token: str):
     try:

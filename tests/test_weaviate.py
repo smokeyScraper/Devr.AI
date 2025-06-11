@@ -15,7 +15,7 @@ def test_weaviate_client():
         ready = client.is_ready()
         assert ready, "Weaviate client is not ready"
     except Exception as e:
-        assert False, f"Weaviate client connection failed: {e}"
+        raise AssertionError(f"Weaviate client connection failed: {e}")
 
 def insert_user_profile():
     user_profile = WeaviateUserProfile(
@@ -29,7 +29,7 @@ def insert_user_profile():
     try:
         client.data_object.create(
             data_object=user_profile.dict(by_alias=True),
-            class_name="Weaviate_user_profile"
+            class_name="weaviate_user_profile"
         )
         print("User profile inserted successfully.")
         return user_profile
@@ -41,7 +41,7 @@ def insert_user_profile():
 def get_user_profile_by_id(user_id: str):
     client = get_client()
     try:
-        questions = client.collections.get("Weaviate_user_profile")
+        questions = client.collections.get("weaviate_user_profile"")
         response = questions.query.bm25(
             query=user_id,
             properties=["supabaseUserId", "profileSummary", "primaryLanguages", "expertiseAreas"]
@@ -54,7 +54,7 @@ def get_user_profile_by_id(user_id: str):
         return None
 
 def update_user_profile(user_id: str):
-    questions = get_client().collections.get("Weaviate_user_profile")
+    questions = get_client().collections.get("weaviate_user_profile"")
     try:
         user_profile = questions.query.bm25(
             query=user_id,
@@ -73,7 +73,7 @@ def update_user_profile(user_id: str):
         return None
 
 def delete_user_profile(user_id: str):
-    questions = get_client().collections.get("Weaviate_user_profile")
+    questions = get_client().collections.get("weaviate_user_profile"")
     try:
         deleted = questions.data.delete_by_id(user_id)
         if deleted:
