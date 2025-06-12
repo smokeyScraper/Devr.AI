@@ -84,6 +84,7 @@ class DiscordBot(commands.Bot):
                 "user_id": user_id,
                 "channel_id": str(message.channel.id),
                 "thread_id": thread_id,
+                "memory_thread_id": user_id,
                 "content": message.content,
                 "classification": classification,
                 "platform": "discord",
@@ -186,14 +187,23 @@ class DiscordBot(commands.Bot):
 
     @commands.command(name="reset")
     async def reset_thread(self, ctx):
-        """Reset user's DevRel thread"""
+        """Reset user's DevRel thread and memory"""
         user_id = str(ctx.author.id)
 
+        # Send clear memory request to agent coordinator
+        cleanup_message = {
+            "type": "clear_thread_memory",
+            "memory_thread_id": user_id,
+            "user_id": user_id,
+            "cleanup_reason": "manual_reset"
+        }
+        await self.queue_manager.enqueue(cleanup_message, QueuePriority.HIGH)
+
+        # Clean up Discord thread tracking
         if user_id in self.active_threads:
             del self.active_threads[user_id]
-            await ctx.send("Your DevRel thread has been reset. Next message will create a new thread.")
-        else:
-            await ctx.send("No active thread found to reset.")
+
+        await ctx.send("Your DevRel thread and memory have been reset. Next message will create a new thread.")
 
     @commands.command(name="help_devrel")
     async def help_devrel(self, ctx):
@@ -229,7 +239,7 @@ class DiscordBot(commands.Bot):
         embed.add_field(
             name="Commands:",
             value="""
-            • `!reset` - Reset your chat thread
+            • `!reset` - Reset your chat thread and memory
             • `!help_devrel` - Show this help message
             """,
             inline=False
