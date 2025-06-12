@@ -1,5 +1,19 @@
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Annotated
 from pydantic import BaseModel, Field
+from datetime import datetime
+from operator import add
+
+def replace_summary(existing: Optional[str], new: Optional[str]) -> Optional[str]:
+    """Replace summary"""
+    if new is not None:
+        return new
+    return existing
+
+def replace_topics(existing: List[str], new: List[str]) -> List[str]:
+    """Replace topics"""
+    if new:
+        return new
+    return existing
 
 class AgentState(BaseModel):
     """Base state for all LangGraph agents"""
@@ -9,9 +23,26 @@ class AgentState(BaseModel):
     platform: str  # discord, slack, github
 
     # Conversation context
-    messages: List[Dict[str, Any]] = Field(default_factory=list)
-    conversation_history: List[Dict[str, Any]] = Field(default_factory=list)
+    messages: Annotated[List[Dict[str, Any]], add] = Field(default_factory=list)
     context: Dict[str, Any] = Field(default_factory=dict)
+
+    # TODO: PERSISTENT MEMORY DATA (survives across sessions via summarization)
+    user_profile: Dict[str, Any] = Field(default_factory=dict)
+
+    # LLM-generated summary of PAST conversations
+    conversation_summary: Annotated[Optional[str], replace_summary] = None
+
+    # Key topics discussed with the user
+    key_topics: Annotated[List[str], replace_topics] = Field(default_factory=list)
+
+    # SESSION MANAGEMENT
+    session_start_time: datetime = Field(default_factory=datetime.now)
+    last_interaction_time: datetime = Field(default_factory=datetime.now)
+    interaction_count: Annotated[int, add] = Field(default=0)
+    summarization_needed: bool = False
+
+    # Memory management flag (for thread timeout)
+    memory_timeout_reached: bool = False
 
     # Processing state
     current_task: Optional[str] = None
