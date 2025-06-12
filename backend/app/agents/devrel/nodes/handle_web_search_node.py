@@ -18,7 +18,7 @@ async def _extract_search_query(message: str, llm) -> str:
     logger.info(f"Extracted search query: {search_query}")
     return search_query
 
-async def handle_web_search_node(state: AgentState, search_tool, llm) -> AgentState:
+async def handle_web_search_node(state: AgentState, search_tool, llm) -> dict:
     """Handle web search requests"""
     logger.info(f"Handling web search for session {state.session_id}")
 
@@ -31,12 +31,13 @@ async def handle_web_search_node(state: AgentState, search_tool, llm) -> AgentSt
     search_query = await _extract_search_query(latest_message, llm)
     search_results = await search_tool.search(search_query)
 
-    state.task_result = {
-        "type": "web_search",
-        "query": search_query,
-        "results": search_results,
-        "source": "tavily_search"
+    return {
+        "task_result": {
+            "type": "web_search",
+            "query": search_query,
+            "results": search_results,
+            "source": "tavily_search"
+        },
+        "tools_used": ["tavily_search"],
+        "current_task": "web_search_handled"
     }
-    state.tools_used.append("tavily_search")
-    state.current_task = "web_search_handled"
-    return state
