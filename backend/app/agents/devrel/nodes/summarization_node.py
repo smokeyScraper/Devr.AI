@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from typing import Dict, Any
 from app.agents.shared.state import AgentState
 from langchain_core.messages import HumanMessage
 from app.agents.devrel.prompts.summarization_prompt import CONVERSATION_SUMMARY_PROMPT
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 SUMMARIZATION_THRESHOLD = 5
 THREAD_TIMEOUT_HOURS = 1
 
-async def check_summarization_needed(state: AgentState) -> AgentState:
+async def check_summarization_needed(state: AgentState) -> Dict[str, Any]:
     """Check if summarization is needed and update interaction count"""
 
     current_count = getattr(state, 'interaction_count', 0)
@@ -44,7 +45,7 @@ async def check_summarization_needed(state: AgentState) -> AgentState:
 
     return updates
 
-async def summarize_conversation_node(state: AgentState, llm) -> AgentState:
+async def summarize_conversation_node(state: AgentState, llm) -> Dict[str, Any]:
     """Summarize the conversation and update the state"""
     logger.info(f"Summarizing conversation for session {state.session_id}")
 
