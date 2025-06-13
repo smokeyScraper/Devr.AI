@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.core.orchestration.queue_manager import AsyncQueueManager
 from app.core.orchestration.agent_coordinator import AgentCoordinator
 from bots.discord.discord_bot import DiscordBot
+from bots.discord.discord_cogs import DevRelCommands
 from app.db.weaviate.weaviate_client import get_client
 
 # Configure logging
@@ -29,6 +30,7 @@ class DevRAIApplication:
         self.queue_manager = AsyncQueueManager()
         self.agent_coordinator = AgentCoordinator(self.queue_manager)
         self.discord_bot = DiscordBot(self.queue_manager)
+        self.discord_bot.add_cog(DevRelCommands(self.discord_bot, self.queue_manager))
         self.running = False
 
     async def start(self):
