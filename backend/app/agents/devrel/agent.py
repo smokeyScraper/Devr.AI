@@ -135,36 +135,36 @@ class DevRelAgent(BaseAgent):
             logger.error(f"Error getting thread state: {str(e)}")
             return {}
 
-async def clear_thread_memory(self, thread_id: str, force_clear: bool = False) -> bool:
-    """Clear memory for a specific thread using memory_timeout_reached flag"""
-    try:
-        config = {"configurable": {"thread_id": thread_id}}
-        state = self.graph.get_state(config)
+    async def clear_thread_memory(self, thread_id: str, force_clear: bool = False) -> bool:
+        """Clear memory for a specific thread using memory_timeout_reached flag"""
+        try:
+            config = {"configurable": {"thread_id": thread_id}}
+            state = self.graph.get_state(config)
 
-        if state and state.values:
-            agent_state = AgentState(**state.values)
+            if state and state.values:
+                agent_state = AgentState(**state.values)
 
-            # Check the memory_timeout_reached flag
-            if agent_state.memory_timeout_reached or force_clear:
-                if agent_state.memory_timeout_reached:
-                    logger.info(f"Thread {thread_id} timeout flag set, storing final summary and clearing memory")
+                # Check the memory_timeout_reached flag
+                if agent_state.memory_timeout_reached or force_clear:
+                    if agent_state.memory_timeout_reached:
+                        logger.info(f"Thread {thread_id} timeout flag set, storing final summary and clearing memory")
+                    else:
+                        logger.info(f"Force clearing memory for thread {thread_id}")
+
+                    # Store final summary to database before clearing
+                    await store_summary_to_database(agent_state)
+
+                    # Delete the thread from InMemorySaver
+                    self.checkpointer.delete_thread(thread_id)
+                    logger.info(f"Successfully cleared memory for thread {thread_id}")
+                    return True
                 else:
-                    logger.info(f"Force clearing memory for thread {thread_id}")
-
-                # Store final summary to database before clearing
-                await store_summary_to_database(agent_state)
-
-                # Delete the thread from InMemorySaver
-                self.checkpointer.delete_thread(thread_id)
-                logger.info(f"Successfully cleared memory for thread {thread_id}")
-                return True
+                    logger.info(f"Thread {thread_id} has not timed out, memory preserved")
+                    return False
             else:
-                logger.info(f"Thread {thread_id} has not timed out, memory preserved")
-                return False
-        else:
-            logger.info(f"No state found for thread {thread_id}, nothing to clear")
-            return True
+                logger.info(f"No state found for thread {thread_id}, nothing to clear")
+                return True
 
-    except Exception as e:
-        logger.error(f"Error clearing thread memory: {str(e)}")
-        return False
+        except Exception as e:
+            logger.error(f"Error clearing thread memory: {str(e)}")
+            return False
