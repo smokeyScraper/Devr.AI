@@ -3,6 +3,7 @@ from typing import Dict, Any
 from functools import partial
 from langgraph.graph import StateGraph, END
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.checkpoint.memory import InMemorySaver
 from ..shared.base_agent import BaseAgent, AgentState
 from ..shared.classification_router import MessageCategory
 from .tools.search_tool import TavilySearchTool
@@ -14,6 +15,7 @@ from .nodes.handle_web_search_node import handle_web_search_node
 from .nodes.handle_technical_support_node import handle_technical_support_node
 from .nodes.handle_onboarding_node import handle_onboarding_node
 from .nodes.generate_response_node import generate_response_node
+from .nodes.summarization_node import check_summarization_needed, summarize_conversation_node, store_summary_to_database
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,7 @@ class DevRelAgent(BaseAgent):
         )
         self.search_tool = TavilySearchTool()
         self.faq_tool = FAQTool()
+        self.checkpointer = InMemorySaver()
         super().__init__("DevRelAgent", self.config)
 
     def _build_graph(self):
@@ -43,6 +46,8 @@ class DevRelAgent(BaseAgent):
         workflow.add_node("handle_technical_support", handle_technical_support_node)
         workflow.add_node("handle_onboarding", handle_onboarding_node)
         workflow.add_node("generate_response", partial(generate_response_node, llm=self.llm))
+        workflow.add_node("check_summarization", check_summarization_needed)
+        workflow.add_node("summarize_conversation", partial(summarize_conversation_node, llm=self.llm))
 
         # Add edges
         workflow.add_conditional_edges(
@@ -65,12 +70,26 @@ class DevRelAgent(BaseAgent):
         for node in ["handle_faq", "handle_web_search", "handle_technical_support", "handle_onboarding"]:
             workflow.add_edge(node, "generate_response")
 
-        workflow.add_edge("generate_response", END)
+        workflow.add_edge("generate_response", "check_summarization")
+
+        # Conditional edge for summarization
+        workflow.add_conditional_edges(
+            "check_summarization",
+            self._should_summarize,
+            {
+                "summarize": "summarize_conversation",
+                "end": END
+            }
+        )
+
+        # End after summarization
+        workflow.add_edge("summarize_conversation", END)
 
         # Set entry point
         workflow.set_entry_point("gather_context")
 
-        self.graph = workflow.compile()
+        # Compile with InMemorySaver checkpointer
+        self.graph = workflow.compile(checkpointer=self.checkpointer)
 
     def _route_to_handler(self, state: AgentState) -> str:
         """Route to the appropriate handler based on intent"""
@@ -98,3 +117,54 @@ class DevRelAgent(BaseAgent):
         # Later to be changed to handle anomalies
         logger.info(f"Unknown intent '{intent}', routing to technical support")
         return MessageCategory.TECHNICAL_SUPPORT
+
+    def _should_summarize(self, state: AgentState) -> str:
+        """Determine if conversation should be summarized"""
+        if state.summarization_needed:
+            logger.info(f"Summarization needed for session {state.session_id}")
+            return "summarize"
+        return "end"
+
+    async def get_thread_state(self, thread_id: str) -> Dict[str, Any]:
+        """Get the current state of a thread"""
+        try:
+            config = {"configurable": {"thread_id": thread_id}}
+            state = self.graph.get_state(config)
+            return state.values if state else {}
+        except Exception as e:
+            logger.error(f"Error getting thread state: {str(e)}")
+            return {}
+
+    async def clear_thread_memory(self, thread_id: str, force_clear: bool = False) -> bool:
+        """Clear memory for a specific thread using memory_timeout_reached flag"""
+        try:
+            config = {"configurable": {"thread_id": thread_id}}
+            state = self.graph.get_state(config)
+
+            if state and state.values:
+                agent_state = AgentState(**state.values)
+
+                # Check the memory_timeout_reached flag
+                if agent_state.memory_timeout_reached or force_clear:
+                    if agent_state.memory_timeout_reached:
+                        logger.info(f"Thread {thread_id} timeout flag set, storing final summary and clearing memory")
+                    else:
+                        logger.info(f"Force clearing memory for thread {thread_id}")
+
+                    # Store final summary to database before clearing
+                    await store_summary_to_database(agent_state)
+
+                    # Delete the thread from InMemorySaver
+                    self.checkpointer.delete_thread(thread_id)
+                    logger.info(f"Successfully cleared memory for thread {thread_id}")
+                    return True
+                else:
+                    logger.info(f"Thread {thread_id} has not timed out, memory preserved")
+                    return False
+            else:
+                logger.info(f"No state found for thread {thread_id}, nothing to clear")
+                return True
+
+        except Exception as e:
+            logger.error(f"Error clearing thread memory: {str(e)}")
+            return False

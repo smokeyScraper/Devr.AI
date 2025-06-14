@@ -1,11 +1,13 @@
 import logging
 import uuid
 from typing import Dict, Any
+from datetime import datetime
 from app.agents.devrel.agent import DevRelAgent
 # TODO: Implement GitHub agent
 # from app.agents.github.agent import GitHubAgent
 from app.agents.shared.state import AgentState
 from app.core.orchestration.queue_manager import AsyncQueueManager
+from app.agents.devrel.nodes.summarization_node import store_summary_to_database
 from langsmith import traceable
 
 logger = logging.getLogger(__name__)
@@ -25,6 +27,7 @@ class AgentCoordinator:
     def _register_handlers(self):
         """Register message handlers"""
         self.queue_manager.register_handler("devrel_request", self._handle_devrel_request)
+        self.queue_manager.register_handler("clear_thread_memory", self._handle_clear_memory_request)
         # TODO: Register GitHub agent handler after implementation
         # self.queue_manager.register_handler("github_request", self._handle_github_request)
 
@@ -32,7 +35,8 @@ class AgentCoordinator:
     async def _handle_devrel_request(self, message_data: Dict[str, Any]):
         """Handle DevRel agent requests"""
         try:
-            # Create agent state
+            # Extract memory thread ID (user_id for Discord)
+            memory_thread_id = message_data.get("memory_thread_id") or message_data.get("user_id", "")
             session_id = str(uuid.uuid4())
 
             initial_state = AgentState(
@@ -49,8 +53,12 @@ class AgentCoordinator:
             )
 
             # Run agent
-            logger.info(f"Running DevRel agent for session {session_id}")
-            result_state = await self.devrel_agent.run(initial_state)
+            logger.info(f"Running DevRel agent for session {session_id} with memory thread {memory_thread_id}")
+            result_state = await self.devrel_agent.run(initial_state, memory_thread_id)
+
+            # Check if thread timeout was reached during processing
+            if result_state.memory_timeout_reached:
+                await self._handle_memory_timeout(memory_thread_id, result_state)
 
             # Send response back to platform
             if result_state.final_response:
@@ -60,31 +68,55 @@ class AgentCoordinator:
             logger.error(f"Error handling DevRel request: {str(e)}")
             await self._send_error_response(message_data, "I'm having trouble processing your request. Please try again.")
 
-    # TODO: Implement GitHub agent
-    # async def _handle_github_request(self, message_data: Dict[str, Any]):
-    #     """Handle GitHub agent requests"""
-    #     try:
-    #         # Implementation for GitHub agent
-    #         session_id = str(uuid.uuid4())
+    async def _handle_clear_memory_request(self, message_data: Dict[str, Any]):
+        """Handle requests to clear thread memory"""
+        try:
+            memory_thread_id = message_data.get("memory_thread_id")
+            user_id = message_data.get("user_id")
+            cleanup_reason = message_data.get("cleanup_reason", "manual")
 
-    #         initial_state = AgentState(
-    #             session_id=session_id,
-    #             user_id=message_data.get("user_id", ""),
-    #             platform="github",
-    #             context={
-    #                 "github_event": message_data.get("github_event", {}),
-    #                 "event_type": message_data.get("event_type", "")
-    #             }
-    #         )
+            if not memory_thread_id:
+                logger.warning("No memory_thread_id provided for memory clear request")
+                return
 
-    #         # Run GitHub agent
-    #         logger.info(f"Running GitHub agent for session {session_id}")
-    #         result_state = await self.github_agent.run(initial_state)
+            logger.info(f"Clearing memory for thread {memory_thread_id}, reason: {cleanup_reason}")
 
-    #         logger.info(f"GitHub agent completed for session {session_id}")
+            # Get current state before clearing
+            current_state_data = await self.devrel_agent.get_thread_state(memory_thread_id)
 
-    #     except Exception as e:
-    #         logger.error(f"Error handling GitHub request: {str(e)}")
+            if current_state_data:
+                current_state = AgentState(**current_state_data)
+
+                # Store to database before clearing
+                await store_summary_to_database(current_state)
+                logger.info(f"Stored final summary to database for user {user_id}")
+
+            # Clear from InMemorySaver
+            success = await self.devrel_agent.clear_thread_memory(memory_thread_id, force_clear=True)
+
+            if success:
+                logger.info(f"Successfully cleared memory for thread {memory_thread_id}")
+            else:
+                logger.error(f"Failed to clear memory for thread {memory_thread_id}")
+
+        except Exception as e:
+            logger.error(f"Error clearing memory: {str(e)}")
+
+    async def _handle_memory_timeout(self, memory_thread_id: str, state: AgentState):
+        """Handle memory timeout - store to database and clear from InMemorySaver"""
+        try:
+            logger.info(f"Handling memory timeout for thread {memory_thread_id}")
+
+            # Store final summary to database
+            await store_summary_to_database(state)
+
+            # Clear from InMemorySaver
+            await self.devrel_agent.clear_thread_memory(memory_thread_id, force_clear=True)
+
+            logger.info(f"Memory timeout handled successfully for thread {memory_thread_id}")
+
+        except Exception as e:
+            logger.error(f"Error handling memory timeout: {str(e)}")
 
     async def _send_response_to_platform(self, original_message: Dict[str, Any], response: str):
         """Send agent response back to the originating platform"""
@@ -92,7 +124,6 @@ class AgentCoordinator:
             platform = original_message.get("platform", "discord")
 
             if platform == "discord":
-                # Send response back to Discord queue for bot to handle
                 response_message = {
                     "type": "discord_response",
                     "thread_id": original_message.get("thread_id"),
@@ -109,3 +140,6 @@ class AgentCoordinator:
     async def _send_error_response(self, original_message: Dict[str, Any], error_message: str):
         """Send error response to platform"""
         await self._send_response_to_platform(original_message, error_message)
+
+    # TODO: Implement GitHub agent
+    # async def _handle_github_request(self, message_data: Dict[str, Any]):
