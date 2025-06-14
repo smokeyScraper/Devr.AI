@@ -43,10 +43,10 @@ class DiscordBot(commands.Bot):
         if message.author == self.user:
             return
 
-        # Skip if message is a command (starts with !)
-        # TODO: Add support for commands
-        if message.content.startswith('!'):
-            await self.process_commands(message)
+        # if message is a command (starts with !)
+        ctx = await self.get_context(message)
+        if ctx.command is not None:
+            await self.invoke(ctx)
             return
 
         try:
@@ -184,65 +184,3 @@ class DiscordBot(commands.Bot):
 
         except Exception as e:
             logger.error(f"Error handling agent response: {str(e)}")
-
-    @commands.command(name="reset")
-    async def reset_thread(self, ctx):
-        """Reset user's DevRel thread and memory"""
-        user_id = str(ctx.author.id)
-
-        # Send clear memory request to agent coordinator
-        cleanup_message = {
-            "type": "clear_thread_memory",
-            "memory_thread_id": user_id,
-            "user_id": user_id,
-            "cleanup_reason": "manual_reset"
-        }
-        await self.queue_manager.enqueue(cleanup_message, QueuePriority.HIGH)
-
-        # Clean up Discord thread tracking
-        if user_id in self.active_threads:
-            del self.active_threads[user_id]
-
-        await ctx.send("Your DevRel thread and memory have been reset. Next message will create a new thread.")
-
-    @commands.command(name="help_devrel")
-    async def help_devrel(self, ctx):
-        """Show DevRel bot help"""
-        embed = discord.Embed(
-            title="DevRel Assistant Help",
-            description="I'm here to help you with Devr.AI related questions!",
-        )
-
-        embed.add_field(
-            name="What I can do:",
-            value="""
-            • Answer FAQs about Devr.AI
-            • Help with getting started
-            • Search the web for information
-            • Provide technical support
-            • Guide you through onboarding
-            """,
-            inline=False
-        )
-
-        embed.add_field(
-            name="Example questions:",
-            value="""
-            • "What is Devr.AI?"
-            • "How do I contribute?"
-            • "Search for latest AI news"
-            • "How to get started with LangGraph?"
-            """,
-            inline=False
-        )
-
-        embed.add_field(
-            name="Commands:",
-            value="""
-            • `!reset` - Reset your chat thread and memory
-            • `!help_devrel` - Show this help message
-            """,
-            inline=False
-        )
-
-        await ctx.send(embed=embed)

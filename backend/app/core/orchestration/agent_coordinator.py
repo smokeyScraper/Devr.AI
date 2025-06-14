@@ -72,7 +72,6 @@ class AgentCoordinator:
         """Handle requests to clear thread memory"""
         try:
             memory_thread_id = message_data.get("memory_thread_id")
-            user_id = message_data.get("user_id")
             cleanup_reason = message_data.get("cleanup_reason", "manual")
 
             if not memory_thread_id:
@@ -80,16 +79,6 @@ class AgentCoordinator:
                 return
 
             logger.info(f"Clearing memory for thread {memory_thread_id}, reason: {cleanup_reason}")
-
-            # Get current state before clearing
-            current_state_data = await self.devrel_agent.get_thread_state(memory_thread_id)
-
-            if current_state_data:
-                current_state = AgentState(**current_state_data)
-
-                # Store to database before clearing
-                await store_summary_to_database(current_state)
-                logger.info(f"Stored final summary to database for user {user_id}")
 
             # Clear from InMemorySaver
             success = await self.devrel_agent.clear_thread_memory(memory_thread_id, force_clear=True)
