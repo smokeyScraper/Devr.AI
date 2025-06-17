@@ -3,6 +3,9 @@ import logging
 from typing import Dict, Any, Callable, Optional
 from datetime import datetime
 from enum import Enum
+import pika
+import time
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -12,27 +15,44 @@ class QueuePriority(str, Enum):
     LOW = "low"
 
 class AsyncQueueManager:
-    """AsyncIO-based queue manager for agent orchestration"""
+    """Queue manager for agent orchestration"""
 
     def __init__(self):
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.channel = self.connection.channel()
         self.queues = {
-            QueuePriority.HIGH: asyncio.Queue(),
-            QueuePriority.MEDIUM: asyncio.Queue(),
-            QueuePriority.LOW: asyncio.Queue()
+            QueuePriority.HIGH: 'high_task_queue',
+            QueuePriority.MEDIUM: 'medium_task_queue',
+            QueuePriority.LOW: 'low_task_queue'
         }
         self.handlers: Dict[str, Callable] = {}
         self.running = False
         self.worker_tasks = []
 
+    def callback(ch, method, properties, body):
+        print(f" [x] Received {body.decode()}")
+        time.sleep(body.count(b'.'))
+        print(" [x] Done")
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+
     async def start(self, num_workers: int = 3):
         """Start the queue processing workers"""
         self.running = True
 
-        for i in range(num_workers):
-            task = asyncio.create_task(self._worker(f"worker-{i}"))
-            self.worker_tasks.append(task)
+        # for i in range(num_workers):
+        #     task = asyncio.create_task(self._worker(f"worker-{i}"))
+        #     self.worker_tasks.append(task)
 
-        logger.info(f"Started {num_workers} queue workers")
+        logger.info("Setting QOS")
+        self.channel.basic_qos(prefetch_count=1)
+        logger.info("QOS set")
+        logger.info("Starting Queues")
+        for i in self.queues.values():
+            self.channel.queue_declare(queue=i, durable=True)
+            logger.info(f"Queue {i} started")
+        logger.info("Starting Channel")
+        self.channel.start_consuming()
+        logger.info(f"Started channel {self.channel.channel_number}")
 
     async def stop(self):
         """Stop the queue processing"""
@@ -44,6 +64,9 @@ class AsyncQueueManager:
 
         await asyncio.gather(*self.worker_tasks, return_exceptions=True)
         logger.info("Stopped all queue workers")
+        self.channel.stop_consuming()
+        self.connection.close()
+        logger.info('Stopped Queue')
 
     async def enqueue(self,
                       message: Dict[str, Any],
@@ -60,9 +83,10 @@ class AsyncQueueManager:
             "priority": priority,
             "data": message
         }
-
-        await self.queues[priority].put(queue_item)
-        logger.debug(f"Enqueued message {queue_item['id']} with priority {priority}")
+        json_message = json.dumps(queue_item)
+        # await self.queues[priority].put(queue_item)
+        self.channel.basic_publish(exchange='', routing_key=f'{self.queues[priority]}', body=json_message)
+        logger.info(f"Enqueued message {queue_item['id']} with priority {priority}")
 
     def register_handler(self, message_type: str, handler: Callable):
         """Register a handler for a specific message type"""
