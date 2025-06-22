@@ -40,7 +40,7 @@ CREATE TABLE users (
     last_active_slack TIMESTAMPTZ,
 
     total_interactions_count INTEGER NOT NULL DEFAULT 0,
-    preferred_languages TEXT[],
+    preferred_languages TEXT[]
 );
 
 -- Create index for efficient cleanup queries
