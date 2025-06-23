@@ -1,254 +1,173 @@
+import json
+from datetime import datetime
 from app.db.weaviate.weaviate_client import get_client
 
+def populate_weaviate_user_profile(client):
+    """
+    Populate WeaviateUserProfile collection with sample data matching the model structure.
+    """
+    current_time = datetime.now().astimezone()
 
-def populate_Weaviate_code_chunk(client):
-    code_chunks = [
-        {
-            "supabaseChunkId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
-            "codeContent": (
-                "Maybe evening clearly trial want whose far. Sound life away senior difficult put. "
-                "Whose source hand so add Mr."
-            ),
-            "language": "C++",
-            "functionNames": ["comment"]
-        },
-        {
-            "supabaseChunkId": "b6bbdb5a-deb1-43c7-bf99-b9f88e4af1ed",
-            "codeContent": (
-                "Break doctor Mr home he we recent. Industry score choice increase between majority impact.\n"
-                "Real describe know. Talk between rate name within."
-            ),
-            "language": "Go",
-            "functionNames": ["function"]
-        },
-        {
-            "supabaseChunkId": "1f787967-316c-4232-b251-64bcf8e3251b",
-            "codeContent": (
-                "Music sometimes body term. Address so draw food.\n"
-                "Appear score moment second live. Message board mean war analysis situation."
-            ),
-            "language": "C++",
-            "functionNames": ["module"]
-        },
-        {
-            "supabaseChunkId": "233530b2-d89f-416d-a73c-40b4ebb33c50",
-            "codeContent": (
-                "Result Democrat later direction fund law indeed. Fine fine effort well.\n"
-                "Before be it season. Speech news only form business. Them wait institution trouble anything explain."
-            ),
-            "language": "C++",
-            "functionNames": ["import"]
-        },
-        {
-            "supabaseChunkId": "b3103899-d683-422a-9072-2ad26050d8f5",
-            "codeContent": (
-                "Ahead event several TV go. Thank not husband center. Begin most heavy. "
-                "Game have return since nothing be apply."
-            ),
-            "language": "C++",
-            "functionNames": ["function"]
-        },
-        {
-            "supabaseChunkId": "28ea68b7-1f26-472c-b568-319e1d41732b",
-            "codeContent": (
-                "War should share face build. Section compare herself region matter street south.\n"
-                "Technology amount affect TV television office. Identify policy face if whom commercial way."
-            ),
-            "language": "C++",
-            "functionNames": ["module"]
-        },
-        {
-            "supabaseChunkId": "1cb8ccc0-db27-49c5-8dff-8d535d5a37d3",
-            "codeContent": (
-                "Concern significant management senior. Large under north play person ten physical character.\n"
-                "Kind field ever argue medical financial later. Hard expert popular within."
-            ),
-            "language": "C++",
-            "functionNames": ["module"]
-        },
-        {
-            "supabaseChunkId": "9edaae8a-3d6c-47c1-8777-ff0b0002b85a",
-            "codeContent": (
-                "Position always remain yard model particular hair. Hold simple quickly appear piece."
-            ),
-            "language": "Java",
-            "functionNames": ["import"]
-        },
-        {
-            "supabaseChunkId": "d1927881-d0e7-4df3-a97a-18521db08ff4",
-            "codeContent": (
-                "Gun guy Congress degree way main difficult. Choice fast small medical. Strong this also from short.\n"
-                "Story side speak close. Analysis hair rest wide particular sell."
-            ),
-            "language": "Rust",
-            "functionNames": ["comment"]
-        },
-        {
-            "supabaseChunkId": "fdda052a-ca4f-40b5-ae99-a711e2161d85",
-            "codeContent": (
-                "Expect several evening town. Store begin treat stage. Us increase how hear history bank.\n"
-                "Five between research. Social case expert stop receive catch."
-            ),
-            "language": "JavaScript",
-            "functionNames": ["function"]
-        }
-    ]
-    try:
-        with client.batch.dynamic() as batch:
-            for chunk in code_chunks:
-                batch.add_object(
-                    collection="weaviate_code_chunk",
-                    properties=chunk
-                )
-        print("Populated: weaviate_code_chunk with sample data.")
-    except Exception as e:
-        print(f"Error populating weaviate_code_chunk: {e}")
-def populate_Weaviate_interaction(client):
-    interactions = [
-        {
-            "supabaseInteractionId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
-            "conversationSummary": "User asked about C++ code chunk.",
-            "platform": "web",
-            "topics": ["C++", "Code Chunk"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "b6bbdb5a-deb1-43c7-bf99-b9f88e4af1ed",
-            "conversationSummary": "User inquired about Go function.",
-            "platform": "mobile",
-            "topics": ["Go", "Function"],
-            "embedding": [0.4, 0.5, 0.6]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "1f787967-316c-4232-b251-64bcf8e3251b",
-            "conversationSummary": "User asked for a summary of the C++ module.",
-            "platform": "web",
-            "topics": ["C++", "Module"],
-            "embedding": [0.7, 0.8, 0.9]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "233530b2-d89f-416d-a73c-40b4ebb33c50",
-            "conversationSummary": "User inquired about the import statement in C++.",
-            "platform": "web",
-            "topics": ["C++", "Import"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "b3103899-d683-422a-9072-2ad26050d8f5",
-            "conversationSummary": "User asked if this function in C++ is recursive.",
-            "platform": "web",
-            "topics": ["C++", "Function", "Recursion"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "28ea68b7-1f26-472c-b568-319e1d41732b",
-            "conversationSummary": "User inquired about what this module handles in the codebase.",
-            "platform": "web",
-            "topics": ["C++", "Module"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "1cb8ccc0-db27-49c5-8dff-8d535d5a37d3",
-            "conversationSummary": "User asked about the logic in this C++ module.",
-            "platform": "web",
-            "topics": ["C++", "Module"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "9edaae8a-3d6c-47c1-8777-ff0b0002b85a",
-            "conversationSummary": "User inquired about the import statement in Java.",
-            "platform": "web",
-            "topics": ["Java", "Import"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "d1927881-d0e7-4df3-a97a-18521db08ff4",
-            "conversationSummary": "User asked if this is a comment or code in Rust.",
-            "platform": "web",
-            "topics": ["Rust", "Comment", "Code"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        },
-        {
-            "supabaseInteractionId": "fdda052a-ca4f-40b5-ae99-a711e2161d85",
-            "conversationSummary": "User inquired about the output of this JavaScript function.",
-            "platform": "web",
-            "topics": ["JavaScript", "Function", "Output"],
-            "embedding": [0.1, 0.2, 0.3]  # Example embedding vector
-        }
-    ]
-    try:
-        with client.batch.dynamic() as batch:
-            for interaction in interactions:
-                batch.add_object(
-                    collection="weaviate_interaction",
-                    properties=interaction
-                )
-        print("Populated: weaviate_interaction with sample data.")
-    except Exception as e:
-        print(f"Error populating weaviate_interaction: {e}")
-def populate_Weaviate_user_profile(client):
     user_profiles = [
         {
-            "supabaseUserId": "095a5ff0-545a-48ff-83ad-2ea3566f5674",
-            "profileSummary": "Experienced C++ developer with a focus on performance optimization.",
-            "primaryLanguages": ["C++", "Python"],
-            "expertiseAreas": ["Performance Tuning", "Concurrency"]
+            "user_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+            "github_username": "jane-dev",
+            "display_name": "Jane Developer",
+            "bio": "Creator of innovative open-source tools. Full-stack developer with a passion for Rust and WebAssembly.",
+            "location": "Berlin, Germany",
+            "repositories": json.dumps([
+                {
+                    "name": "rust-web-framework",
+                    "description": "A high-performance web framework for Rust.",
+                    "url": "https://github.com/jane-dev/rust-web-framework",
+                    "languages": ["Rust", "TOML"],
+                    "stars": 2500,
+                    "forks": 400
+                },
+                {
+                    "name": "data-viz-lib",
+                    "description": "A declarative data visualization library for JavaScript.",
+                    "url": "https://github.com/jane-dev/data-viz-lib",
+                    "languages": ["JavaScript", "TypeScript"],
+                    "stars": 1200,
+                    "forks": 150
+                }
+            ]),
+            "languages": ["Rust", "JavaScript", "TypeScript", "TOML"],
+            "topics": ["rust", "webdev", "performance", "framework", "data-visualization", "d3", "charts"],
+            "followers_count": 1800,
+            "following_count": 250,
+            "total_stars_received": 3700,
+            "total_forks": 550,
+            "profile_text_for_embedding": "Jane Developer, Creator of innovative open-source tools. Full-stack developer with a passion for Rust and WebAssembly. Repositories: rust-web-framework, A high-performance web framework for Rust. data-viz-lib, A declarative data visualization library for JavaScript. Languages: Rust, JavaScript, TypeScript. Topics: rust, webdev, performance, data-visualization.",
+            "last_updated": current_time
         },
         {
-            "supabaseUserId": "b6bbdb5a-deb1-43c7-bf99-b9f88e4af1ed",
-            "profileSummary": "Go developer with a passion for building scalable systems.",
-            "primaryLanguages": ["Go", "JavaScript"],
-            "expertiseAreas": ["Microservices", "Cloud Computing"]
+            "user_id": "b2c3d4e5-f6g7-8901-2345-678901bcdefg",
+            "github_username": "python-ninja",
+            "display_name": "Alex Chen",
+            "bio": "Python enthusiast and machine learning researcher. Building the future of AI.",
+            "location": "San Francisco, CA",
+            "repositories": json.dumps([
+                {
+                    "name": "ml-toolkit",
+                    "description": "A comprehensive machine learning toolkit for Python.",
+                    "url": "https://github.com/python-ninja/ml-toolkit",
+                    "languages": ["Python", "Jupyter Notebook"],
+                    "stars": 3200,
+                    "forks": 580
+                },
+                {
+                    "name": "data-pipeline",
+                    "description": "Scalable data processing pipeline for big data applications.",
+                    "url": "https://github.com/python-ninja/data-pipeline",
+                    "languages": ["Python", "SQL"],
+                    "stars": 1800,
+                    "forks": 320
+                }
+            ]),
+            "languages": ["Python", "SQL", "Jupyter Notebook"],
+            "topics": ["machine-learning", "ai", "data-science", "python", "big-data"],
+            "followers_count": 2400,
+            "following_count": 180,
+            "total_stars_received": 5000,
+            "total_forks": 900,
+            "profile_text_for_embedding": "Alex Chen, Python enthusiast and machine learning researcher. Building the future of AI. Repositories: ml-toolkit, A comprehensive machine learning toolkit for Python. data-pipeline, Scalable data processing pipeline for big data applications. Languages: Python, SQL. Topics: machine-learning, ai, data-science, python.",
+            "last_updated": current_time
         },
         {
-            "supabaseUserId": "1f787967-316c-4232-b251-64bcf8e3251b",
-            "profileSummary": "C++ module developer with experience in embedded systems.",
-            "primaryLanguages": ["C++", "Rust"],
-            "expertiseAreas": ["Embedded Systems", "Real-time Processing"]
+            "user_id": "c3d4e5f6-g7h8-9012-3456-789012cdefgh",
+            "github_username": "go-developer",
+            "display_name": "Sam Rodriguez",
+            "bio": "Cloud infrastructure engineer specializing in Go and Kubernetes.",
+            "location": "Austin, TX",
+            "repositories": json.dumps([
+                {
+                    "name": "k8s-operator",
+                    "description": "Custom Kubernetes operator for managing microservices.",
+                    "url": "https://github.com/go-developer/k8s-operator",
+                    "languages": ["Go", "Dockerfile"],
+                    "stars": 1500,
+                    "forks": 280
+                }
+            ]),
+            "languages": ["Go", "Dockerfile"],
+            "topics": ["kubernetes", "microservices", "cloud", "devops", "api"],
+            "followers_count": 890,
+            "following_count": 120,
+            "total_stars_received": 1500,
+            "total_forks": 280,
+            "profile_text_for_embedding": "Sam Rodriguez, Cloud infrastructure engineer specializing in Go and Kubernetes. Repositories: k8s-operator, Custom Kubernetes operator for managing microservices. Languages: Go, Dockerfile. Topics: kubernetes, microservices, cloud, devops.",
+            "last_updated": current_time
         },
         {
-            "supabaseUserId": "233530b2-d89f-416d-a73c-40b4ebb33c50",
-            "profileSummary": "C++ developer with a knack for clean imports and modular code.",
-            "primaryLanguages": ["C++"],
-            "expertiseAreas": ["Code Organization", "Modularity"]
+            "user_id": "d4e5f6g7-h8i9-0123-4567-890123defghi",
+            "github_username": "frontend-wizard",
+            "display_name": "Emily Johnson",
+            "bio": "Frontend developer creating beautiful and accessible web experiences.",
+            "location": "New York, NY",
+            "repositories": json.dumps([
+                {
+                    "name": "react-components",
+                    "description": "Reusable React component library with TypeScript.",
+                    "url": "https://github.com/frontend-wizard/react-components",
+                    "languages": ["TypeScript", "CSS", "JavaScript"],
+                    "stars": 2100,
+                    "forks": 420
+                },
+                {
+                    "name": "css-animations",
+                    "description": "Collection of smooth CSS animations and transitions.",
+                    "url": "https://github.com/frontend-wizard/css-animations",
+                    "languages": ["CSS", "HTML"],
+                    "stars": 850,
+                    "forks": 180
+                }
+            ]),
+            "languages": ["TypeScript", "JavaScript", "CSS", "HTML"],
+            "topics": ["react", "frontend", "typescript", "css", "ui-ux", "accessibility"],
+            "followers_count": 1320,
+            "following_count": 200,
+            "total_stars_received": 2950,
+            "total_forks": 600,
+            "profile_text_for_embedding": "Emily Johnson, Frontend developer creating beautiful and accessible web experiences. Repositories: react-components, Reusable React component library with TypeScript. css-animations, Collection of smooth CSS animations and transitions. Languages: TypeScript, JavaScript, CSS. Topics: react, frontend, typescript, css, ui-ux.",
+            "last_updated": current_time
         },
         {
-            "supabaseUserId": "b3103899-d683-422a-9072-2ad26050d8f5",
-            "profileSummary": "C++ enthusiast focusing on algorithmic challenges.",
-            "primaryLanguages": ["C++"],
-            "expertiseAreas": ["Algorithms", "Problem Solving"]
-        },
-        {
-            "supabaseUserId": "28ea68b7-1f26-472c-b568-319e1d41732b",
-            "profileSummary": "C++ developer with experience in system architecture.",
-            "primaryLanguages": ["C++"],
-            "expertiseAreas": ["System Design", "Architecture"]
-        },
-        {
-            "supabaseUserId": "1cb8ccc0-db27-49c5-8dff-8d535d5a37d3",
-            "profileSummary": "C++ developer passionate about medical technology.",
-            "primaryLanguages": ["C++"],
-            "expertiseAreas": ["Medical Tech", "Data Analysis"]
-        },
-        {
-            "supabaseUserId": "9edaae8a-3d6c-47c1-8777-ff0b0002b85a",
-            "profileSummary": "Java developer with a focus on enterprise solutions.",
-            "primaryLanguages": ["Java"],
-            "expertiseAreas": ["Enterprise Software", "APIs"]
-        },
-        {
-            "supabaseUserId": "d1927881-d0e7-4df3-a97a-18521db08ff4",
-            "profileSummary": "Rustacean interested in safe and fast code.",
-            "primaryLanguages": ["Rust"],
-            "expertiseAreas": ["Memory Safety", "Performance"]
-        },
-        {
-            "supabaseUserId": "fdda052a-ca4f-40b5-ae99-a711e2161d85",
-            "profileSummary": "JavaScript developer with a love for UI/UX.",
-            "primaryLanguages": ["JavaScript"],
-            "expertiseAreas": ["Frontend", "User Experience"]
+            "user_id": "e5f6g7h8-i9j0-1234-5678-901234efghij",
+            "github_username": "rust-enthusiast",
+            "display_name": "David Kim",
+            "bio": "Systems programmer passionate about performance and memory safety.",
+            "location": "Seattle, WA",
+            "repositories": json.dumps([
+                {
+                    "name": "memory-allocator",
+                    "description": "Custom memory allocator written in Rust for high-performance applications.",
+                    "url": "https://github.com/rust-enthusiast/memory-allocator",
+                    "languages": ["Rust"],
+                    "stars": 1750,
+                    "forks": 240
+                },
+                {
+                    "name": "concurrent-data-structures",
+                    "description": "Lock-free data structures for concurrent programming in Rust.",
+                    "url": "https://github.com/rust-enthusiast/concurrent-data-structures",
+                    "languages": ["Rust"],
+                    "stars": 1200,
+                    "forks": 180
+                }
+            ]),
+            "languages": ["Rust", "C++", "Assembly"],
+            "topics": ["rust", "systems-programming", "performance", "memory-safety", "concurrency"],
+            "followers_count": 980,
+            "following_count": 85,
+            "total_stars_received": 2950,
+            "total_forks": 420,
+            "profile_text_for_embedding": "David Kim, Systems programmer passionate about performance and memory safety. Repositories: memory-allocator, Custom memory allocator written in Rust for high-performance applications. concurrent-data-structures, Lock-free data structures for concurrent programming in Rust. Languages: Rust, C++, Assembly. Topics: rust, systems-programming, performance, memory-safety.",
+            "last_updated": current_time
         }
     ]
+
     try:
         with client.batch.dynamic() as batch:
             for profile in user_profiles:
@@ -256,13 +175,16 @@ def populate_Weaviate_user_profile(client):
                     collection="weaviate_user_profile",
                     properties=profile
                 )
-        print("Populated: weaviate_user_profile with sample data.")
+        print("✅ Populated weaviate_user_profile with sample user data.")
     except Exception as e:
-        print(f"Error populating weaviate_user_profile: {e}")
+        print(f"❌ Error populating weaviate_user_profile: {e}")
+
 def populate_all_collections():
+    """
+    Populate only the user profile collection as per the updated model structure.
+    """
     client = get_client()
-    print("Populating Weaviate collections with sample data...")
-    populate_Weaviate_code_chunk(client)
-    populate_Weaviate_interaction(client)
-    populate_Weaviate_user_profile(client)
-    print("✅ All collections populated with sample data.")
+    print("Populating Weaviate user profile collection with sample data...")
+    populate_weaviate_user_profile(client)
+    client.close()
+    print("✅ User profile collection populated successfully.")
