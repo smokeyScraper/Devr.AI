@@ -10,7 +10,7 @@ from app.api.v1.auth import router as auth_router
 from app.core.config import settings
 from app.core.orchestration.agent_coordinator import AgentCoordinator
 from app.core.orchestration.queue_manager import AsyncQueueManager
-# from app.db.weaviate.weaviate_client import get_client
+from app.db.weaviate.weaviate_client import get_weaviate_client
 from bots.discord.discord_bot import DiscordBot
 from bots.discord.discord_cogs import DevRelCommands
 
@@ -28,13 +28,7 @@ class DevRAIApplication:
 
     def __init__(self):
         """Initializes all services required by the application."""
-        # try:
-        #     self.weaviate_client = get_client()
-        #     logger.info(f"Weaviate client initialized: {self.weaviate_client.is_ready()}")
-        # except Exception as e:
-        #     logger.error(f"Fatal: Error initializing Weaviate client: {e}", exc_info=True)
-        #     self.weaviate_client = None
-        #     sys.exit(1)
+        self.weaviate_client = None
         self.queue_manager = AsyncQueueManager()
         self.agent_coordinator = AgentCoordinator(self.queue_manager)
         self.discord_bot = DiscordBot(self.queue_manager)
@@ -44,6 +38,9 @@ class DevRAIApplication:
         """Starts the Discord bot and queue workers in the background."""
         try:
             logger.info("Starting background tasks (Discord Bot & Queue Manager)...")
+
+            await self.test_weaviate_connection()
+
             await self.queue_manager.start(num_workers=3)
             asyncio.create_task(
                 self.discord_bot.start(settings.discord_bot_token)
@@ -52,6 +49,17 @@ class DevRAIApplication:
         except Exception as e:
             logger.error(f"Error during background task startup: {e}", exc_info=True)
             await self.stop_background_tasks()
+
+    async def test_weaviate_connection(self):
+        """Test Weaviate connection during startup."""
+        try:
+            async with get_weaviate_client() as client:
+                is_ready = await client.is_ready()
+                if is_ready:
+                    logger.info("Weaviate connection successful and ready")
+        except Exception as e:
+            logger.error(f"Failed to connect to Weaviate: {e}")
+            raise
 
     async def stop_background_tasks(self):
         """Stops all background tasks and connections gracefully."""
@@ -69,13 +77,6 @@ class DevRAIApplication:
             logger.info("Queue manager has been stopped.")
         except Exception as e:
             logger.error(f"Error stopping queue manager: {e}", exc_info=True)
-
-        try:
-            if hasattr(self, 'weaviate_client') and self.weaviate_client is not None:
-                self.weaviate_client.close()
-                logger.info("Weaviate client connection closed.")
-        except Exception as e:
-            logger.error(f"Error closing Weaviate client: {e}", exc_info=True)
 
         logger.info("All background tasks and connections stopped.")
 
@@ -102,13 +103,34 @@ async def favicon():
     """Return empty favicon to prevent 404 logs"""
     return Response(status_code=204)
 
+@api.get("/health")
+async def health_check():
+    """Health check endpoint to verify services are running"""
+    try:
+        async with get_weaviate_client() as client:
+            weaviate_ready = await client.is_ready()
+
+        return {
+            "status": "healthy",
+            "services": {
+                "weaviate": "ready" if weaviate_ready else "not_ready",
+                "discord_bot": "running" if app_instance.discord_bot and not app_instance.discord_bot.is_closed() else "stopped"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "error": str(e)
+        }
+
 api.include_router(auth_router, prefix="/v1/auth", tags=["Authentication"])
 
 
 if __name__ == "__main__":
     required_vars = [
         "DISCORD_BOT_TOKEN", "SUPABASE_URL", "SUPABASE_KEY",
-        "BACKEND_URL", "GEMINI_API_KEY", "TAVILY_API_KEY"
+        "BACKEND_URL", "GEMINI_API_KEY", "TAVILY_API_KEY", "GITHUB_TOKEN"
     ]
     missing_vars = [var for var in required_vars if not getattr(settings, var.lower(), None)]
 
