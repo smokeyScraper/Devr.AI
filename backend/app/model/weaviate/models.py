@@ -14,6 +14,20 @@ class WeaviateRepository(BaseModel):
     stars: int = Field(0, description="The number of stars the repository has.")
     forks: int = Field(0, description="The number of forks the repository has.")
 
+class WeaviatePullRequest(BaseModel):
+    """
+    Represents a single pull request created by the user.
+    Provides insights into contribution patterns and collaboration style.
+    """
+    title: str = Field(..., description="The title of the pull request.")
+    body: Optional[str] = Field(None, description="The body/description of the pull request (truncated to 500 chars).")
+    state: str = Field(..., description="The state of the PR: 'open', 'closed', etc.")
+    repository: str = Field(..., description="The full name of the repository (e.g., 'owner/repo').")
+    created_at: Optional[str] = Field(None, description="ISO timestamp when the PR was created.")
+    closed_at: Optional[str] = Field(None, description="ISO timestamp when the PR was closed (if applicable).")
+    merged_at: Optional[str] = Field(None, description="ISO timestamp when the PR was merged (if applicable).")
+    labels: List[str] = Field(default_factory=list, description="Labels associated with the pull request.")
+    url: str = Field(..., description="The URL of the pull request.")
 
 class WeaviateUserProfile(BaseModel):
     """
@@ -29,8 +43,11 @@ class WeaviateUserProfile(BaseModel):
     repositories: List[WeaviateRepository] = Field(
         default_factory=list, description="List of repositories the user's repositories.")
 
+    pull_requests: List[WeaviatePullRequest] = Field(
+        default_factory=list, description="List of pull requests the user has created.")
+
     languages: List[str] = Field(default_factory=list,
-                                 description="A unique, aggregated list of all programming languages from the user's repositories.")
+                                 description="A unique, aggregated list of top 5 languages the user is most comfortable with based on usage frequency.")
     topics: List[str] = Field(default_factory=list,
                               description="A unique, aggregated list of all topics from the user's repositories.")
 
@@ -74,6 +91,30 @@ class WeaviateUserProfile(BaseModel):
                         "topics": ["data-visualization", "d3", "charts"],
                         "stars": 1200,
                         "forks": 150
+                    }
+                ],
+                "pull_requests": [
+                    {
+                        "title": "Add async support for database connections",
+                        "body": "This PR adds comprehensive async support for database connections, improving performance by 40%...",
+                        "state": "closed",
+                        "repository": "microsoft/vscode",
+                        "created_at": "2024-01-15T10:30:00Z",
+                        "closed_at": "2024-01-20T14:20:00Z",
+                        "merged_at": "2024-01-20T14:20:00Z",
+                        "labels": ["enhancement", "database", "performance"],
+                        "url": "https://github.com/microsoft/vscode/pull/12345",
+                    },
+                    {
+                        "title": "Fix memory leak in WebAssembly module",
+                        "body": "Fixes a critical memory leak that was causing crashes in production environments...",
+                        "state": "open",
+                        "repository": "facebook/react",
+                        "created_at": "2024-02-01T09:15:00Z",
+                        "closed_at": None,
+                        "merged_at": None,
+                        "labels": ["bug", "wasm", "critical"],
+                        "url": "https://github.com/facebook/react/pull/67890",
                     }
                 ],
                 "languages": ["Rust", "JavaScript", "TypeScript", "TOML"],
