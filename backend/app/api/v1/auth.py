@@ -2,8 +2,10 @@ from fastapi import APIRouter, Request, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from app.db.supabase.supabase_client import get_supabase_client
 from app.db.supabase.users_service import find_user_by_session_and_verify, get_verification_session_info
+from app.db.weaviate.user_profiling import profile_user_from_github
 from typing import Optional
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -67,7 +69,15 @@ async def auth_callback(request: Request, code: Optional[str] = Query(None), ses
             logger.error("User verification failed - no pending verification found")
             return _error_response("No pending verification found or verification has expired. Please try the !verify_github command again.")
 
-        logger.info(f"Successfully verified user: {verified_user.id}")
+        logger.info(f"Successfully verified user: {verified_user.id}!")
+
+        logger.info(f"Indexing user: {verified_user.id} into Weaviate...")
+        try:
+            asyncio.create_task(profile_user_from_github(str(verified_user.id), github_username))
+            logger.info(f"User profiling started in background for: {verified_user.id}")
+        except Exception as e:
+            logger.error(f"Error starting user profiling: {verified_user.id}: {str(e)}")
+
         return _success_response(github_username)
 
     except Exception as e:
