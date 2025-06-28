@@ -2,8 +2,8 @@ import logging
 import json
 from typing import Optional, Dict, Any
 from datetime import datetime, timezone
-from app.model.weaviate.models import WeaviateUserProfile
-from app.db.weaviate.weaviate_client import get_weaviate_client
+from app.models.database.weaviate import WeaviateUserProfile
+from app.database.weaviate.client import get_weaviate_client
 import weaviate.exceptions as weaviate_exceptions
 import weaviate.classes as wvc
 
