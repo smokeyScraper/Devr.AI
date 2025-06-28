@@ -2,14 +2,11 @@ import discord
 from discord.ext import commands, tasks
 import logging
 from app.core.orchestration.queue_manager import AsyncQueueManager, QueuePriority
-from app.db.supabase.auth import login_with_github
-from app.db.supabase.users_service import (
-    get_or_create_user_by_discord,
-    create_verification_session,
-    cleanup_expired_tokens
-)
-from bots.discord.discord_bot import DiscordBot
-from bots.discord.discord_views import OAuthView
+from app.services.auth.supabase import login_with_github
+from app.services.auth.management import get_or_create_user_by_discord
+from app.services.auth.verification import create_verification_session, cleanup_expired_tokens
+from integrations.discord.bot import DiscordBot
+from integrations.discord.views import OAuthView
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)

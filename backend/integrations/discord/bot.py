@@ -3,7 +3,7 @@ from discord.ext import commands
 import logging
 from typing import Dict, Any, Optional
 from app.core.orchestration.queue_manager import AsyncQueueManager, QueuePriority
-from app.agents.shared.classification_router import ClassificationRouter
+from app.agents.classification_router import ClassificationRouter
 
 logger = logging.getLogger(__name__)
 
