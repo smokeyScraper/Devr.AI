@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
+from pydantic import field_validator
 
 load_dotenv()
 
@@ -14,10 +15,9 @@ class Settings(BaseSettings):
     github_token: str = ""
     discord_bot_token: str = ""
 
-    # TODO: Add DB configuration
-    # Database
-    # Supabase
-    # Weaviate
+    # DB configuration
+    supabase_url: str
+    supabase_key: str
 
     # LangSmith Tracing
     langsmith_tracing: bool = False
@@ -31,6 +31,16 @@ class Settings(BaseSettings):
     classification_agent_model: str = "gemini-1.5-flash"
     agent_timeout: int = 30
     max_retries: int = 3
+
+    # Backend URL
+    backend_url: str = ""
+
+    @field_validator("supabase_url", "supabase_key", mode="before")
+    @classmethod
+    def _not_empty(cls, v, field):
+        if not v:
+            raise ValueError(f"{field.name} must be set")
+        return v
 
     class Config:
         env_file = ".env"

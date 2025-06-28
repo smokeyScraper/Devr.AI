@@ -1,28 +1,49 @@
-from app.db.supabase.supabase_client import supabase_client
-import os
-def login_with_oauth(provider: str):
+from typing import Optional
+from app.db.supabase.supabase_client import get_supabase_client
+import logging
+
+logger = logging.getLogger(__name__)
+
+async def login_with_oauth(provider: str, redirect_to: Optional[str] = None, state: Optional[str] = None):
+    """
+    Generates an asynchronous OAuth sign-in URL.
+    """
+    supabase = get_supabase_client()
     try:
-        result = supabase_client.auth.sign_in_with_oauth({
+        options = {}
+        if redirect_to:
+            options['redirect_to'] = redirect_to
+        if state:
+            options['queryParams'] = {'state': state}
+
+        result = await supabase.auth.sign_in_with_oauth({
             "provider": provider,
-            "options": {
-                "redirect_to": os.getenv("SUPABASE_REDIRECT_URL", "http://localhost:3000/home")
-            }
+            "options": options
         })
         return {"url": result.url}
     except Exception as e:
-        raise Exception(f"OAuth login failed for {provider}: {str(e)}")
+        logger.error(f"OAuth login failed for provider {provider}: {e}", exc_info=True)
+        raise
 
+async def login_with_github(redirect_to: Optional[str] = None, state: Optional[str] = None):
+    """Generates a GitHub OAuth login URL."""
+    return await login_with_oauth("github", redirect_to=redirect_to, state=state)
 
-def login_with_github():
-    return login_with_oauth("github")
+async def login_with_discord(redirect_to: Optional[str] = None):
+    """Generates a Discord OAuth login URL."""
+    return await login_with_oauth("discord", redirect_to=redirect_to)
 
-def login_with_discord():
-    return login_with_oauth("discord")
+async def login_with_slack(redirect_to: Optional[str] = None):
+    """Generates a Slack OAuth login URL."""
+    return await login_with_oauth("slack", redirect_to=redirect_to)
 
-def logout(access_token: str):
+async def logout(access_token: str):
+    """Logs out a user by revoking their session."""
+    supabase = get_supabase_client()
     try:
-        supabase_client.auth.set_session(access_token, refresh_token="")
-        supabase_client.auth.sign_out()
+        await supabase.auth.set_session(access_token, refresh_token="")
+        await supabase.auth.sign_out()
         return {"message": "User logged out successfully"}
     except Exception as e:
-        raise Exception(f"Logout failed: {str(e)}")
+        logger.error(f"Logout failed: {e}", exc_info=True)
+        raise

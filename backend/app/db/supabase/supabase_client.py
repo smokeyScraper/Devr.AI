@@ -1,17 +1,13 @@
-import os
-from dotenv import load_dotenv
-from supabase import create_client
+from app.core.config import settings
+from supabase._async.client import AsyncClient
 
-load_dotenv()
+supabase_client: AsyncClient = AsyncClient(
+    settings.supabase_url,
+    settings.supabase_key
+)
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-if SUPABASE_URL is None or SUPABASE_KEY is None:
-    raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in environment variables.")
-
-supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-
-def get_supabase_client():
+def get_supabase_client() -> AsyncClient:
+    """
+    Returns a shared asynchronous Supabase client instance.
+    """
     return supabase_client
