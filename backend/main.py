@@ -114,7 +114,11 @@ async def health_check():
             "status": "healthy",
             "services": {
                 "weaviate": "ready" if weaviate_ready else "not_ready",
-                "discord_bot": "running" if app_instance.discord_bot and not app_instance.discord_bot.is_closed() else "stopped"
+                "discord_bot": (
+                    "running"
+                    if app_instance.discord_bot and not app_instance.discord_bot.is_closed()
+                    else "stopped"
+                )
             }
         }
     except Exception as e:
