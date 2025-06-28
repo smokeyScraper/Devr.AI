@@ -1,5 +1,5 @@
 import logging
-from app.agents.shared.state import AgentState
+from app.agents.state import AgentState
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, Any
-from app.agents.shared.state import AgentState
+from app.agents.state import AgentState
 from langchain_core.messages import HumanMessage
 from app.agents.devrel.prompts.summarization_prompt import CONVERSATION_SUMMARY_PROMPT
 
@@ -12,7 +12,9 @@ SUMMARIZATION_THRESHOLD = 5
 THREAD_TIMEOUT_HOURS = 1
 
 async def check_summarization_needed(state: AgentState) -> Dict[str, Any]:
-    """Check if summarization is needed and update interaction count"""
+    """
+    Check if summarization is needed and update interaction count
+    """
 
     current_count = getattr(state, 'interaction_count', 0)
     new_count = current_count + 1
@@ -46,14 +48,15 @@ async def check_summarization_needed(state: AgentState) -> Dict[str, Any]:
     return updates
 
 async def summarize_conversation_node(state: AgentState, llm) -> Dict[str, Any]:
-    """Summarize the conversation and update the state"""
+    """
+    Summarize the conversation and update the state
+    """
     logger.info(f"Summarizing conversation for session {state.session_id}")
 
     try:
         current_count = state.interaction_count
         logger.info(f"Summarizing at interaction count: {current_count}")
 
-        # Get the recent messages
         all_messages = state.messages
 
         if not all_messages:
@@ -66,7 +69,6 @@ async def summarize_conversation_node(state: AgentState, llm) -> Dict[str, Any]:
             for msg in all_messages
         ])
 
-        # Create prompt
         existing_summary = state.conversation_summary
         if not existing_summary or existing_summary == "This is the beginning of our conversation.":
             existing_summary = "No previous summary - this is the start of our conversation tracking."
@@ -85,11 +87,9 @@ async def summarize_conversation_node(state: AgentState, llm) -> Dict[str, Any]:
         logger.info(f"Generating summary with {len(all_messages)} messages, "
                     f"conversation text length: {len(conversation_text)}")
 
-        # Generate summary
         response = await llm.ainvoke([HumanMessage(content=prompt)])
         new_summary = response.content.strip()
 
-        # Extract key topics from summary
         new_topics = await _extract_key_topics(new_summary, llm)
 
         logger.info(f"Conversation summarized successfully for session {state.session_id}")
@@ -121,7 +121,6 @@ async def _extract_key_topics(summary: str, llm) -> list[str]:
         response = await llm.ainvoke([HumanMessage(content=topic_prompt)])
         topics_text = response.content.strip()
 
-        # Parse topics from response
         topics = [topic.strip() for topic in topics_text.split(',') if topic.strip()]
         return topics[:5]  # Limiting to 5 topics
 

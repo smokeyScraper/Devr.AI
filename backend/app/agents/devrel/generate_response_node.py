@@ -1,28 +1,12 @@
 import logging
 from typing import Dict, Any
-from app.agents.shared.state import AgentState
+from app.agents.state import AgentState
 from langchain_core.messages import HumanMessage
-from ..prompts.base_prompt import GENERAL_LLM_RESPONSE_PROMPT
+from .prompts.base_prompt import GENERAL_LLM_RESPONSE_PROMPT
+from .nodes.handlers.web_search import create_search_response
 
 logger = logging.getLogger(__name__)
 
-async def _create_search_response(task_result: Dict[str, Any]) -> str:
-    """Create a response string from search results."""
-    query = task_result.get("query")
-    results = task_result.get("results", [])
-    if not results:
-        return f"I couldn't find any information for '{query}'. You might want to try rephrasing your search."
-
-    response_parts = [f"Here's what I found for '{query}':"]
-    for i, result in enumerate(results[:3]):
-        title = result.get('title', 'N/A')
-        snippet = result.get('snippet', 'N/A')
-        url = result.get('url', '#')
-        result_line = f"{i+1}. {title}: {snippet}"
-        response_parts.append(result_line)
-        response_parts.append(f"   (Source: {url})")
-    response_parts.append("You can ask me to search again with a different query if these aren't helpful.")
-    return "\n".join(response_parts)
 
 async def _create_llm_response(state: AgentState, task_result: Dict[str, Any], llm) -> str:
     """Generate a response using the LLM based on the current state and task result."""
@@ -89,7 +73,7 @@ async def generate_response_node(state: AgentState, llm) -> dict:
     if task_result.get("type") == "faq":
         final_response = task_result.get("response", "I don't have a specific answer for that question.")
     elif task_result.get("type") == "web_search":
-        final_response = await _create_search_response(task_result)
+        final_response = create_search_response(task_result)
     else:
         final_response = await _create_llm_response(state, task_result, llm)
 

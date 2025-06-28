@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
-from app.agents.shared.state import AgentState
-from app.agents.shared.classification_router import MessageCategory
+from app.agents.state import AgentState
 
 logger = logging.getLogger(__name__)
 
