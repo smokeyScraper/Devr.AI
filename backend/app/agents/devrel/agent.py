@@ -4,18 +4,18 @@ from functools import partial
 from langgraph.graph import StateGraph, END
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import InMemorySaver
-from ..shared.base_agent import BaseAgent, AgentState
-from ..shared.classification_router import MessageCategory
+from ..base_agent import BaseAgent, AgentState
+from ..classification_router import MessageCategory
 from .tools.search_tool import TavilySearchTool
 from .tools.faq_tool import FAQTool
 from app.core.config import settings
-from .nodes.gather_context_node import gather_context_node
-from .nodes.handle_faq_node import handle_faq_node
-from .nodes.handle_web_search_node import handle_web_search_node
-from .nodes.handle_technical_support_node import handle_technical_support_node
-from .nodes.handle_onboarding_node import handle_onboarding_node
-from .nodes.generate_response_node import generate_response_node
-from .nodes.summarization_node import check_summarization_needed, summarize_conversation_node, store_summary_to_database
+from .nodes.gather_context import gather_context_node
+from .nodes.handlers.faq import handle_faq_node
+from .nodes.handlers.web_search import handle_web_search_node
+from .nodes.handlers.technical_support import handle_technical_support_node
+from .nodes.handlers.onboarding import handle_onboarding_node
+from .generate_response_node import generate_response_node
+from .nodes.summarization import check_summarization_needed, summarize_conversation_node, store_summary_to_database
 
 logger = logging.getLogger(__name__)
 
