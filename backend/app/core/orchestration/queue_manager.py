@@ -28,12 +28,20 @@ class AsyncQueueManager:
         self.connection: Optional[aio_pika.RobustConnection] = None
         self.channel: Optional[aio_pika.abc.AbstractChannel] = None
 
+from app.core.config import settings
+
     async def connect(self):
-        self.connection = await aio_pika.connect_robust("amqp://guest:guest@localhost/")
-        self.channel = await self.connection.channel()
-        # Declare queues
-        for queue_name in self.queues.values():
-            await self.channel.declare_queue(queue_name, durable=True)
+        try:
+            rabbitmq_url = getattr(settings, 'rabbitmq_url', 'amqp://guest:guest@localhost/')
+            self.connection = await aio_pika.connect_robust(rabbitmq_url)
+            self.channel = await self.connection.channel()
+            # Declare queues
+            for queue_name in self.queues.values():
+                await self.channel.declare_queue(queue_name, durable=True)
+            logger.info("Successfully connected to RabbitMQ")
+        except Exception as e:
+            logger.error(f"Failed to connect to RabbitMQ: {e}")
+            raise
 
     async def start(self, num_workers: int = 3):
         """Start the queue processing workers"""
