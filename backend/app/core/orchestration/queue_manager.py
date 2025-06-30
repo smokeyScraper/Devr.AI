@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import Enum
 import aio_pika
 import json
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class AsyncQueueManager:
         self.connection: Optional[aio_pika.RobustConnection] = None
         self.channel: Optional[aio_pika.abc.AbstractChannel] = None
 
-from app.core.config import settings
+
 
     async def connect(self):
         try:
