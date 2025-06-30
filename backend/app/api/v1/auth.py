@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Request, HTTPException, Query
 from fastapi.responses import HTMLResponse
-from app.db.supabase.supabase_client import get_supabase_client
-from app.db.supabase.users_service import find_user_by_session_and_verify, get_verification_session_info
-from app.db.weaviate.user_profiling import profile_user_from_github
+from app.database.supabase.client import get_supabase_client
+from app.services.auth.verification import find_user_by_session_and_verify, get_verification_session_info
+from app.services.user.profiling import profile_user_from_github
 from typing import Optional
 import logging
 import asyncio
