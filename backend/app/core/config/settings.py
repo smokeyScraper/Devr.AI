@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     classification_agent_model: str = "gemini-1.5-flash"
     agent_timeout: int = 30
     max_retries: int = 3
+    
+    # RabbitMQ configuration
+    rabbitmq_url: str = ""
 
     # Backend URL
     backend_url: str = ""
