@@ -3,7 +3,7 @@ import logging
 from langchain_core.messages import HumanMessage
 from app.agents.devrel.nodes.handlers.web_search import _extract_search_query
 from .search import handle_web_search
-from ..prompts.general_github_help import GENERAL_GITHUB_HELP_PROMPT
+from app.agents.devrel.github.prompts.general_github_help import GENERAL_GITHUB_HELP_PROMPT
 
 logger = logging.getLogger(__name__)
 
