@@ -215,7 +215,7 @@ class WeaviateUserOperations:
 
     # TODO: Add hybrid search for contributors. Default in built hybrid search doesn't support custom vectors.
 
-    async def get_contributor_profile(self, github_username: str) -> Optional[Dict[str, Any]]:
+    async def get_contributor_profile(self, github_username: str) -> Optional[WeaviateUserProfile]:
         """Get a specific contributor's profile by GitHub username."""
         try:
             async with get_weaviate_client() as client:
@@ -285,7 +285,7 @@ async def store_user_profile(profile: WeaviateUserProfile, embedding_vector: Lis
     operations = WeaviateUserOperations()
     return await operations.upsert_user_profile(profile, embedding_vector)
 
-async def search_similar_contributors(query_embedding: List[float], limit: int = 10, min_distance: float = 0.5) -> List[Dict[str, Any]]:
+async def search_similar_contributors(query_embedding: List[float], limit: int = 10, min_distance: float = 0.7) -> List[Dict[str, Any]]:
     """
     Convenience function to search for similar contributors using vector similarity.
     """
@@ -299,7 +299,7 @@ async def search_contributors_by_keywords(keywords: List[str], limit: int = 10) 
     operations = WeaviateUserOperations()
     return await operations.search_contributors_by_keywords(keywords, limit)
 
-async def get_contributor_profile(github_username: str) -> Optional[Dict[str, Any]]:
+async def get_contributor_profile(github_username: str) -> Optional[WeaviateUserProfile]:
     """Convenience function to get a contributor's profile by GitHub username."""
     operations = WeaviateUserOperations()
     return await operations.get_contributor_profile(github_username)

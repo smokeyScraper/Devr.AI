@@ -156,7 +156,7 @@ class EmbeddingService:
             logger.error(f"Error summarizing profile for {profile.github_username}: {str(e)}")
             raise
 
-    async def process_user_profile(self, profile: WeaviateUserProfile) -> WeaviateUserProfile:
+    async def process_user_profile(self, profile: WeaviateUserProfile) -> tuple[WeaviateUserProfile, List[float]]:
         """Process a user profile by generating summary and embedding, then updating the profile object."""
         try:
             logger.info(f"Processing user profile for Weaviate storage: {profile.github_username}")
