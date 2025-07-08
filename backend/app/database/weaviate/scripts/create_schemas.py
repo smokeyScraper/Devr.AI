@@ -6,6 +6,7 @@ async def create_schema(client, name, properties):
     await client.collections.create(
         name=name,
         properties=properties,
+        vectorizer_config=wc.Configure.Vectorizer.none()
     )
     print(f"Created: {name}")
 
