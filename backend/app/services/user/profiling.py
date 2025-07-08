@@ -6,6 +6,7 @@ from datetime import datetime
 from collections import Counter
 from app.models.database.weaviate import WeaviateUserProfile, WeaviateRepository, WeaviatePullRequest
 from app.database.weaviate.operations import store_user_profile
+from app.services.embedding_service.service import EmbeddingService
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -281,7 +282,7 @@ class GitHubUserProfiler:
             following_count=user_data.get("following", 0),
             total_stars_received=total_stars,
             total_forks=total_forks,
-            profile_text_for_embedding="",  # TODO: Invoke agent/llm to generate this
+            profile_text_for_embedding="",  # Will be filled by embedding service
             last_updated=datetime.now()
         )
 
@@ -294,17 +295,35 @@ class GitHubUserProfiler:
 
 
 async def profile_user_from_github(user_id: str, github_username: str) -> bool:
-    """Profile a user and store in Weaviate with proper resource management."""
+    """Profile a user, generate embeddings, and store in Weaviate."""
 
     async with GitHubUserProfiler() as profiler:
         try:
             profile = await profiler.build_user_profile(user_id, github_username)
-            if profile:
-                success = await store_user_profile(profile)
+            if not profile:
+                logger.error(f"Failed to build profile for {github_username}")
+                return False
+
+            logger.info(f"Processing profile for embedding: {github_username}")
+            embedding_service = EmbeddingService()
+
+            try:
+                processed_profile, embedding_vector = await embedding_service.process_user_profile(profile)
+                logger.info(f"Successfully generated profile summary for {github_username}")
+
+                success = await store_user_profile(processed_profile, embedding_vector)
                 if success:
-                    logger.info(f"Successfully stored profile for user {github_username}")
+                    logger.info(f"Successfully stored profile for user {github_username} with embeddings")
+                else:
+                    logger.error(f"Failed to store profile for user {github_username} in Weaviate")
                 return success
-            return False
+
+            except Exception as e:
+                logger.error(f"Error processing profile with embedding service for {github_username}: {str(e)}")
+                return False
+            finally:
+                embedding_service.clear_cache()
+
         except Exception as e:
             logger.error(f"Failed to profile user {github_username}: {str(e)}")
             return False
