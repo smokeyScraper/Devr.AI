@@ -10,11 +10,12 @@
 -   [Integration Details](#integration-details)
 -   [Workflows](#workflows)
 -   [Data Flow and Storage](#data-flow-and-storage)
+-   [Planned Features & Roadmap](#planned-features--roadmap)
 -   [Deployment Strategy](#deployment-strategy)
 
 ## Project Overview
 
-Devr.AI is an advanced AI-powered Developer Relations (DevRel) assistant designed to revolutionize open-source community management. By integrating with platforms like Discord, Slack, GitHub, and Discourse, Devr.AI functions as a virtual DevRel advocate that helps maintainers engage with contributors, streamline onboarding processes, and deliver real-time project updates.
+Devr.AI is an advanced AI-powered Developer Relations (DevRel) assistant designed to revolutionize open-source community management. Currently integrating with Discord and GitHub, Devr.AI functions as a virtual DevRel advocate that helps maintainers engage with contributors, streamline onboarding processes, and deliver real-time project updates.
 
 The system leverages Large Language Models (LLMs), knowledge retrieval mechanisms, and workflow automation to enhance community engagement, simplify contributor onboarding, and ensure that open-source projects remain active and well-supported.
 
@@ -38,356 +39,366 @@ flowchart TB
     subgraph "External Platforms"
         GH["GitHub"]
         DS["Discord"]
-        SL["Slack"]
     end
 
     %% React Frontend
     subgraph "React Frontend"
-        FRONT["React + TS + TailwindCSS"]
+        FRONT["React + Vite + TailwindCSS"]
         DASH["Dashboard"]
     end
 
     %% FastAPI Backend
-    subgraph "FastAPI backend"
+    subgraph "FastAPI Backend"
         API["FastAPI Gateway"]
+        HEALTH["Health Endpoints"]
+        AUTH_EP["Auth Endpoints"]
     end
 
     %% Authentication
     subgraph "Authentication"
-        GitAuth["GitHub Authentication"]
+        GitAuth["GitHub OAuth"]
         SupaAuth["Supabase Authentication"]
     end
 
-    %% Core Processing Engine
-    subgraph "Core Processing Engine"
-        WF["Workflow Orchestrator"]
-        Q["Task Queue"]
+    %% LangGraph Agent Orchestration
+    subgraph "LangGraph Agent System"
+        AC["Agent Coordinator"]
+        DEVREL["DevRel Agent"]
+        GITHUB_AGENT["GitHub Toolkit"]
     end
 
-    %% AI Service Layer (Groq APIs)
-    subgraph "AI Service Layer (Groq APIs)"
-        LLM["LLM Service"]
-        KR["Knowledge Retrieval"]
-        CODE["Code Understanding"]
-        DOC["Documentation Assistant"]
-        CONTENT["Content Generator"]
-        PERS["Personalization Engine"]
+    %% Agent Workflow (ReAct Pattern)
+    subgraph "DevRel Agent Workflow"
+        GATHER["Gather Context"]
+        SUPERVISOR["ReAct Supervisor"]
+        TOOLS["Tool Execution"]
+        RESPONSE["Generate Response"]
+        SUMMARY["Summarization"]
+    end
+
+    %% Tools & Capabilities
+    subgraph "Agent Tools"
+        WEB_SEARCH["Web Search (Tavily)"]
+        FAQ["FAQ Tool"]
+        ONBOARD["Onboarding Tool"]
+        GH_TOOLS["GitHub Tools"]
+    end
+
+    %% Queue System
+    subgraph "Async Processing"
+        RABBIT["RabbitMQ Queue"]
+        WORKERS["Queue Workers"]
+    end
+
+    %% AI Services
+    subgraph "AI Services"
+        GEMINI["Google Gemini LLM"]
+        TAVILY["Tavily Search API"]
+        EMBEDDINGS["Text Embeddings"]
     end
 
     %% Integration Services
     subgraph "Integration Services"
-        GHS["GitHub Service"]
-        DSS["Discord Service"]
-        SLS["Slack Service"]
-        CLI["CLI Integration"]
-        WEB["Web Widget Integration"]
-        EVENT["Event Integration"]
+        DISCORD_BOT["Discord Bot"]
+        DISCORD_COGS["Discord Commands"]
+        GH_WEBHOOK["GitHub Webhooks"]
     end
 
     %% Data Storage Layer
-    subgraph "Data Storage Layer"
-        Supa["(Supabase)"]
-        VDB["Vector DB and Relational DB "]
-        UDB["User Profiles & Preferences"]
+    subgraph "Data Storage"
+        SUPA_DB["Supabase (PostgreSQL)"]
+        WEAVIATE["Weaviate (Vector DB)"]
+        MEMORY["Agent Memory Store"]
     end
 
-    %% Analytics Engine
-    subgraph "Analytics Engine"
-        METRICS["Metrics Calculator"]
-        REPORT["Report Generator"]
-        TREND["Trend Analyzer"]
-        SENT["Sentiment Analysis"]
+    %% User Management
+    subgraph "User Management"
+        USER_PROF["User Profiles"]
+        VERIFICATION["GitHub Verification"]
+        SESSIONS["Conversation Sessions"]
     end
 
-    %% Education & Advocacy Layer
-    subgraph "Education & Advocacy"
-        TUT["Interactive Tutorials"]
-        QSTART["Quickstart Generator"]
-        LIVE["Live Code Assistance"]
-    end
-
-    %% Connections
+    %% Connections - External to Frontend
     FRONT --> DASH
     DASH <--> API
 
-    GH <--> GHS
-    DS <--> DSS
-    SL <--> SLS
+    %% API Endpoints
+    API --> HEALTH
+    API --> AUTH_EP
 
-    GHS <--> API
-    DSS <--> API
-    SLS <--> API
-    CLI <--> API
-    WEB <--> API
-    EVENT <--> API
+    %% External Platform Connections
+    DS <--> DISCORD_BOT
+    GH <--> GH_WEBHOOK
 
+    %% Discord Integration
+    DISCORD_BOT <--> DISCORD_COGS
+    DISCORD_BOT <--> RABBIT
+
+    %% Authentication Flow
     API <--> GitAuth
     API <--> SupaAuth
+    AUTH_EP <--> VERIFICATION
 
-    API <--> WF
+    %% Agent Orchestration
+    RABBIT <--> AC
+    AC --> DEVREL
+    AC --> GITHUB_AGENT
 
-    WF <--> Q
+    %% Agent Workflow
+    DEVREL --> GATHER
+    GATHER --> SUPERVISOR
+    SUPERVISOR --> TOOLS
+    TOOLS --> RESPONSE
+    RESPONSE --> SUMMARY
 
-    WF <--> LLM
-    WF <--> KR
-    WF <--> CODE
-    WF <--> DOC
-    WF <--> CONTENT
-    WF <--> PERS
+    %% Tool Connections
+    TOOLS --> WEB_SEARCH
+    TOOLS --> FAQ
+    TOOLS --> ONBOARD
+    TOOLS --> GH_TOOLS
 
-    LLM <--> Supa
-    KR <--> Supa
-    CODE <--> Supa
-    DOC <--> Supa
-    CONTENT <--> Supa
-    PERS <--> UDB
-    Supa --> VDB
+    %% AI Service Connections
+    SUPERVISOR <--> GEMINI
+    RESPONSE <--> GEMINI
+    WEB_SEARCH <--> TAVILY
+    EMBEDDINGS <--> WEAVIATE
 
-    WF --> METRICS
-    WF --> TUT
-    WF --> QSTART
-    WF --> LIVE
+    %% Data Storage Connections
+    DEVREL <--> MEMORY
+    USER_PROF <--> SUPA_DB
+    VERIFICATION <--> SUPA_DB
+    SESSIONS <--> SUPA_DB
+    MEMORY <--> WEAVIATE
 
-    METRICS --> REPORT
-    METRICS --> TREND
-    METRICS --> SENT
-    REPORT --> Supa
-    TREND --> Supa
-    SENT --> Supa
+    %% Queue Processing
+    RABBIT --> WORKERS
+    WORKERS --> AC
 
-    TUT --> DASH
-    QSTART --> DASH
-    LIVE --> DASH
+    %% Response Flow
+    RESPONSE --> RABBIT
+    RABBIT --> DISCORD_BOT
 
-    %% Styling for Light Colors with Black Text
-    classDef external fill:#e0f7fa,stroke:#00796b,stroke-width:1px,color:#000;
-    classDef backend fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000;
-    classDef auth fill:#f3e5f5,stroke:#8e24aa,stroke-width:1px,color:#000;
-    classDef core fill:#fff3e0,stroke:#f57c00,stroke-width:1px,color:#000;
-    classDef ai fill:#e1f5fe,stroke:#0288d1,stroke-width:1px,color:#000;
-    classDef integration fill:#fce4ec,stroke:#d81b60,stroke-width:1px,color:#000;
-    classDef storage fill:#ede7f6,stroke:#5e35b1,stroke-width:1px,color:#000;
-    classDef analytics fill:#e8eaf6,stroke:#3949ab,stroke-width:1px,color:#000;
-    classDef education fill:#fce4ec,stroke:#c2185b,stroke-width:1px,color:#000;
+    %% Styling
+    classDef external fill:#e0f7fa,stroke:#00796b,stroke-width:2px,color:#000;
+    classDef frontend fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000;
+    classDef backend fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#000;
+    classDef auth fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000;
+    classDef agents fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#000;
+    classDef workflow fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000;
+    classDef tools fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000;
+    classDef queue fill:#fff8e1,stroke:#ffa000,stroke-width:2px,color:#000;
+    classDef ai fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#000;
+    classDef integration fill:#fce4ec,stroke:#d81b60,stroke-width:2px,color:#000;
+    classDef storage fill:#ede7f6,stroke:#5e35b1,stroke-width:2px,color:#000;
+    classDef users fill:#f1f8e9,stroke:#689f38,stroke-width:2px,color:#000;
 
-    %% Apply classes to nodes
-    class GH,DS,SL external;
-    class API backend;
-    class GitAuth,SupaAuth,FRONT auth;
-    class WF,Q core;
-    class LLM,KR,CODE,DOC,CONTENT,PERS,DASH ai;
-    class GHS,DSS,SLS,CLI,WEB,EVENT integration;
-    class VDB,UDB storage;
-    class METRICS,REPORT,TREND,SENT analytics;
-    class TUT,QSTART,LIVE education;
+    %% Apply classes
+    class GH,DS external;
+    class FRONT,DASH frontend;
+    class API,HEALTH,AUTH_EP backend;
+    class GitAuth,SupaAuth auth;
+    class AC,DEVREL,GITHUB_AGENT agents;
+    class GATHER,SUPERVISOR,TOOLS,RESPONSE,SUMMARY workflow;
+    class WEB_SEARCH,FAQ,ONBOARD,GH_TOOLS tools;
+    class RABBIT,WORKERS queue;
+    class GEMINI,TAVILY,EMBEDDINGS ai;
+    class DISCORD_BOT,DISCORD_COGS,GH_WEBHOOK integration;
+    class SUPA_DB,WEAVIATE,MEMORY storage;
+    class USER_PROF,VERIFICATION,SESSIONS users;
 ```
 
 ### High-Level Architecture Overview
 
-Devr.AI follows a microservices architecture with the following key components:
+Devr.AI is built on a **LangGraph agent-based architecture** that replaces traditional centralized LLM approaches with autonomous, reasoning agents that can think, act, and observe. The system follows a **ReAct (Reasoning and Acting) pattern** for intelligent decision-making and tool usage.
 
--   **API Gateway Layer**
+#### **Core Architectural Components**
 
-    -   Handles all incoming requests from integrated platforms
-    -   Manages authentication and request routing
-    -   Implements rate limiting and request validation
+-   **LangGraph Agent System**
 
--   **Core Processing Engine**
+    -   **Agent Coordinator**: Central orchestrator that manages agent instances and handles routing between different specialized agents
+    -   **DevRel Agent**: Primary conversational agent using ReAct workflow for community support and engagement
+    -   **GitHub Toolkit**: Specialized agent for GitHub-specific operations and integrations
 
-    -   Orchestrates workflows between different services
-    -   Manages the processing queue for asynchronous tasks
-    -   Handles context management for ongoing conversations
+-   **ReAct Agent Workflow**
 
--   **AI Service Layer**
+    -   **Gather Context**: Collects user information, conversation history, and platform-specific context
+    -   **ReAct Supervisor**: Implements Think → Act → Observe pattern to decide which tools to use
+    -   **Tool Execution**: Dynamically selects and executes appropriate tools (web search, FAQ, onboarding, GitHub operations)
+    -   **Generate Response**: Synthesizes tool results into coherent, contextual responses
+    -   **Summarization**: Maintains long-term conversation memory and context preservation
 
-    -   LLM integration for natural language understanding and generation
-    -   Knowledge retrieval system for accessing project-specific information
-    -   Specialized models for code understanding and issue triage
-    -   Documentation assistant for navigation and custom content generation
-    -   Content generator for creating technical materials
-    -   Personalization engine for user-specific experiences
+-   **Asynchronous Processing**
 
--   **Integration Services**
+    -   **RabbitMQ Message Queue**: Handles high-throughput message processing with priority-based queuing
+    -   **Queue Workers**: Multiple worker processes for parallel message handling and agent coordination
+    -   **Background Tasks**: User profiling, verification flows, and maintenance operations
 
-    -   Platform-specific adapters for Discord, Slack, GitHub, and Discourse
-    -   Webhook handlers and event processors
-    -   Authentication managers for each platform
-    -   CLI integration for command-line interactions
-    -   Web widget for website embedding
-    -   Event integration for community gatherings
+-   **AI Services Integration**
 
--   **Data Storage Layer**
+    -   **Google Gemini**: Primary LLM for reasoning, response generation, and conversation management
+    -   **Tavily Search API**: Real-time web search and information retrieval
+    -   **Text Embeddings**: Semantic search and knowledge retrieval from vector storage
 
-    -   Vector database for semantic search functionality
-    -   Relational database for structured data and relationships
-    -   Document store for conversation history and analytics
-    -   User profiles and preferences database for personalization
+-   **Platform Integrations**
 
--   **Analytics Engine**
+    -   **Discord Bot**: Real-time community engagement with command support and conversation threads
+    -   **GitHub Integration**: Webhook processing, issue triage, and repository analysis
 
-    -   Real-time metrics calculation
-    -   Report generation
-    -   Anomaly detection and trend analysis
-    -   Sentiment analysis for community feedback
+-   **Data Storage Architecture**
 
--   **Education & Advocacy Layer**
-    -   Interactive tutorial framework
-    -   Quickstart generator for personalized setup guides
-    -   Live code assistance for real-time developer support
+    -   **Supabase (PostgreSQL)**: User profiles, authentication, conversation metadata, and structured data
+    -   **Weaviate Vector Database**: Semantic search, embeddings storage, and knowledge retrieval
+    -   **Agent Memory Store**: Persistent conversation context and user interaction history
+
+-   **Authentication & User Management**
+    -   **GitHub OAuth Integration**: User verification and repository access
+    -   **Supabase Authentication**: Session management and user account linking
+    -   **Multi-platform Identity**: Unified user profiles across Discord and GitHub
 
 ## Core Features
 
-### 1. AI-Driven Contributor Engagement
+### 1. LangGraph Agent-Based Intelligence
 
--   **New Contributor Welcome & Onboarding**
+-   **ReAct Reasoning Pattern**
 
-    -   Automatic detection of first-time contributors
-    -   Personalized welcome messages with project-specific onboarding instructions
-    -   Interactive guidance through first contribution steps
+    -   Think → Act → Observe workflow for intelligent decision making
+    -   Dynamic tool selection based on conversation context
+    -   Iterative problem-solving with self-correction capabilities
 
--   **Community Interaction**
+-   **Conversational Memory**
 
-    -   Natural language conversations across all integrated platforms
-    -   Contextual responses based on user history and project knowledge
-    -   Multi-turn dialogue management with memory of previous interactions
+    -   Persistent conversation context across Discord sessions
+    -   Automatic summarization after 15+ interactions or timeout
+    -   Long-term user relationship building with topic tracking
 
--   **Activity Promotion**
-    -   Automated suggestions for good first issues to new contributors
-    -   Regular updates about project milestones and achievements
-    -   Recognition of contributor achievements and milestones
+-   **Multi-Tool Orchestration**
+    -   Web search integration via Tavily for real-time information
+    -   FAQ knowledge base for common questions
+    -   GitHub toolkit for repository-specific assistance (basic implementation)
+    -   Onboarding flows for new community members
 
-### 2. Technical Education & Advocacy
+### 2. Discord Community Integration
 
--   **Code Explanation**
+-   **Intelligent Message Processing**
 
-    -   Detailed breakdowns of SDKs, APIs, and library functionality
-    -   Contextual explanations of repository code snippets
-    -   Clear translations of technical concepts for different expertise levels
+    -   Real-time classification of messages requiring AI intervention
+    -   Context-aware responses based on conversation history
+    -   Background processing via RabbitMQ for scalable message handling
 
--   **Interactive Tutorials**
+-   **GitHub Account Verification**
 
-    -   Step-by-step coding walkthroughs with real-time feedback
-    -   Customizable learning paths based on developer needs
-    -   Progress tracking and achievements for completed tutorials
+    -   OAuth-based GitHub account linking for enhanced personalization
+    -   Automatic user profiling with repository and contribution analysis
+    -   Secure verification flow with time-limited tokens
 
--   **Live Code Assistance**
-    -   Real-time debugging support for user-submitted code
-    -   Performance optimization suggestions
-    -   Best practice recommendations and pattern identification
+-   **Command Interface**
+    -   `!verify_github` for account linking and verification
+    -   `!verification_status` to check current account status
+    -   `!reset` for conversation memory management
+    -   `!help_devrel` for command assistance and bot capabilities
 
-### 3. Content Creation Engine
+### 3. Advanced Data Management
+
+-   **Multi-Database Architecture**
+
+    -   Supabase (PostgreSQL) for structured user data and authentication
+    -   Weaviate vector database for semantic search and embeddings
+    -   Integrated data flow between relational and vector storage
+
+-   **User Profiling & Analytics**
+
+    -   Comprehensive GitHub profile analysis (repositories, languages, contributions)
+    -   Semantic user modeling stored in vector format for intelligent matching
+    -   Cross-platform identity linking (Discord ↔ GitHub integration)
+
+-   **Conversation Intelligence**
+    -   Persistent conversation context with automatic summarization
+    -   Topic extraction and conversation pattern analysis
+    -   Memory management with configurable retention policies
+
+### 4. Scalable Infrastructure & Processing
+
+-   **Asynchronous Message Processing**
+
+    -   RabbitMQ message queue with priority-based processing
+    -   Multiple worker processes for parallel task execution
+    -   Graceful error handling and message acknowledgment
+
+-   **Agent Coordination Framework**
+
+    -   Central coordinator managing multiple specialized agents
+    -   LangGraph state management with persistent checkpointing
+    -   Dynamic routing between DevRel and GitHub toolkit agents
+
+-   **Real-Time Response Generation**
+    -   Google Gemini integration for natural language understanding
+    -   Context-aware response personalization
+    -   Platform-specific formatting and delivery optimization
+
+## Planned Features & Roadmap
+
+### Upcoming Integrations
+
+-   **Slack Workspace Integration**
+    -   Block Kit interactive components
+    -   Workflow automation for technical announcements
+    -   Channel-specific DevRel agent configurations
+
+-   **CLI Tool Integration**
+    -   Command-line interface for developers
+    -   Local environment integration
+    -   Repository health checks and diagnostics
+
+-   **Web Widget Integration**
+    -   Embeddable chat widget for documentation sites
+    -   Real-time assistance for website visitors
+    -   Seamless handoff to Discord/GitHub
+
+### Enhanced GitHub Features
+
+-   **Advanced Issue Triage**
+    -   Automated issue labeling and assignment
+    -   Duplicate detection and linking
+    -   Priority classification
+
+-   **Pull Request Assistance**
+    -   Review comment suggestions
+    -   Code quality analysis
+    -   Automated testing recommendations
+
+-   **Repository Analytics**
+    -   Contributor statistics and recognition
+    -   Health monitoring and insights
+    -   Release notes generation
+
+### Content Creation & Education
 
 -   **Technical Content Generation**
+    -   Blog post drafts with code examples
+    -   Social media announcements
+    -   Tutorial creation assistance
 
-    -   Blog post drafts from release notes, commits, or community discussions
-    -   Sample code generation for various use cases and programming languages
-    -   Social media content for technical announcements
+-   **Interactive Learning**
+    -   Step-by-step coding tutorials
+    -   Live debugging assistance
+    -   Skill assessment and personalized learning paths
 
 -   **Documentation Enhancement**
+    -   AI-powered documentation generation
+    -   Contextual help integration
+    -   Knowledge gap identification
 
-    -   Automated documentation drafts for new features
-    -   API reference examples with practical usage scenarios
-    -   Visual aids and diagrams for complex processes
+### Advanced Analytics
 
--   **Multi-format Content**
-    -   Video script outlines for tutorials and demonstrations
-    -   Slide deck templates for technical presentations
-    -   Podcast briefings on technical topics and community highlights
+-   **Community Health Metrics**
+    -   Engagement trend analysis
+    -   Contributor retention insights
+    -   Sentiment monitoring
 
-### 4. Automated Issue Triage & PR Assistance
-
--   **Issue Classification**
-
-    -   Automatic categorization of new issues by type, component, and priority
-    -   Identification of duplicate issues and linking them together
-    -   Suggested assignment based on contributor expertise and availability
-
--   **PR Review Support**
-
-    -   Automated initial code review comments for common issues
-    -   Documentation verification and suggestions
-    -   Test coverage analysis and feedback
-
--   **Contributor Guidance**
-    -   Step-by-step assistance for setting up development environments
-    -   Code style and convention explanations
-    -   Troubleshooting help for common development issues
-
-### 5. Documentation Assistant
-
--   **Intelligent Navigation**
-
-    -   Natural language queries for finding specific documentation
-    -   Context-aware answers drawn from official documentation
-    -   Automatic linking to relevant sections and related topics
-
--   **Custom Documentation Generation**
-
-    -   User-specific guides based on their technology stack
-    -   Version-aware documentation that matches the user's current environment
-    -   Supplementary examples for existing documentation
-
--   **Documentation Health Monitoring**
-    -   Identification of outdated or missing documentation
-    -   Tracking of frequently queried topics without clear documentation
-    -   Suggestions for improvements based on user interaction patterns
-
-### 6. Knowledge Base & FAQ Automation
-
--   **Dynamic Documentation**
-
-    -   Automatic extraction of FAQs from community conversations
-    -   Creation and maintenance of project wikis and guides
-    -   Code documentation generation and enhancement
-
--   **Contextual Help**
-
-    -   Instant answers to common technical questions
-    -   Project-specific knowledge retrieval
-    -   Code snippet explanations and examples
-
--   **Knowledge Preservation**
-    -   Capturing of tribal knowledge from experienced contributors
-    -   Archiving of important decisions and their context
-    -   Historical project evolution tracking
-
-### 7. Personalized Experience
-
--   **User Context Awareness**
-
-    -   Memory of previous interactions and queries
-    -   Understanding of individual developer's technical background
-    -   Adaptation to preferred learning and communication styles
-
--   **Tailored Recommendations**
-
-    -   Suggestion of relevant documentation, issues, or features
-    -   Customized onboarding paths based on expertise and interests
-    -   Personalized notifications for areas of interest
-
--   **Multi-platform Consistency**
-    -   Synchronized experience across Discord, Slack, GitHub, and CLI
-    -   Continuous conversation context across different platforms
-    -   Contextual awareness of a user's recent activities
-
-### 8. AI-Powered Community Analytics
-
--   **Engagement Metrics**
-
-    -   Contributor activity tracking across platforms
-    -   Response time and resolution rate monitoring
-    -   Community growth and retention analytics
-
--   **Contribution Analysis**
-
-    -   Identification of valuable contributors and their patterns
-    -   Code quality and impact measurements
-    -   Diversity and inclusion metrics
-
--   **Health Monitoring**
-    -   Early warning system for declining project activity
-    -   Burnout risk detection for maintainers
-    -   Community sentiment analysis
+-   **Performance Analytics**
+    -   Response time optimization
+    -   User satisfaction tracking
+    -   Feature usage analytics
 
 ## Setup Guide
 
@@ -397,37 +408,58 @@ For installing the project locally refer to the [Installation Guide](./docs/INST
 
 ### Backend Services
 
--   **Core Framework**: FastAPI
--   **Containerization**: Docker & Kubernetes
--   **Messaging Queue**: RabbitMQ
--   **Task Scheduling**: Celery
+-   **Core Framework**: FastAPI with asynchronous lifespan management
+-   **Agent Framework**: LangGraph for multi-agent orchestration
+-   **Messaging Queue**: RabbitMQ with `aio-pika` for asynchronous processing
+-   **Containerization**: Docker & Docker Compose
+-   **Web Server**: Uvicorn ASGI server
 
-### AI Components (Groq APIs)
+### AI & LLM Services
 
--   **LLM Integration**: Strong LLM with reasoning capacity
--   **Embeddings**: Embedding Model
--   **Code Analysis**: Specialized code understanding models
--   **Content Generation**: Fine-tuned content creation models
+-   **Primary LLM**: Google Gemini (gemini-2.5-flash, gemini-2.0-flash)
+-   **Web Search**: Tavily Search API for real-time information retrieval
+-   **Text Embeddings**: Sentence Transformers for semantic search
+-   **Agent Patterns**: ReAct (Reasoning and Acting) workflow implementation
+-   **Memory Management**: LangGraph checkpointing with conversation summarization
 
 ### Data Storage
 
--   **Vector Database**: Supabase
--   **Relational Database**: Supabase (PostgreSQL)
--   **Document Storage**: Supabase
--   **User Profiles**: Supabase (PostgreSQL)
+-   **Relational Database**: Supabase (PostgreSQL) for user profiles, auth, and structured data
+-   **Vector Database**: Weaviate for semantic search and embeddings storage
+-   **Authentication**: Supabase Auth with GitHub OAuth integration
+-   **Agent Memory**: Persistent conversation context and state management
 
 ### Frontend Components
 
--   **Dashboard**: React.js + Tailwind CSS
--   **Analytics UI**: React.js + Shadcn
--   **Interactive Tutorials**: React.js + Monaco Editor
+-   **Landing Page**: React + Vite + TypeScript
+-   **Styling**: Tailwind CSS with custom themes
+-   **Animations**: Framer Motion for interactive UI
+-   **Icons**: Lucide React icon library
+-   **Routing**: React Router DOM
+-   **Deployment**: Netlify with SPA configuration
 
-### DevOps & Infrastructure
+### Platform Integrations
 
--   **CI/CD**: GitHub Actions
--   **Monitoring**: Prometheus
--   **Logging**: ELK Stack
--   **Cloud Provider**: AWS / GCP
+-   **Discord**: py-cord (Discord.py v2) with commands and cogs
+-   **GitHub**: PyGithub for repository and issue management
+-   **User Verification**: GitHub OAuth flow integration
+-   **Webhooks**: FastAPI endpoints for platform event handling
+
+### Development & Infrastructure
+
+-   **Language**: Python 3.9+ with type hints
+-   **Package Management**: Poetry with pyproject.toml
+-   **Environment**: python-dotenv for configuration
+-   **Async Operations**: aiohttp, asyncio for concurrent processing
+-   **Testing**: pytest for unit and integration tests
+-   **Code Quality**: flake8, autopep8, isort for code formatting
+
+### Monitoring & Observability
+
+-   **Tracing**: LangSmith integration for agent workflow tracing
+-   **Health Checks**: Built-in health endpoints for system monitoring
+-   **Logging**: Structured logging with configurable levels
+-   **Error Handling**: Comprehensive exception management in agent flows
 
 ## Integration Details
 
@@ -437,61 +469,69 @@ For installing the project locally refer to the [Installation Guide](./docs/INST
 sequenceDiagram
     participant User as Discord User
     participant Bot as Discord Bot
-    participant API as API Gateway
-    participant EP as Event Processor
-    participant AI as AI Service
-    participant KB as Knowledge Base
-    participant DB as Database
+    participant ClassRouter as Classification Router
+    participant Queue as RabbitMQ Queue
+    participant Coordinator as Agent Coordinator
+    participant DevRel as DevRel Agent
+    participant DB as Supabase/Weaviate
 
-    User->>Bot: Sends message or command
-    Bot->>API: Forwards event via webhook
-    API->>EP: Routes to Event Processor
+    User->>Bot: Sends message or uses command
+    Bot->>ClassRouter: Classify message intent
+    ClassRouter->>Bot: Triage result (process/ignore)
+    
+    alt Message requires DevRel processing
+        Bot->>Queue: Enqueue devrel_request
+        Queue->>Coordinator: Process message
+        Coordinator->>DevRel: Create AgentState & invoke
+        
+        DevRel->>DevRel: Gather Context
+        DevRel->>DevRel: ReAct Supervisor (Think→Act→Observe)
+        DevRel->>DevRel: Generate Response
+        DevRel->>DB: Update conversation memory
+        
+        DevRel->>Queue: Queue response
+        Queue->>Bot: Discord response event
+        Bot->>User: Send formatted response
+    else Command processing
+        Bot->>Bot: Handle command directly
+        Bot->>User: Command response
+    end
 
-    EP->>DB: Check user context
-    DB->>EP: Return context
-
-    EP->>KB: Retrieve relevant knowledge
-    KB->>EP: Return knowledge
-
-    EP->>AI: Generate response with context
-    AI->>EP: Return formatted response
-
-    EP->>DB: Update conversation history
-    EP->>Bot: Send response to Discord
-    Bot->>User: Display response message
-
-    Note over EP,AI: For complex queries, additional<br/>processing steps may occur
+    Note over DevRel,DB: Agent maintains persistent<br/>conversation memory
 ```
 
-#### Authentication & Setup
+#### Current Implementation
 
--   OAuth2 flow for bot installation
--   Server-specific configuration and permission setup
--   Role-based access control configuration
+-   **Discord Bot Framework**: py-cord (Discord.py v2) with modern async/await patterns
+-   **Command System**: Discord Cogs architecture for modular command organization
+-   **Message Processing**: Real-time classification and intelligent routing
+-   **Memory Management**: Thread-based conversation persistence with user context
 
-#### Event Handling
+#### Bot Commands
 
--   Message creation and update events
--   Channel join/leave events
--   Reaction events for issue tracking
+-   **`!verify_github`**: Initiates GitHub OAuth verification flow
+-   **`!verification_status`**: Checks GitHub account linking status
+-   **`!reset`**: Clears conversation thread memory
+-   **`!help_devrel`**: Shows available commands and bot capabilities
 
 #### Features
 
--   Thread creation for complex discussions
--   Slash commands for direct interaction with DevrAI
--   Automated welcome messages in designated channels
--   Role assignment based on GitHub contribution history
--   Interactive tutorials triggered via commands
--   Code explanation functionality for shared snippets
--   Documentation search via natural language queries
+-   **Intelligent Classification**: Determines which messages need AI processing vs simple responses
+-   **Thread Management**: Creates conversation threads for complex discussions
+-   **User Verification**: GitHub account linking for enhanced personalization
+-   **Context Preservation**: Maintains conversation history across sessions
+-   **Background Processing**: Asynchronous message handling via RabbitMQ
+-   **Error Handling**: Graceful degradation with user-friendly error messages
 
 #### Data Flow
 
-1. Discord webhook sends event to API Gateway
-2. Event processor extracts relevant information
-3. User context and preferences are retrieved
-4. AI Service generates appropriate response
-5. Integration service formats and sends response back to Discord
+1. Discord bot receives message or command using py-cord event handlers
+2. Classification router determines if DevRel agent processing is needed
+3. Messages requiring AI processing are queued via RabbitMQ with priority
+4. Agent Coordinator creates AgentState and invokes appropriate LangGraph agent
+5. DevRel Agent executes ReAct workflow (gather context → think → act → respond)
+6. Response is queued back to Discord bot for delivery
+7. Conversation state and user interactions are persisted to databases
 
 ### Slack Integration
 
@@ -720,60 +760,164 @@ sequenceDiagram
 
 ## Workflows
 
-### New Contributor Onboarding Workflow
+### LangGraph Agent Workflow (ReAct Pattern)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> DetectNewContributor
+    [*] --> MessageReceived
 
-    DetectNewContributor --> LoadUserProfile
-    LoadUserProfile --> GenerateWelcome
-    GenerateWelcome --> DetermineIntention
+    MessageReceived --> ClassificationTriage
+    ClassificationTriage --> QueueMessage: DevRel Needed
+    ClassificationTriage --> IgnoreMessage: No Action Required
 
-    DetermineIntention --> IssueGuidance: Issue Creation
-    DetermineIntention --> PRGuidance: PR Submission
-    DetermineIntention --> GeneralGuidance: Platform Join
+    QueueMessage --> AgentCoordinator
+    AgentCoordinator --> CreateAgentState
+    CreateAgentState --> DevRelAgent
 
-    IssueGuidance --> ProvideResources
-    PRGuidance --> ProvideResources
-    GeneralGuidance --> ProvideResources
+    %% DevRel Agent ReAct Workflow
+    DevRelAgent --> GatherContext
+    GatherContext --> ReActSupervisor
 
-    ProvideResources --> SuggestTutorials
-    SuggestTutorials --> MonitorEngagement
+    ReActSupervisor --> Think
+    Think --> Act
+    Act --> WebSearchTool: Web Search Needed
+    Act --> FAQTool: FAQ Query
+    Act --> OnboardingTool: New User
+    Act --> GitHubToolkit: GitHub Related
+    Act --> Complete: Sufficient Info
 
-    MonitorEngagement --> FollowUp: No Activity
-    MonitorEngagement --> AnswerQuestions: User Response
-    MonitorEngagement --> CompleteOnboarding: Task Completed
+    WebSearchTool --> UpdateContext
+    FAQTool --> UpdateContext
+    OnboardingTool --> UpdateContext
+    GitHubToolkit --> UpdateContext
 
-    FollowUp --> MonitorEngagement
-    AnswerQuestions --> MonitorEngagement
+    UpdateContext --> ReActSupervisor: Continue Loop
+    UpdateContext --> CheckIteration: Max Iterations
+    CheckIteration --> ReActSupervisor: Under Limit
+    CheckIteration --> Complete: Over Limit
 
-    CompleteOnboarding --> UpdateUserProfile
-    UpdateUserProfile --> RecordStats
-    RecordStats --> [*]
+    Complete --> GenerateResponse
+    GenerateResponse --> CheckSummarization
+    
+    CheckSummarization --> SummarizeConversation: Needed
+    CheckSummarization --> SendResponse: Not Needed
 
-    AnswerQuestions --> EscalateToMaintainer: Complex Question
-    EscalateToMaintainer --> [*]
+    SummarizeConversation --> UpdateMemory
+    UpdateMemory --> SendResponse
+
+    SendResponse --> QueueResponse
+    QueueResponse --> PlatformDelivery
+    PlatformDelivery --> [*]
+
+    IgnoreMessage --> [*]
 ```
 
--   **Trigger**: First-time contributor opens an issue or PR, or joins community platform
--   **Detection**: System identifies user as new contributor based on platform history
--   **Personalization**: AI generates personalized welcome message based on:
-    -   Contribution type (issue, PR, question)
-    -   Project area of interest
-    -   Technical background (if available)
-    -   Learning preferences
--   **Guidance**: Provides specific next steps based on contribution intent:
-    -   Development environment setup instructions
-    -   Coding standards and guidelines
-    -   Testing requirements
-    -   Documentation expectations
-    -   Recommended interactive tutorials
--   **Follow-up**: Monitors engagement and provides additional assistance:
-    -   Answers to follow-up questions
-    -   Escalation to human maintainers when necessary
-    -   Check-ins on progress after predefined intervals
-    -   Suggestions for additional resources based on progress
+The LangGraph Agent Workflow implements a **ReAct (Reasoning and Acting) pattern** that enables the AI to think before acting and observe results to make informed decisions.
+
+#### **Workflow Phases**
+
+-   **Message Processing**
+    -   Platform messages (Discord, GitHub, etc.) are received and classified
+    -   Classification triage determines if DevRel agent intervention is needed
+    -   Qualified messages are queued with appropriate priority
+
+-   **Agent Initialization**
+    -   Agent Coordinator creates initial AgentState with user context
+    -   Session management handles conversation continuity and memory
+    -   DevRel Agent begins processing with conversation history
+
+-   **Context Gathering**
+    -   Collects user profile information and interaction history
+    -   Loads previous conversation summary and key topics
+    -   Prepares platform-specific context for decision making
+
+-   **ReAct Loop (Think → Act → Observe)**
+    -   **Think**: Supervisor analyzes current context and determines next action
+    -   **Act**: Executes selected tool (web search, FAQ lookup, onboarding, GitHub operations)
+    -   **Observe**: Reviews tool results and updates conversation context
+    -   Loop continues until sufficient information is gathered or max iterations reached
+
+-   **Response Generation**
+    -   Synthesizes all gathered information into a coherent response
+    -   Personalizes response based on user profile and conversation history
+    -   Applies platform-specific formatting (Discord embeds, GitHub comments, etc.)
+
+-   **Memory Management**
+    -   Checks if conversation summarization is needed (after 15+ interactions or timeout)
+    -   Creates compressed conversation summaries for long-term memory
+    -   Updates user profile with new topics and interaction patterns
+
+-   **Response Delivery**
+    -   Queues response message for appropriate platform
+    -   Handles platform-specific delivery mechanisms
+    -   Tracks delivery status and error handling
+
+### GitHub Verification Workflow
+
+```mermaid
+stateDiagram-v2
+    [*] --> UserJoinsDiscord
+    
+    UserJoinsDiscord --> DiscordInteraction
+    DiscordInteraction --> VerifyGitHubCommand: !verify_github
+    DiscordInteraction --> CheckStatusCommand: !verification_status
+    DiscordInteraction --> Continue: Other Commands
+    
+    VerifyGitHubCommand --> CheckExistingUser
+    CheckExistingUser --> AlreadyVerified: GitHub Linked
+    CheckExistingUser --> CreateVerificationSession: Not Verified
+    
+    CreateVerificationSession --> GenerateOAuthURL
+    GenerateOAuthURL --> SendDMToUser
+    SendDMToUser --> UserClicksLink
+    
+    UserClicksLink --> GitHubOAuth
+    GitHubOAuth --> AuthCallback
+    AuthCallback --> VerifyAndLinkAccount
+    
+    VerifyAndLinkAccount --> ProfileUserAsync: Success
+    VerifyAndLinkAccount --> AuthError: Failure
+    
+    ProfileUserAsync --> FetchGitHubData
+    FetchGitHubData --> StoreInWeaviate
+    StoreInWeaviate --> NotifySuccess
+    
+    CheckStatusCommand --> QueryUserStatus
+    QueryUserStatus --> ReturnStatus
+    
+    AlreadyVerified --> [*]
+    NotifySuccess --> [*]
+    AuthError --> [*]
+    ReturnStatus --> [*]
+    Continue --> [*]
+```
+
+#### **GitHub Integration Process**
+
+-   **Discord Command Integration**
+    -   `!verify_github` command initiates OAuth flow
+    -   `!verification_status` checks current account linking status
+    -   Background token cleanup prevents expired verification sessions
+
+-   **OAuth Verification Flow**
+    -   Creates temporary verification session with expiring tokens
+    -   Generates GitHub OAuth URL with state parameter for security
+    -   Sends private message to user with verification instructions
+
+-   **Account Linking**
+    -   Validates OAuth callback with authorization code
+    -   Links GitHub account to Discord user in Supabase database
+    -   Prevents duplicate account associations
+
+-   **User Profiling**
+    -   Asynchronously fetches GitHub user data, repositories, and pull requests
+    -   Analyzes programming language usage across repositories
+    -   Stores comprehensive user profile in Weaviate for semantic search
+
+-   **Data Persistence**
+    -   User profiles stored in Supabase for structured queries
+    -   Conversation context maintained for cross-session continuity
+    -   Vector embeddings in Weaviate for intelligent recommendations
 
 ### Technical Education Workflow
 
@@ -1082,87 +1226,108 @@ stateDiagram-v2
 
 ## Data Flow and Storage
 
-### Data Collection and Processing
+### Current Data Architecture
 
 ```mermaid
 flowchart TB
-    subgraph "External Data Sources"
-        GH["GitHub API"]
-        DS["Discord API"]
-        SL["Slack API"]
-        DOC["Documentation Sites"]
-        CLI["CLI Tool"]
-        WEB["Web Widget"]
-        EVENT["Community Events"]
+    subgraph "Data Sources"
+        DISCORD["Discord Messages"]
+        GITHUB_API["GitHub API"]
+        USER_INPUT["User Commands"]
+        OAUTH["OAuth Callbacks"]
     end
 
-    subgraph "Data Collection Layer"
-        WH["Webhooks"]
-        API["API Clients"]
-        UI["User Interactions"]
-        PREF["User Preferences"]
+    subgraph "Processing Layer"
+        BOT["Discord Bot"]
+        CLASSIFIER["Classification Router"]
+        RABBIT["RabbitMQ Queue"]
+        COORD["Agent Coordinator"]
     end
 
-    subgraph "Data Processing"
-        NORM["Data Normalizer"]
-        EXTR["Entity Extractor"]
-        EMB["Embedding Generator"]
-        PERS["Personalization Processor"]
+    subgraph "Agent Layer"
+        DEVREL["DevRel Agent"]
+        GITHUB_AGENT["GitHub Toolkit"]
+        TOOLS["Agent Tools"]
     end
 
-    subgraph "Storage Layer"
-        PIN["Supabase<br>(Vector DB)"]
-        SUP["Supabase<br>(PostgreSQL)"]
-        MDB["Supabase<br>(Document Store)"]
-        UP["User Profiles<br>(PostgreSQL)"]
+    subgraph "Storage Systems"
+        SUPA["Supabase PostgreSQL"]
+        WEAVIATE["Weaviate Vector DB"]
+        MEMORY["Agent Memory"]
     end
 
-    GH --> WH
-    DS --> WH
-    SL --> API
-    DOC --> API
-    CLI --> API
-    WEB --> API
-    EVENT --> API
+    subgraph "Data Types"
+        USERS["User Profiles"]
+        CONVOS["Conversations"]
+        EMBEDDINGS["Vector Embeddings"]
+        SESSIONS["Verification Sessions"]
+    end
 
-    WH --> NORM
-    API --> NORM
-    UI --> NORM
-    UI --> PREF
+    %% Data Flow
+    DISCORD --> BOT
+    USER_INPUT --> BOT
+    OAUTH --> BOT
 
-    NORM --> EXTR
-    EXTR --> EMB
-    PREF --> PERS
-    EMB --> PERS
+    BOT --> CLASSIFIER
+    CLASSIFIER --> RABBIT
+    RABBIT --> COORD
 
-    EMB --> PIN
-    EXTR --> SUP
-    NORM --> MDB
-    PERS --> UP
+    COORD --> DEVREL
+    COORD --> GITHUB_AGENT
+    DEVREL --> TOOLS
+
+    GITHUB_API --> GITHUB_AGENT
+    GITHUB_AGENT --> WEAVIATE
+
+    %% Storage Connections
+    DEVREL --> MEMORY
+    MEMORY --> SUPA
+    MEMORY --> WEAVIATE
+
+    USERS --> SUPA
+    CONVOS --> SUPA
+    EMBEDDINGS --> WEAVIATE
+    SESSIONS --> SUPA
+
+    %% Response Flow
+    DEVREL --> RABBIT
+    RABBIT --> BOT
+    BOT --> DISCORD
 ```
 
--   **External Data Sources**
+#### **Data Processing Pipeline**
 
-    -   Platform APIs (GitHub, Discord, Slack)
-    -   Documentation sites
-    -   CLI tools and web widgets
-    -   Community events
-    -   Webhook events
-    -   Direct user interactions
+-   **Message Ingestion**
+    -   Discord bot receives messages and commands via py-cord
+    -   Classification router determines processing requirements
+    -   Priority-based queuing via RabbitMQ for scalable processing
 
--   **Data Transformation**
+-   **Agent Processing**
+    -   Agent Coordinator manages LangGraph agent lifecycle
+    -   DevRel Agent executes ReAct workflow with persistent state
+    -   Tool execution results stored in conversation context
 
-    -   Normalization of platform-specific data formats
-    -   Entity extraction and relationship mapping
-    -   Embedding generation for textual content
-    -   Personalization processing based on user profiles
+-   **Data Persistence**
+    -   **Supabase (PostgreSQL)**: User profiles, authentication, conversation metadata
+    -   **Weaviate (Vector DB)**: User embeddings, semantic search, knowledge base
+    -   **Agent Memory**: Conversation summaries, interaction history, context preservation
 
--   **Storage Destinations**
-    -   Vector embeddings → Supabase
-    -   Structured relationships → Supabase
-    -   Historical conversations → Supabase
-    -   User profiles and preferences → Supabase
-    -   Temporary state → Redis
+#### **Storage Schema**
+
+-   **User Management**
+    -   Discord and GitHub account linking
+    -   OAuth verification tokens and session management
+    -   User preferences and interaction statistics
+
+-   **Conversation Intelligence**
+    -   Thread-based conversation context
+    -   Automatic summarization for long-term memory
+    -   Topic extraction and conversation pattern analysis
+
+-   **Vector Knowledge Base**
+    -   User profile embeddings for semantic matching
+    -   Repository and contribution analysis
+    -   FAQ and knowledge article embeddings for retrieval
 
 ## Deployment Strategy
 
