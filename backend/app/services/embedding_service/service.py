@@ -2,9 +2,14 @@ import logging
 import os
 from typing import List, Dict, Any, Optional
 import torch
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import HumanMessage
+from app.core.config import settings
+from app.models.database.weaviate import WeaviateUserProfile
+from app.services.embedding_service.profile_summarization.prompts.summarization_prompt import PROFILE_SUMMARIZATION_PROMPT
 
 load_dotenv()
 
@@ -15,34 +20,52 @@ EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "cpu")
 logger = logging.getLogger(__name__)
 
 
-class EmbeddingItem(BaseModel):
-    id: str
-    collection: str
-    content: str
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+class ProfileSummaryResult(BaseModel):
+    """Result of profile summarization"""
+    summary_text: str
+    token_count_estimate: int
     embedding: Optional[List[float]] = None
 
 class EmbeddingService:
-    """Service for generating embeddings for text using Hugging Face models"""
+    """Service for generating embeddings and profile summarization for Weaviate integration"""
 
     def __init__(self, model_name: str = MODEL_NAME, device: str = EMBEDDING_DEVICE):
-        """Initialize the embedding service with specified model"""
+        """Initialize the embedding service with specified model and LLM"""
         self.model_name = model_name
         self.device = device
         self._model = None
+        self._llm = None
         logger.info(f"Initializing EmbeddingService with model: {model_name} on device: {device}")
 
     @property
     def model(self) -> SentenceTransformer:
-        """Lazy-load model to avoid loading during import"""
+        """Lazy-load embedding model to avoid loading during import"""
         if self._model is None:
             try:
-                logger.info(f"Loading model: {self.model_name}")
+                logger.info(f"Loading embedding model: {self.model_name}")
                 self._model = SentenceTransformer(self.model_name, device=self.device)
+                logger.info(
+                    f"Model loaded successfully. Embedding dimension: {self._model.get_sentence_embedding_dimension()}")
             except Exception as e:
                 logger.error(f"Error loading model {self.model_name}: {str(e)}")
                 raise
         return self._model
+
+    @property
+    def llm(self) -> ChatGoogleGenerativeAI:
+        """Lazy-load LLM for profile summarization"""
+        if self._llm is None:
+            try:
+                self._llm = ChatGoogleGenerativeAI(
+                    model=settings.github_agent_model,
+                    temperature=0.3,
+                    google_api_key=settings.gemini_api_key
+                )
+                logger.info("LLM initialized for profile summarization")
+            except Exception as e:
+                logger.error(f"Error initializing LLM: {str(e)}")
+                raise
+        return self._llm
 
     async def get_embedding(self, text: str) -> List[float]:
         """Generate embedding for a single text input"""
@@ -50,16 +73,17 @@ class EmbeddingService:
             # Convert to list for consistency
             if isinstance(text, str):
                 text = [text]
-            
+
             # Generate embeddings
             embeddings = self.model.encode(
-                text, 
+                text,
                 convert_to_tensor=True,
                 show_progress_bar=False
             )
-            
+
             # Convert to standard Python list and return
             embedding_list = embeddings[0].cpu().tolist()
+            logger.debug(f"Generated embedding with dimension: {len(embedding_list)}")
             return embedding_list
         except Exception as e:
             logger.error(f"Error generating embedding: {str(e)}")
@@ -70,47 +94,113 @@ class EmbeddingService:
         try:
             # Generate embeddings
             embeddings = self.model.encode(
-                texts, 
+                texts,
                 convert_to_tensor=True,
                 batch_size=MAX_BATCH_SIZE,
                 show_progress_bar=len(texts) > 10
             )
-            
+
             # Convert to standard Python list
             embedding_list = embeddings.cpu().tolist()
+            logger.info(f"Generated {len(embedding_list)} embeddings")
             return embedding_list
         except Exception as e:
             logger.error(f"Error generating batch embeddings: {str(e)}")
             raise
 
-    # Process_item and process_items are used to add embeddings to items
-    # Can be migrated to a separate class if needed aligning both VectorDB service and Embedding service
-    async def process_item(self, item: EmbeddingItem) -> EmbeddingItem:
-        """Process a single item to add embedding"""
-        if not item.embedding:
-            item.embedding = await self.get_embedding(item.content)
-        return item
+    async def summarize_user_profile(self, profile: WeaviateUserProfile) -> ProfileSummaryResult:
+        """Generate a comprehensive summary of a user profile optimized for embedding and semantic search."""
+        try:
+            logger.info(f"Summarizing profile for user: {profile.github_username}")
 
-    async def process_items(self, items: List[EmbeddingItem]) -> List[EmbeddingItem]:
-        """Process multiple items to add embeddings efficiently"""
-        # Extract content from items that need embeddings
-        texts_to_embed = []
-        items_to_embed = []
-        
-        for item in items:
-            if not item.embedding:
-                texts_to_embed.append(item.content)
-                items_to_embed.append(item)
-        
-        if texts_to_embed:
-            # Generate embeddings in batch
-            embeddings = await self.get_embeddings(texts_to_embed)
-            
-            # Update items with their embeddings
-            for i, item in enumerate(items_to_embed):
-                item.embedding = embeddings[i]
-        
-        return items
+            bio = profile.bio or "No bio provided"
+            languages = ", ".join(profile.languages) if profile.languages else "No languages specified"
+            topics = ", ".join(profile.topics) if profile.topics else "No topics specified"
+
+            prs_info = []
+            for pr in profile.pull_requests:
+                pr_desc = pr.body if pr.body else "No description"
+                prs_info.append(f"{pr.title} in {pr.repository}: {pr_desc}")
+            pull_requests_text = " | ".join(prs_info) if prs_info else "No recent pull requests"
+
+            stats_text = f"Followers: {profile.followers_count}, Following: {profile.following_count}, Total Stars: {profile.total_stars_received}, Total Forks: {profile.total_forks}"
+
+            prompt = PROFILE_SUMMARIZATION_PROMPT.format(
+                github_username=profile.github_username,
+                bio=bio,
+                languages=languages,
+                pull_requests=pull_requests_text,
+                topics=topics,
+                stats=stats_text
+            )
+
+            logger.info(f"Sending profile summarization request to LLM for {profile.github_username}")
+            response = await self.llm.ainvoke([HumanMessage(content=prompt)])
+            summary_text = response.content.strip()
+
+            # Estimate token count (rough approximation: 1 token ≈ 4 characters)
+            token_estimate = len(summary_text) // 4
+            logger.info(
+                f"Generated profile summary for {profile.github_username}: {len(summary_text)} chars (~{token_estimate} tokens)"
+            )
+
+            embedding = await self.get_embedding(summary_text)
+
+            return ProfileSummaryResult(
+                summary_text=summary_text,
+                token_count_estimate=token_estimate,
+                embedding=embedding
+            )
+
+        except Exception as e:
+            logger.error(f"Error summarizing profile for {profile.github_username}: {str(e)}")
+            raise
+
+    async def process_user_profile(self, profile: WeaviateUserProfile) -> tuple[WeaviateUserProfile, List[float]]:
+        """Process a user profile by generating summary and embedding, then updating the profile object."""
+        try:
+            logger.info(f"Processing user profile for Weaviate storage: {profile.github_username}")
+
+            summary_result = await self.summarize_user_profile(profile)
+
+            profile.profile_text_for_embedding = summary_result.summary_text
+
+            logger.info(
+                f"Successfully processed profile for {profile.github_username}: summary generated with {summary_result.token_count_estimate} estimated tokens"
+            )
+
+            return profile, summary_result.embedding
+
+        except Exception as e:
+            logger.error(f"Error processing user profile for Weaviate: {str(e)}")
+            raise
+
+    async def search_similar_profiles(self, query_text: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Search for similar profiles using embedding similarity.
+        This method generates an embedding for the query and searches for similar contributors.
+        """
+        try:
+            logger.info(f"Searching for similar profiles with query: {query_text[:100]}")
+
+            query_embedding = await self.get_embedding(query_text)
+
+            logger.info(f"Generated query embedding with dimension: {len(query_embedding)}")
+
+            from app.database.weaviate.operations import search_similar_contributors
+
+            results = await search_similar_contributors(
+                query_embedding=query_embedding,
+                limit=limit,
+                min_distance=0.5
+            )
+
+            logger.info(f"Found {len(results)} similar contributors for query")
+            return results
+
+        except Exception as e:
+            logger.error(f"Error searching similar profiles: {str(e)}")
+            raise
 
     def get_model_info(self) -> Dict[str, Any]:
         """Get information about the model being used"""
@@ -125,8 +215,12 @@ class EmbeddingService:
         if self._model:
             del self._model
             self._model = None
-            # Force garbage collection
-            import gc
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+        if self._llm:
+            del self._llm
+            self._llm = None
+        # Force garbage collection
+        import gc
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        logger.info("Cleared embedding service cache")
