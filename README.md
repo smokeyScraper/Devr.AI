@@ -209,7 +209,7 @@ flowchart TB
 
 ### High-Level Architecture Overview
 
-Devr.AI is built on a **LangGraph agent-based architecture** that replaces traditional centralized LLM approaches with autonomous, reasoning agents that can think, act, and observe. The system follows a **ReAct (Reasoning and Acting) pattern** for intelligent decision-making and tool usage.
+Devr.AI is built on a **LangGraph agent-based architecture** with autonomous, reasoning agents that can think, act, and observe. The system follows a **ReAct (Reasoning and Acting) pattern** for intelligent decision-making and tool usage.
 
 #### **Core Architectural Components**
 
@@ -260,13 +260,11 @@ Devr.AI is built on a **LangGraph agent-based architecture** that replaces tradi
 ### 1. LangGraph Agent-Based Intelligence
 
 -   **ReAct Reasoning Pattern**
-
     -   Think → Act → Observe workflow for intelligent decision making
     -   Dynamic tool selection based on conversation context
     -   Iterative problem-solving with self-correction capabilities
 
 -   **Conversational Memory**
-
     -   Persistent conversation context across Discord sessions
     -   Automatic summarization after 15+ interactions or timeout
     -   Long-term user relationship building with topic tracking
@@ -280,13 +278,11 @@ Devr.AI is built on a **LangGraph agent-based architecture** that replaces tradi
 ### 2. Discord Community Integration
 
 -   **Intelligent Message Processing**
-
     -   Real-time classification of messages requiring AI intervention
     -   Context-aware responses based on conversation history
     -   Background processing via RabbitMQ for scalable message handling
 
 -   **GitHub Account Verification**
-
     -   OAuth-based GitHub account linking for enhanced personalization
     -   Automatic user profiling with repository and contribution analysis
     -   Secure verification flow with time-limited tokens
@@ -297,17 +293,15 @@ Devr.AI is built on a **LangGraph agent-based architecture** that replaces tradi
     -   `!reset` for conversation memory management
     -   `!help_devrel` for command assistance and bot capabilities
 
-### 3. Advanced Data Management
+### 3. Data Management
 
 -   **Multi-Database Architecture**
-
     -   Supabase (PostgreSQL) for structured user data and authentication
     -   Weaviate vector database for semantic search and embeddings
     -   Integrated data flow between relational and vector storage
 
--   **User Profiling & Analytics**
-
-    -   Comprehensive GitHub profile analysis (repositories, languages, contributions)
+-   **User Profiling**
+    -   GitHub profile analysis (repositories, languages, contributions)
     -   Semantic user modeling stored in vector format for intelligent matching
     -   Cross-platform identity linking (Discord ↔ GitHub integration)
 
@@ -316,16 +310,14 @@ Devr.AI is built on a **LangGraph agent-based architecture** that replaces tradi
     -   Topic extraction and conversation pattern analysis
     -   Memory management with configurable retention policies
 
-### 4. Scalable Infrastructure & Processing
+### 4. Infrastructure & Processing
 
 -   **Asynchronous Message Processing**
-
     -   RabbitMQ message queue with priority-based processing
     -   Multiple worker processes for parallel task execution
     -   Graceful error handling and message acknowledgment
 
 -   **Agent Coordination Framework**
-
     -   Central coordinator managing multiple specialized agents
     -   LangGraph state management with persistent checkpointing
     -   Dynamic routing between DevRel and GitHub toolkit agents
@@ -335,74 +327,38 @@ Devr.AI is built on a **LangGraph agent-based architecture** that replaces tradi
     -   Context-aware response personalization
     -   Platform-specific formatting and delivery optimization
 
-## Planned Features & Roadmap
+## Current Integrations
 
-### Upcoming Integrations
+### Discord Integration
+- **Intelligent Message Processing**: AI-powered responses to community questions
+- **GitHub Account Verification**: Link Discord accounts to GitHub profiles
+- **Conversation Memory**: Persistent context across sessions
+- **Commands**:
+  - `!verify_github` - Link your GitHub account
+  - `!verification_status` - Check account linking status
+  - `!reset` - Clear conversation memory
+  - `!help_devrel` - Show available commands
 
--   **Slack Workspace Integration**
-    -   Block Kit interactive components
-    -   Workflow automation for technical announcements
-    -   Channel-specific DevRel agent configurations
+### GitHub Integration (Basic)
+- **OAuth Authentication**: Secure GitHub account linking
+- **User Profiling**: Repository and contribution analysis
+- **Basic Repository Operations**: Read access to user repositories
 
--   **CLI Tool Integration**
-    -   Command-line interface for developers
-    -   Local environment integration
-    -   Repository health checks and diagnostics
-
--   **Web Widget Integration**
-    -   Embeddable chat widget for documentation sites
-    -   Real-time assistance for website visitors
-    -   Seamless handoff to Discord/GitHub
-
-### Enhanced GitHub Features
-
--   **Advanced Issue Triage**
-    -   Automated issue labeling and assignment
-    -   Duplicate detection and linking
-    -   Priority classification
-
--   **Pull Request Assistance**
-    -   Review comment suggestions
-    -   Code quality analysis
-    -   Automated testing recommendations
-
--   **Repository Analytics**
-    -   Contributor statistics and recognition
-    -   Health monitoring and insights
-    -   Release notes generation
-
-### Content Creation & Education
-
--   **Technical Content Generation**
-    -   Blog post drafts with code examples
-    -   Social media announcements
-    -   Tutorial creation assistance
-
--   **Interactive Learning**
-    -   Step-by-step coding tutorials
-    -   Live debugging assistance
-    -   Skill assessment and personalized learning paths
-
--   **Documentation Enhancement**
-    -   AI-powered documentation generation
-    -   Contextual help integration
-    -   Knowledge gap identification
-
-### Advanced Analytics
-
--   **Community Health Metrics**
-    -   Engagement trend analysis
-    -   Contributor retention insights
-    -   Sentiment monitoring
-
--   **Performance Analytics**
-    -   Response time optimization
-    -   User satisfaction tracking
-    -   Feature usage analytics
+### Frontend Dashboard
+- **React + Vite + TypeScript**: Modern web interface
+- **Tailwind CSS**: Responsive design system
+- **Real-time Updates**: Live data from backend services
 
 ## Setup Guide
 
-For installing the project locally refer to the [Installation Guide](./docs/INSTALL_GUIDE.md)
+For installing the project locally, refer to the [Installation Guide](./docs/INSTALL_GUIDE.md) which includes:
+
+- Complete setup instructions with all dependencies
+- Environment variable configuration
+- API key setup guides
+- Database setup (Weaviate + Supabase)
+- Current feature documentation
+- Troubleshooting guide
 
 ## Technology Stack
 
@@ -411,7 +367,7 @@ For installing the project locally refer to the [Installation Guide](./docs/INST
 -   **Core Framework**: FastAPI with asynchronous lifespan management
 -   **Agent Framework**: LangGraph for multi-agent orchestration
 -   **Messaging Queue**: RabbitMQ with `aio-pika` for asynchronous processing
--   **Containerization**: Docker & Docker Compose
+-   **Containerization**: Docker & Docker Compose (for Weaviate)
 -   **Web Server**: Uvicorn ASGI server
 
 ### AI & LLM Services
@@ -431,19 +387,17 @@ For installing the project locally refer to the [Installation Guide](./docs/INST
 
 ### Frontend Components
 
--   **Landing Page**: React + Vite + TypeScript
+-   **Dashboard**: React + Vite + TypeScript
 -   **Styling**: Tailwind CSS with custom themes
 -   **Animations**: Framer Motion for interactive UI
 -   **Icons**: Lucide React icon library
 -   **Routing**: React Router DOM
--   **Deployment**: Netlify with SPA configuration
 
 ### Platform Integrations
 
 -   **Discord**: py-cord (Discord.py v2) with commands and cogs
--   **GitHub**: PyGithub for repository and issue management
+-   **GitHub**: PyGithub for repository access and user profiling
 -   **User Verification**: GitHub OAuth flow integration
--   **Webhooks**: FastAPI endpoints for platform event handling
 
 ### Development & Infrastructure
 
@@ -456,7 +410,7 @@ For installing the project locally refer to the [Installation Guide](./docs/INST
 
 ### Monitoring & Observability
 
--   **Tracing**: LangSmith integration for agent workflow tracing
+-   **Tracing**: LangSmith integration for agent workflow tracing (optional)
 -   **Health Checks**: Built-in health endpoints for system monitoring
 -   **Logging**: Structured logging with configurable levels
 -   **Error Handling**: Comprehensive exception management in agent flows
@@ -533,230 +487,43 @@ sequenceDiagram
 6. Response is queued back to Discord bot for delivery
 7. Conversation state and user interactions are persisted to databases
 
-### Slack Integration
-
-```mermaid
-sequenceDiagram
-    participant User as Slack User
-    participant Slack as Slack Platform
-    participant API as API Gateway
-    participant EP as Event Processor
-    participant AI as AI Service
-    participant KB as Knowledge Base
-
-    User->>Slack: Sends message/command
-    Slack->>API: Forwards via Events API
-    API->>EP: Process Slack event
-
-    EP->>KB: Query relevant information
-    KB->>EP: Return knowledge snippets
-
-    EP->>AI: Generate response
-    AI->>EP: Return formatted response
-
-    EP->>Slack: Send Block Kit message
-    Slack->>User: Display interactive response
-
-    alt User Interaction
-        User->>Slack: Clicks interactive element
-        Slack->>API: Action payload
-        API->>EP: Process interaction
-        EP->>Slack: Update message
-        Slack->>User: Show updated content
-    end
-```
-
-#### Authentication & Setup
-
--   Slack App Directory installation flow
--   Workspace-specific settings configuration
--   Channel mapping to project components
-
-#### Event Handling
-
--   Message events in channels and direct messages
--   App mention events
--   Interactive component events (buttons, dropdowns)
-
-#### Features
-
--   Slash commands for project information
--   Interactive message components for issue triage
--   Automatic daily/weekly project updates
--   Direct message onboarding for new contributors
--   Technical content generation for announcements
--   Documentation search functionality
--   Code assistance and review through file sharing
-
-#### Data Flow
-
-1. Slack Events API sends event to API Gateway
-2. Event processor validates and processes the event
-3. User context and preferences are retrieved
-4. Workflow engine determines appropriate action
-5. Response is formatted according to Slack Block Kit
-6. Message is sent back to appropriate Slack channel
-
 ### GitHub Integration
 
 ```mermaid
 sequenceDiagram
-    participant GH as GitHub
-    participant API as API Gateway
-    participant EP as Event Processor
-    participant AT as Automated Triage
-    participant AI as AI Service
-    participant DB as Database
+    participant User as Discord User
+    participant Bot as Discord Bot
+    participant OAuth as GitHub OAuth
+    participant API as GitHub API
+    participant DB as Supabase/Weaviate
 
-    GH->>API: Webhook (Issue/PR/Comment)
-    API->>EP: Process GitHub event
-
-    alt New Issue
-        EP->>AT: Triage new issue
-        AT->>AI: Analyze issue content
-        AI->>AT: Return classification
-        AT->>GH: Apply labels & suggestions
-        AT->>DB: Log issue metadata
-    else New PR
-        EP->>AT: Review PR
-        AT->>AI: Analyze code changes
-        AI->>AT: Return review comments
-        AT->>GH: Post initial review
-        AT->>DB: Track PR statistics
-    else Comment
-        EP->>AI: Process comment context
-        AI->>EP: Generate appropriate response
-        EP->>GH: Post response comment
-        EP->>DB: Update conversation tracking
-    end
+    User->>Bot: !verify_github command
+    Bot->>OAuth: Generate OAuth URL
+    Bot->>User: Send verification link
+    
+    User->>OAuth: Complete OAuth flow
+    OAuth->>API: Exchange code for token
+    API->>OAuth: Return user data
+    
+    OAuth->>DB: Store user profile
+    OAuth->>Bot: Verification complete
+    Bot->>User: Success notification
 ```
 
-#### Authentication & Setup
+#### Current Features
 
--   GitHub App installation process
--   Repository-specific configuration
--   Permission scopes management
-
-#### Event Handling
-
--   Issue creation, update, and comment events
--   Pull request lifecycle events
--   Repository star and fork events
--   Release publication events
-
-#### Features
-
--   Automated issue labeling and assignment
--   PR review comments and suggestions
--   Release notes generation
--   Contributor statistics and recognition
--   Documentation suggestions for code changes
--   Sample code generation for issue resolution
--   Quickstart guides based on repository structure
+-   **OAuth Authentication**: Secure GitHub account linking via Discord commands
+-   **User Profiling**: Automatic analysis of repositories, languages, and contributions
+-   **Data Storage**: User profiles stored in Supabase and Weaviate for semantic search
+-   **Verification Commands**: Discord bot commands for account management
 
 #### Data Flow
 
-1. GitHub webhook sends event to API Gateway
-2. Event processor categorizes and enriches event data
-3. User context and repository information are retrieved
-4. Task is assigned to appropriate service based on event type
-5. Response actions are taken via GitHub API
-6. Event and action are logged for analytics
-
-### CLI Integration
-
-#### Authentication & Setup
-
--   API key authentication
--   Repository linking
--   User preference synchronization
-
-#### Event Handling
-
--   Command execution events
--   Interactive prompts and inputs
--   File system access events
-
-#### Features
-
--   Direct access to documentation and code examples
--   Interactive tutorials and guided workflows
--   Local environment setup assistance
--   Repository health checks and diagnostics
--   Custom command extension capabilities
--   Contextual help based on current project
-
-#### Data Flow
-
-1. CLI tool sends command to API Gateway
-2. Command is processed with user context and repository information
-3. Response is generated based on command parameters
-4. Results are displayed in the terminal interface
-5. User interactions are tracked for personalization
-
-### Web Widget Integration
-
-#### Authentication & Setup
-
--   JavaScript snippet for website embedding
--   Configuration options for appearance and behavior
--   Anonymous or authenticated user sessions
-
-#### Event Handling
-
--   Widget activation events
--   User query submissions
--   Interface interaction events
-
-#### Features
-
--   Documentation search and browsing
--   Contextual help based on current page
--   Question answering capabilities
--   Code example generation and explanation
--   Guided onboarding for new developers
--   Analytics for most common queries and issues
-
-#### Data Flow
-
-1. Widget sends user interaction to API Gateway
-2. Page context and user information are included in request
-3. Response is generated based on query and context
-4. Results are displayed within the widget interface
-5. Interactions are logged for analytics and personalization
-
-### Discourse Integration
-
-#### Authentication & Setup
-
--   API key authentication
--   Category and tag mapping
--   User role configuration
-
-#### Event Handling
-
--   New topic creation events
--   Post creation and update events
--   User registration events
-
-#### Features
-
--   Automatic responses to common questions
--   Cross-linking between forum topics and GitHub issues
--   Knowledge base article suggestions
--   Community showcase of project achievements
--   Technical content generation for forum posts
--   Interactive tutorial linking
--   Documentation search capability
-
-#### Data Flow
-
-1. Discourse webhook or API polling detects new content
-2. Content is processed and classified
-3. User context and preferences are retrieved
-4. Knowledge retrieval finds relevant information
-5. Response is generated and posted to appropriate thread
-6. New knowledge is extracted and stored for future use
+1. User initiates GitHub verification via Discord command
+2. OAuth flow creates secure verification session
+3. GitHub API provides user data and repository access
+4. User profile is analyzed and stored in databases
+5. Verification status is updated in Discord
 
 ## Workflows
 
@@ -817,7 +584,7 @@ The LangGraph Agent Workflow implements a **ReAct (Reasoning and Acting) pattern
 #### **Workflow Phases**
 
 -   **Message Processing**
-    -   Platform messages (Discord, GitHub, etc.) are received and classified
+    -   Platform messages (Discord) are received and classified
     -   Classification triage determines if DevRel agent intervention is needed
     -   Qualified messages are queued with appropriate priority
 
@@ -831,7 +598,7 @@ The LangGraph Agent Workflow implements a **ReAct (Reasoning and Acting) pattern
     -   Loads previous conversation summary and key topics
     -   Prepares platform-specific context for decision making
 
--   **ReAct Loop (Think → Act → Observe)**
+-   **React Loop (Think → Act → Observe)**
     -   **Think**: Supervisor analyzes current context and determines next action
     -   **Act**: Executes selected tool (web search, FAQ lookup, onboarding, GitHub operations)
     -   **Observe**: Reviews tool results and updates conversation context
@@ -840,7 +607,7 @@ The LangGraph Agent Workflow implements a **ReAct (Reasoning and Acting) pattern
 -   **Response Generation**
     -   Synthesizes all gathered information into a coherent response
     -   Personalizes response based on user profile and conversation history
-    -   Applies platform-specific formatting (Discord embeds, GitHub comments, etc.)
+    -   Applies platform-specific formatting (Discord embeds)
 
 -   **Memory Management**
     -   Checks if conversation summarization is needed (after 15+ interactions or timeout)
@@ -848,7 +615,7 @@ The LangGraph Agent Workflow implements a **ReAct (Reasoning and Acting) pattern
     -   Updates user profile with new topics and interaction patterns
 
 -   **Response Delivery**
-    -   Queues response message for appropriate platform
+    -   Queues response message for Discord platform
     -   Handles platform-specific delivery mechanisms
     -   Tracks delivery status and error handling
 
@@ -919,311 +686,6 @@ stateDiagram-v2
     -   Conversation context maintained for cross-session continuity
     -   Vector embeddings in Weaviate for intelligent recommendations
 
-### Technical Education Workflow
-
-```mermaid
-stateDiagram-v2
-    [*] --> DetectLearningIntent
-
-    DetectLearningIntent --> LoadUserProfile
-    LoadUserProfile --> AssessKnowledgeLevel
-
-    AssessKnowledgeLevel --> CodeExplainer: Code Questions
-    AssessKnowledgeLevel --> QuickstartGenerator: Setup Requests
-    AssessKnowledgeLevel --> TutorialEngine: How do I Questions
-    AssessKnowledgeLevel --> LiveAssistance: Debug Help
-
-    CodeExplainer --> GenerateMarkdown
-    CodeExplainer --> CreateDiagrams
-
-    QuickstartGenerator --> CreateCodeSnippets
-
-    TutorialEngine --> BuildInteractiveUI
-
-    LiveAssistance --> UseCodeAnalysis
-    LiveAssistance --> AccessKnowledgeBase
-
-    GenerateMarkdown --> DeliverResponse
-    CreateDiagrams --> DeliverResponse
-    CreateCodeSnippets --> DeliverResponse
-    BuildInteractiveUI --> DeliverResponse
-    UseCodeAnalysis --> DeliverResponse
-    AccessKnowledgeBase --> DeliverResponse
-
-    DeliverResponse --> MonitorProgress
-
-    MonitorProgress --> ProvideHints: User Stuck
-    MonitorProgress --> ValidateCompletion: Step Completed
-
-    ProvideHints --> MonitorProgress
-
-    ValidateCompletion --> NextStep: Tutorial Ongoing
-    ValidateCompletion --> CompleteTutorial: All Steps Done
-
-    NextStep --> MonitorProgress
-
-    CompleteTutorial --> UpdateUserProfile
-    UpdateUserProfile --> SuggestNextTutorial
-    SuggestNextTutorial --> [*]
-```
-
--   **Trigger**: User requests learning resources or system detects learning opportunity
--   **Request Routing**: System routes the request to the appropriate education service:
-    -   Code Explainer for code understanding questions
-    -   Quickstart Generator for setup assistance
-    -   Tutorial Engine for how-to questions
-    -   Live Assistance for debugging problems
--   **Content Generation**: Creates personalized educational response:
-    -   Markdown explanations with formatted text
-    -   Diagrams for visual learners
-    -   Code snippets with examples
-    -   Interactive UI for hands-on learning
--   **Delivery**: Presents educational content through:
-    -   Step-by-step guides in chat interface
-    -   Visual aids and diagrams where appropriate
-    -   Interactive elements for engagement
--   **Feedback Loop**: Monitors progress and provides assistance:
-    -   Real-time validation of exercise completion
-    -   Hints when user is stuck
-    -   Celebration of milestone achievements
-    -   Recording of progress for future sessions
-
-### Content Creation Workflow
-
-```mermaid
-stateDiagram-v2
-    [*] --> UserSignUp
-
-    UserSignUp --> ScheduledTask
-    ScheduledTask --> WebScraper
-
-    WebScraper --> ContentRouter
-    ContentRouter --> LLMContentGenerator
-
-    LLMContentGenerator --> ContentReview
-
-    ContentReview --> ApprovalSystem
-    ContentReview --> AudioGenerator
-    ContentReview --> LLMRepoInsights
-    ContentReview --> ReferenceEngine
-
-    ApprovalSystem --> PublishingSystem
-    PublishingSystem --> AnalyticsLogs
-    AnalyticsLogs --> [*]
-```
-
--   **Trigger**: Scheduled content generation task, user signup event, or maintainer request
--   **Content Collection**: Web scraper gathers relevant information from:
-    -   Documentation sites
-    -   Blog posts
-    -   Technical papers
-    -   Community discussions
--   **Content Routing**: System categorizes content needs and directs to appropriate generators
--   **Generation**: LLM-based content generator creates appropriate content type:
-    -   Technical blog post drafts with code examples
-    -   Sample code for various use cases
-    -   API documentation with practical examples
-    -   Social media announcements with key highlights
--   **Review & Enhancement**: Content undergoes quality checks and enhancements:
-    -   Technical accuracy verification
-    -   Style and formatting adjustments
-    -   Repository insights integration
-    -   Reference linking and citation
--   **Output Processing**: Finalized content is prepared for distribution:
-    -   Manual or automated approval
-    -   Publication to appropriate channels
-    -   Audio generation for accessibility
-    -   Analytics tracking for performance measurement
-
-### Personalization Workflow
-
-```mermaid
-stateDiagram-v2
-    [*] --> GatherUserData
-
-    GatherUserData --> DataCollection
-
-    DataCollection --> ProfileGeneration
-    DataCollection --> InterestAnalysis
-    DataCollection --> SkillDetection
-
-    ProfileGeneration --> ContentFiltering
-    InterestAnalysis --> SuggestionGeneration
-    SkillDetection --> ResponseTailoring
-
-    ContentFiltering --> RecommendationSystem
-    SuggestionGeneration --> RecommendationSystem
-    ResponseTailoring --> RecommendationSystem
-
-    RecommendationSystem --> DeliverPersonalizedExperience
-    DeliverPersonalizedExperience --> [*]
-```
-
--   **Data Collection**: Gathers user-specific information from various sources:
-    -   Interaction history with the system
-    -   Developer profile and background
-    -   Usage patterns across platforms
-    -   Stated preferences and feedback
-    -   Geographic location and language
--   **User Modeling**: Processes collected data to build comprehensive user profile:
-    -   Technical expertise level determination
-    -   Interest area identification
-    -   Skill assessment and gap analysis
--   **Content Adaptation**: Customizes interactions based on user model:
-    -   Content filtering to match expertise level
-    -   Suggestion generation for relevant resources
-    -   Response tailoring for communication style
--   **Recommendation System**: Delivers personalized content and assistance:
-    -   Content ranking based on relevance
-    -   Discovery engine for new resources
-    -   Contextual recommendations
-
-### Issue Triage Workflow
-
-```mermaid
-stateDiagram-v2
-    [*] --> NewIssueDetected
-
-    NewIssueDetected --> AnalyzeContent
-
-    AnalyzeContent --> CheckDuplicates
-    CheckDuplicates --> IdentifyDuplicate: Match Found
-    CheckDuplicates --> ClassifyIssue: No Duplicate
-
-    IdentifyDuplicate --> LinkIssues
-    LinkIssues --> NotifyUser
-    NotifyUser --> CloseAsDuplicate
-    CloseAsDuplicate --> [*]
-
-    ClassifyIssue --> AssignLabels
-    AssignLabels --> DetermineComplexity
-
-    DetermineComplexity --> SuggestAssignees
-    SuggestAssignees --> CheckCompleteness
-
-    CheckCompleteness --> RequestInfo: Incomplete
-    CheckCompleteness --> GenerateRepro: Bug Report
-    CheckCompleteness --> CreateSample: Feature Request
-    CheckCompleteness --> UpdateProject: Documentation Issue
-
-    RequestInfo --> AwaitResponse
-    AwaitResponse --> AnalyzeContent: Info Provided
-    AwaitResponse --> CloseStale: No Response
-
-    GenerateRepro --> UpdateProject
-    CreateSample --> UpdateProject
-
-    UpdateProject --> NotifyTeam
-    NotifyTeam --> ScheduleFollowUp
-    ScheduleFollowUp --> [*]
-
-    CloseStale --> [*]
-```
-
--   **Trigger**: New issue created on GitHub
--   **Analysis**:
-    -   AI extracts key information from issue description
-    -   Compares with existing issues for duplicates
-    -   Identifies affected components and potential severity
--   **Classification**:
-    -   Applies appropriate labels (bug, feature, documentation, etc.)
-    -   Assigns priority level
-    -   Suggests potential assignees based on expertise
--   **Enhancement**:
-    -   Requests additional information if description is incomplete
-    -   Generates reproduction steps for bug reports when possible
-    -   Creates sample code for feature requests to clarify intent
-    -   Provides links to relevant documentation
--   **Notification**:
-    -   Alerts appropriate team members in Slack/Discord
-    -   Updates project boards
-    -   Schedules follow-up if issue remains unaddressed
-
-### Knowledge Query Workflow
-
-```mermaid
-stateDiagram-v2
-    [*] --> QuestionDetected
-
-    QuestionDetected --> LoadUserContext
-    LoadUserContext --> ClassifyIntent
-    ClassifyIntent --> ExtractEntities
-
-    ExtractEntities --> SearchKnowledgeBase
-    SearchKnowledgeBase --> SearchCodebase
-    SearchCodebase --> SearchPriorConversations
-
-    SearchPriorConversations --> GenerateResponse: Information Found
-    SearchPriorConversations --> FallbackResponse: No Information
-
-    GenerateResponse --> PersonalizeContent
-    PersonalizeContent --> FormatWithExamples
-    FormatWithExamples --> AddReferences
-    AddReferences --> DeliverResponse
-
-    FallbackResponse --> GenerateGenericGuidance
-    GenerateGenericGuidance --> SuggestAlternatives
-    SuggestAlternatives --> DeliverResponse
-
-    DeliverResponse --> UpdateUserContext
-    UpdateUserContext --> RecordInteraction
-    RecordInteraction --> UpdateFAQ: Common Question
-    RecordInteraction --> [*]: Unique Question
-
-    UpdateFAQ --> [*]
-```
-
--   **Trigger**: Question asked in any integrated platform
--   **Context Loading**:
-    -   Retrieves user's interaction history and preferences
-    -   Identifies user's knowledge level and communication style
--   **Intent Recognition**:
-    -   Identifies question type and topic
-    -   Extracts key entities and concepts
--   **Knowledge Retrieval**:
-    -   Searches vector database for semantically similar content
-    -   Retrieves relevant documentation and past answers
-    -   Examines code repository for relevant examples
--   **Personalization**:
-    -   Adapts complexity level to user's expertise
-    -   References previous interactions for continuity
-    -   Formats response based on user preferences
--   **Response Generation**:
-    -   Creates comprehensive yet concise answer
-    -   Includes code examples if appropriate
-    -   Adds links to official documentation
--   **Knowledge Capture**:
-    -   Records question and answer in knowledge base
-    -   Updates user context with new information
-    -   Updates FAQ if question is common
-
-### Community Analytics Workflow
-
--   **Data Collection**:
-    -   Continuous monitoring of activity across all platforms
-    -   Tracking of individual contributor actions
-    -   Recording of response times and resolution rates
--   **Processing**:
-    -   Aggregation of metrics by timeframe and category
-    -   Calculation of derived metrics (e.g., contributor retention)
-    -   Trend analysis and anomaly detection
-    -   Sentiment analysis of community interactions
--   **Insight Generation**:
-    -   Identification of active vs. declining areas
-    -   Recognition of valuable contributors
-    -   Detection of potential community issues
-    -   Assessment of content effectiveness
--   **Reporting**:
-    -   Automated weekly summaries to maintainers
-    -   Interactive dashboard updates
-    -   Quarterly comprehensive project health reports
-    -   Content performance analytics
--   **Action Recommendation**:
-    -   Suggestions for community engagement improvements
-    -   Identification of contributors for recognition
-    -   Alerts for areas needing maintainer attention
-    -   Content strategy recommendations
-
 ## Data Flow and Storage
 
 ### Current Data Architecture
@@ -1246,7 +708,6 @@ flowchart TB
 
     subgraph "Agent Layer"
         DEVREL["DevRel Agent"]
-        GITHUB_AGENT["GitHub Toolkit"]
         TOOLS["Agent Tools"]
     end
 
@@ -1273,11 +734,10 @@ flowchart TB
     RABBIT --> COORD
 
     COORD --> DEVREL
-    COORD --> GITHUB_AGENT
     DEVREL --> TOOLS
 
-    GITHUB_API --> GITHUB_AGENT
-    GITHUB_AGENT --> WEAVIATE
+    GITHUB_API --> DEVREL
+    DEVREL --> WEAVIATE
 
     %% Storage Connections
     DEVREL --> MEMORY
@@ -1329,105 +789,4 @@ flowchart TB
     -   Repository and contribution analysis
     -   FAQ and knowledge article embeddings for retrieval
 
-## Deployment Strategy
 
-### Infrastructure Architecture
-
-```mermaid
-flowchart TB
-    subgraph "Development Environment"
-        DEV_K8S["Kubernetes Cluster"]
-        DEV_DB["Database Services"]
-        DEV_CACHE["Cache Layer"]
-    end
-
-    subgraph "Staging Environment"
-        STAGE_K8S["Kubernetes Cluster"]
-        STAGE_DB["Database Services"]
-        STAGE_CACHE["Cache Layer"]
-    end
-
-    subgraph "Production Environment"
-        subgraph "Region A"
-            PROD_K8S_A["Kubernetes Cluster"]
-            PROD_DB_A["Database Primary"]
-            PROD_CACHE_A["Cache Primary"]
-        end
-
-        subgraph "Region B"
-            PROD_K8S_B["Kubernetes Cluster"]
-            PROD_DB_B["Database Replica"]
-            PROD_CACHE_B["Cache Replica"]
-        end
-
-        LB["Load Balancer"]
-        CDN["Content Delivery Network"]
-    end
-
-    subgraph "CI/CD Pipeline"
-        GIT["Git Repository"]
-        CI["Continuous Integration"]
-        REG["Container Registry"]
-        CD["Continuous Deployment"]
-    end
-
-    GIT --> CI
-    CI --> REG
-    REG --> CD
-
-    CD --> DEV_K8S
-    CD --> STAGE_K8S
-    CD --> PROD_K8S_A
-    CD --> PROD_K8S_B
-
-    LB --> PROD_K8S_A
-    LB --> PROD_K8S_B
-
-    PROD_DB_A <--> PROD_DB_B
-    PROD_CACHE_A <--> PROD_CACHE_B
-
-    CDN --> LB
-```
-
--   **Multi-environment Setup**:
-
-    -   Development environment for active feature development
-    -   Staging environment for integration testing
-    -   Production environment for live deployment
-
--   **Containerized Deployment**:
-
-    -   Microservices packaged as Docker containers
-    -   Kubernetes for orchestration and scaling
-    -   Helm charts for deployment configuration
-
--   **High Availability Design**:
-    -   Multiple replicas of critical services
-    -   Cross-zone deployment on cloud provider
-    -   Automatic failover mechanisms
-
-### CI/CD Pipeline
-
--   **Code Integration**:
-
-    -   Pull request validation
-    -   Automated code quality checks
-    -   Unit test execution
-
--   **Build Process**:
-
-    -   Docker image building
-    -   Image vulnerability scanning
-    -   Artifact versioning
-
--   **Deployment Stages**:
-
-    -   Automated deployment to development
-    -   Manual approval for staging promotion
-    -   Canary deployment to production
-    -   Progressive rollout strategy
-
--   **Monitoring and Rollback**:
-    -   Health check validation post-deployment
-    -   Automatic rollback on critical metrics deviation
-    -   Deployment audit logging
