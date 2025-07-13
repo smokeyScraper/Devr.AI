@@ -1,15 +1,15 @@
 import logging
 from typing import Dict, Any
-from app.agents.devrel.tools.search_tool import TavilySearchTool
+from backend.app.agents.devrel.tools.search_tool.ddg import DuckDuckGoSearchTool
 logger = logging.getLogger(__name__)
 
 
 async def handle_web_search(query: str) -> Dict[str, Any]:
-    """Handle web search using Tavily search tool"""
+    """Handle web search using DuckDuckGo search tool"""
     logger.info("Handling web search request")
 
     try:
-        search_tool = TavilySearchTool()
+        search_tool = DuckDuckGoSearchTool()
         search_results = await search_tool.search(query, max_results=5)
 
         if not search_results:
