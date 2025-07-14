@@ -48,6 +48,10 @@ async def handle_web_search_node(state: AgentState, search_tool, llm) -> dict:
     }
 
 def create_search_response(task_result: Dict[str, Any]) -> str:
+    """
+    Create a user-friendly response string from search results.
+    """
+        
     query = task_result.get("query")
     results = task_result.get("results", [])
 

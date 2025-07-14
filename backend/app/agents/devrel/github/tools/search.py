@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any
-from backend.app.agents.devrel.tools.search_tool.ddg import DuckDuckGoSearchTool
+from app.agents.devrel.tools.search_tool.ddg import DuckDuckGoSearchTool
 logger = logging.getLogger(__name__)
 
 

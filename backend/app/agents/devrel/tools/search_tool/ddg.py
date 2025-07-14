@@ -26,7 +26,7 @@ class DuckDuckGoSearchTool:
             )
             
             results = []
-            for result in response.get("results", []):
+            for result in response or []:
                 results.append({
                     "title": result.get("title", ""),
                     "content": result.get("body", ""),
@@ -37,6 +37,7 @@ class DuckDuckGoSearchTool:
         
         except (ConnectionError, TimeoutError) as e:
             logger.warning("Network issue during DDG search: %s", e)
+            return []
         except Exception as e:
             logger.error("DuckDuckGo search failed: %s", str(e))
             return []
