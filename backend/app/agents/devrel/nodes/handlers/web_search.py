@@ -4,7 +4,6 @@ from app.agents.state import AgentState
 from langchain_core.messages import HumanMessage
 from app.agents.devrel.prompts.search_prompt import EXTRACT_SEARCH_QUERY_PROMPT
 
-
 logger = logging.getLogger(__name__)
 
 async def _extract_search_query(message: str, llm) -> str:
@@ -42,9 +41,9 @@ async def handle_web_search_node(state: AgentState, search_tool, llm) -> dict:
             "type": "web_search",
             "query": search_query,
             "results": search_results,
-            "source": "tavily_search"
+            "source": "duckduckgo_search"
         },
-        "tools_used": ["tavily_search"],
+        "tools_used": ["duckduckgo_search"],
         "current_task": "web_search_handled"
     }
 
@@ -52,6 +51,7 @@ def create_search_response(task_result: Dict[str, Any]) -> str:
     """
     Create a user-friendly response string from search results.
     """
+        
     query = task_result.get("query")
     results = task_result.get("results", [])
 
@@ -61,10 +61,9 @@ def create_search_response(task_result: Dict[str, Any]) -> str:
     response_parts = [f"Here's what I found for '{query}':"]
     for i, result in enumerate(results[:5]):
         title = result.get('title', 'N/A')
-        snippet = result.get('snippet', 'N/A')
+        snippet = result.get('content', 'N/A') 
         url = result.get('url', '#')
-        result_line = f"{i+1}. {title}: {snippet}"
-        response_parts.append(result_line)
+        response_parts.append(f"{i+1}. {title}: {snippet}")
         response_parts.append(f"   (Source: {url})")
 
     response_parts.append("You can ask me to search again with a different query if these aren't helpful.")

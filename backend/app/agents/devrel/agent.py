@@ -5,7 +5,7 @@ from langgraph.graph import StateGraph, END
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import InMemorySaver
 from ..base_agent import BaseAgent, AgentState
-from .tools.search_tool import TavilySearchTool
+from .tools.search_tool.ddg import DuckDuckGoSearchTool
 from .tools.faq_tool import FAQTool
 from .github.github_toolkit import GitHubToolkit
 from app.core.config import settings
@@ -27,7 +27,7 @@ class DevRelAgent(BaseAgent):
             temperature=0.3,
             google_api_key=settings.gemini_api_key
         )
-        self.search_tool = TavilySearchTool()
+        self.search_tool = DuckDuckGoSearchTool()
         self.faq_tool = FAQTool()
         self.github_toolkit = GitHubToolkit()
         self.checkpointer = InMemorySaver()
