@@ -92,16 +92,28 @@ CREATE TABLE interactions (
     metadata JSONB
 );
 
--- Table: conversation_contexts
+-- Table: conversation_context
 CREATE TABLE conversation_context (
-    id UUID PRIMARY KEY NOT NULL,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    platform TEXT NOT NULL,
-    memory_thread_id TEXT NOT NULL UNIQUE,
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     conversation_summary TEXT,
     key_topics TEXT[],
     total_interactions INTEGER,
     session_start_time TIMESTAMPTZ,
     session_end_time TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Add a trigger to update 'updated_at' timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = now();
+   RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_conversation_context_updated_at
+BEFORE UPDATE ON conversation_context
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
