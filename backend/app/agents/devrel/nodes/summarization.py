@@ -1,9 +1,16 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from app.agents.state import AgentState
 from langchain_core.messages import HumanMessage
 from app.agents.devrel.prompts.summarization_prompt import CONVERSATION_SUMMARY_PROMPT
+from app.database.supabase.client import get_supabase_client
+
+supabase = get_supabase_client()
+
+def isoformat_or_none(dt: Optional[datetime]) -> Optional[str]:
+    return dt.isoformat() if dt else None
+
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +136,46 @@ async def _extract_key_topics(summary: str, llm) -> list[str]:
         return []
 
 async def store_summary_to_database(state: AgentState) -> None:
-    # TODO: Implement database storage to user_interactions
-    """Store the summary in PostgreSQL database"""
-    logger.info(f"[PLACEHOLDER] Storing summary for session {state.session_id}")
-    pass
+    """Store the summary in Supabase database"""
+    logger.info(f"Storing summary for session {state.session_id} into conversation_context")
+
+    try:
+        # Validate required fields
+        if not state.user_id or not state.platform:
+            logger.error(f"Missing required fields: user_id={state.user_id}, platform={state.platform}")
+            return
+
+        platform_id = state.user_id
+        platform_column = f"{state.platform}_id"
+
+        # Fetch the user's UUID from the 'users' table
+        user_response = await supabase.table("users").select("id").eq(platform_column, platform_id).limit(1).execute()
+
+        if not user_response.data:
+            logger.error(f"User with {platform_column} '{platform_id}' not found in users table.")
+            return
+
+        user_uuid = user_response.data[0]['id']
+        logger.info(f"Found user UUID: {user_uuid} for {platform_column}: {platform_id}")
+
+        # Record to insert/update
+        record = {
+            "user_id": user_uuid,
+            "conversation_summary": state.conversation_summary,
+            "key_topics": state.key_topics,
+            "total_interactions": state.interaction_count,
+            "session_start_time": isoformat_or_none(state.session_start_time),
+            "session_end_time": isoformat_or_none(datetime.now()),
+        }
+
+        # Upsert based on the user_id to ensure one summary per user
+        response = await supabase.table("conversation_context").upsert(record, on_conflict="user_id").execute()
+
+        # Checks
+        if response.data and len(response.data) > 0:
+            logger.info(f"✅ Summary stored successfully for session {state.session_id}")
+        else:
+            logger.error(f"❌ Supabase upsert failed for session {state.session_id}: {response}")
+
+    except Exception as e:
+        logger.error(f"Unexpected error while storing summary: {str(e)}")
