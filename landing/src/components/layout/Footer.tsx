@@ -57,12 +57,14 @@ const Footer: React.FC = () => {
                         </a>
                         <a href="https://x.com/aossie_org?lang=en" 
                            className="text-gray-300 hover:text-white hover:scale-110 transition-all duration-300 ease-in-out p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-500/10 hover:to-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20" 
-                           target='_blank'>
+                           target='_blank'
+                           rel="noreferrer">
                             <Twitter size={20} />
                         </a>
                         <a href="https://www.linkedin.com/company/aossie/?originalSubdomain=au" 
                            className="text-gray-300 hover:text-white hover:scale-110 transition-all duration-300 ease-in-out p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-500/10 hover:to-blue-500/10 hover:shadow-lg hover:shadow-green-500/20" 
-                           target='_blank'>
+                           target='_blank'
+                           rel="noreferrer">
                             <Linkedin size={20} />
                         </a>
                     </div>
