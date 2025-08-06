@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { AnimatePresence } from 'framer-motion';
+import toast, { Toaster } from 'react-hot-toast';
+
 import Sidebar from './components/layout/Sidebar';
 import Dashboard from './components/dashboard/Dashboard';
 import BotIntegrationPage from './components/integration/BotIntegrationPage';
@@ -12,29 +14,73 @@ import SupportPage from './components/pages/SupportPage';
 import LandingPage from './components/landing/LandingPage';
 import LoginPage from './components/pages/LoginPage';
 import ProfilePage from './components/pages/ProfilePage';
-import { AnimatePresence } from 'framer-motion';
+import SignUpPage from './components/pages/SignUpPage';
+import { supabase } from './lib/supabaseClient';
+import ForgotPasswrdPage from './components/pages/ForgotPasswrdPage';
+import ResetPasswordPage from './components/pages/ResetPasswordPage';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [repoData, setRepoData] = useState<any>(null); // Store fetched repo stats
+  const [repoData, setRepoData] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check for existing authentication on app load
+  // Auto login if user has already logged in
   useEffect(() => {
-    const savedAuth = localStorage.getItem('isAuthenticated');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        toast.error('User Login Failed');
+        console.error('Error checking session:', error);
+        return;
+      }
+      setIsAuthenticated(!!data.session);
+    });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log("Auth event:", event, session);
+        switch (event) {
+          case "SIGNED_IN":
+            setIsAuthenticated(true);
+            toast.success("Signed in!");
+            break;
+
+          case "SIGNED_OUT":
+            setIsAuthenticated(false);
+            setRepoData(null);
+            toast.success("Signed out!");
+            break;
+
+          case "PASSWORD_RECOVERY":
+            toast("Check your email to reset your password.");
+            break;
+          case "TOKEN_REFRESHED":
+            console.log("Session refreshed");
+            break;
+          case "USER_UPDATED":
+            console.log("User updated", session?.user);
+            break;
+        }
+      }
+    );
+
+    return () => {
+      subscription.subscription.unsubscribe();
+    };
   }, []);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
-    localStorage.setItem('isAuthenticated', 'true');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Logout failed');
+      console.error('Error during logout:', error);
+      return;
+    }
+    toast.success('Signed out!');
     setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
     setRepoData(null);
   };
 
@@ -75,6 +121,23 @@ function App() {
             }
           />
           <Route
+            path="/forgot-password"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/" replace />
+              ) : (
+                <ForgotPasswrdPage />
+              )
+            }
+          />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/signup"
+            element={
+              isAuthenticated ? <Navigate to="/" replace /> : <SignUpPage />
+            }
+          />
+          <Route
             path="/"
             element={
               isAuthenticated ? <ProtectedLayout /> : <Navigate to="/login" replace />
@@ -97,4 +160,3 @@ function App() {
 }
 
 export default App;
-
