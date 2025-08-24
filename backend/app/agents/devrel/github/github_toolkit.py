@@ -5,6 +5,7 @@ from langchain_core.messages import HumanMessage
 from app.core.config import settings
 from .prompts.intent_analysis import GITHUB_INTENT_ANALYSIS_PROMPT
 from .tools.search import handle_web_search
+from .tools.repository_query import handle_repo_query
 # TODO: Implement all tools
 from .tools.contributor_recommendation import handle_contributor_recommendation
 # from .tools.repository_query import handle_repo_query
@@ -55,7 +56,20 @@ class GitHubToolkit:
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
 
             import json
-            result = json.loads(response.content.strip())
+            import re
+            
+            content = response.content.strip()
+            
+            # Try to extract JSON from markdown code blocks if present
+            json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', content, re.DOTALL)
+            if json_match:
+                content = json_match.group(1)
+            
+            json_match = re.search(r'\{.*\}', content, re.DOTALL)
+            if json_match:
+                content = json_match.group(0)
+            
+            result = json.loads(content)
 
             classification = result.get("classification")
             if classification not in self.tools:
@@ -104,7 +118,7 @@ class GitHubToolkit:
             if classification == "contributor_recommendation":
                 result = await handle_contributor_recommendation(query)
             elif classification == "repo_support":
-                result = "Not implemented"
+                result = await handle_repo_query(query)
                 # result = await handle_repo_query(query)
             elif classification == "issue_creation":
                 result = "Not implemented"
