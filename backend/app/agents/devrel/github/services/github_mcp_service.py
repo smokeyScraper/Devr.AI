@@ -20,10 +20,15 @@ class GitHubMCPService:
     def repo_query(self, owner: str, repo: str) -> dict:
 
         url = f"{self.base_url}/repos/{owner}/{repo}"
-        headers = {"Authorization": f"token {self.token}"}
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "DevrAI-GitHubMCPService/0.1"
+        }
         
         try:
-            resp = requests.get(url, headers=headers)
+            resp = requests.get(url, headers=headers, timeout=15)
             resp.raise_for_status()
         except requests.exceptions.RequestException as e:
             return {"error": "Request failed", "message": str(e)}

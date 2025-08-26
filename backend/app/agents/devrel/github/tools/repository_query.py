@@ -1,12 +1,22 @@
 from ..services.github_mcp_client import GitHubMCPClient
 import re
 
-OWNER_REPO_RE = re.compile(r"([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)")
+#GitHub URL forms: https(s)://github.com/owner/repo[.git][...], git@github.com:owner/repo[.git]
+GH_URL_RE = re.compile(
+    r'(?:https?://|git@)github\.com[/:]'
+    r'([A-Za-z0-9](?:-?[A-Za-z0-9]){0,38})/'
+    r'([A-Za-z0-9._-]+?)(?:\.git)?(?:/|$)',
+    re.IGNORECASE,
+)
+
+OWNER_REPO_RE = re.compile(
+    r'\b([A-Za-z0-9](?:-?[A-Za-z0-9]){0,38})/([A-Za-z0-9._-]{1,100})\b'
+)
 
 async def handle_repo_query(user_query: str) -> dict:
-    m = OWNER_REPO_RE.search(user_query)
+    m = GH_URL_RE.search(user_query) or OWNER_REPO_RE.search(user_query)
     if not m:
-        return {"status": "error", "message": "Usage: include owner/repo in query."}
+        return {"status": "error", "message": "Usage: include a GitHub owner/repo (e.g., AOSSIE-Org/Devr.AI) or a GitHub URL."}
 
     owner, repo = m.group(1), m.group(2)
     

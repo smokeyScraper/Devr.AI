@@ -57,19 +57,24 @@ class GitHubToolkit:
 
             import json
             import re
-            
+
             content = response.content.strip()
-            
-            # Try to extract JSON from markdown code blocks if present
-            json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', content, re.DOTALL)
-            if json_match:
-                content = json_match.group(1)
-            
-            json_match = re.search(r'\{.*\}', content, re.DOTALL)
-            if json_match:
-                content = json_match.group(0)
-            
-            result = json.loads(content)
+
+            candidates = []
+            cb = re.search(r'```(?:json)?\s*({[\s\S]*?})\s*```', content, flags=re.IGNORECASE)
+            if cb:
+                candidates.append(cb.group(1))
+            candidates.extend(m.group(0) for m in re.finditer(r'\{[\s\S]*?\}', content))
+
+            result = None
+            for payload in candidates:
+                try:
+                    result = json.loads(payload)
+                    break
+                except json.JSONDecodeError:
+                    continue
+            if result is None:
+                raise json.JSONDecodeError("No valid JSON object found in LLM response", content, 0)
 
             classification = result.get("classification")
             if classification not in self.tools:

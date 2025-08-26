@@ -1,19 +1,28 @@
 import os
 import logging
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from .github_mcp_service import GitHubMCPService
+from typing import Optional
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../../../../.env"))
+dotenv_path = find_dotenv(usecwd=True)
+if dotenv_path:
+    load_dotenv(dotenv_path=dotenv_path)
+else:
+    load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="GitHub MCP Server", version="1.0.0")
 
+github_service: Optional[GitHubMCPService] = None
 try:
-    github_service = GitHubMCPService(token=os.getenv("GITHUB_TOKEN"))
+    token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    if not token:
+        logger.warning("GITHUB_TOKEN/GH_TOKEN not set; GitHub API calls may be rate-limited or fail.")
+    github_service = GitHubMCPService(token=token)
     logger.info("GitHub service initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize GitHub service: {e}")
@@ -51,6 +60,8 @@ async def mcp_endpoint(request: dict):
                 if not owner or not repo:
                     return {"error": "Missing owner or repo parameter"}
                 
+                if not github_service:
+                    return {"error": "GitHub service not available"}
                 result = github_service.repo_query(owner, repo)
                 return {"result": result}
             else:
@@ -59,7 +70,7 @@ async def mcp_endpoint(request: dict):
             return {"error": f"Unknown method: {method}"}
             
     except Exception as e:
-        logger.error(f"Error in MCP endpoint: {e}")
+        logger.exception("Error in MCP endpoint")
         return {"error": str(e)}
 
 @app.post("/repo_info")

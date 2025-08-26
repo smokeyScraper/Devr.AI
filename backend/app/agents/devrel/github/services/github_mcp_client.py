@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Any, Optional
 import aiohttp
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ class GitHubMCPClient:
     
     async def __aenter__(self):
         # Async context manager entry
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15))
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -29,7 +30,6 @@ class GitHubMCPClient:
             raise RuntimeError("Client not initialized. Use async context manager.")
         
         try:
-            # Try the direct repo_info endpoint first (simpler)
             payload = {
                 "owner": owner,
                 "repo": repo
@@ -65,5 +65,7 @@ class GitHubMCPClient:
         try:
             async with self.session.get(f"{self.mcp_server_url}/health", timeout=5) as response:
                 return response.status == 200
-        except:
+            
+        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+            logger.debug(f"Health check failed: {e}")
             return False
