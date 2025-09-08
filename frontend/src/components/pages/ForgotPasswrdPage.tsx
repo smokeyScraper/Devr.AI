@@ -66,7 +66,10 @@ export default function ForgotPasswrdPage() {
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) {
         console.error('resetPasswordForEmail failed', error);
+        toast.error(error.message || 'Could not send reset email.');
+        return;
       }
+      toast.success('Password reset email sent.');
       setMailPage(true);
     } catch (err) {
       console.error('resetPasswordForEmail unexpected error', err);

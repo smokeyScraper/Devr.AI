@@ -35,14 +35,14 @@ const AuthLayout = ({ children }: AuthLayoutProps) => (
   </div>
 );
 
-const InputField = ({ icon: Icon, ...props }: InputFieldProps) => (
+const InputField = ({ icon: Icon, className, ...props }: InputFieldProps) => (
   <div className="relative">
     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
       <Icon className="h-5 w-5 text-gray-400" />
     </div>
     <input
       {...props}
-      className="block w-full pl-10 pr-3 py-2 border border-gray-800 rounded-lg bg-gray-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+      className={`block w-full pl-10 pr-3 py-2 border border-gray-800 rounded-lg bg-gray-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${className ?? ''}`}
     />
   </div>
 );
@@ -86,27 +86,29 @@ export default function SignUpPage() {
       return;
     }
     setIsLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          display_name: name
+    try {
+      const redirectTo = import.meta.env.VITE_BASE_URL || window.location.origin;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: name },
+          emailRedirectTo: redirectTo,
         },
-        emailRedirectTo: import.meta.env.VITE_BASE_URL,
-      },
-    })
-    setIsLoading(false);
-    // Email already confirmed
-    if (data?.user?.confirmed_at) {
-      toast.error("Email is already registered. Please log in.");
-      return;
+      });
+      if (error) {
+        const msg = /already|exist/i.test(error.message)
+          ? "Email is already registered. Please log in."
+          : (error.message || "An unknown error occurred!");
+        toast.error(msg);
+        return;
+      }
+      setMailPage(true);
+    } catch {
+      toast.error("Unexpected error during sign up.");
+    } finally {
+      setIsLoading(false);
     }
-    if (error) {
-      toast.error(error.message || "An Unknown error occured!");
-      return;
-    }
-    setMailPage(true);
   };
 
   return (

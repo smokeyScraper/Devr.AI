@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { ReactNode, FormEvent } from "react";
+import type { ReactNode, FormEvent, ComponentPropsWithoutRef, ElementType } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { toast} from "react-hot-toast";
@@ -14,10 +14,9 @@ interface AuthLayoutProps {
   children: ReactNode;
 }
 
-interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon: React.ElementType;
+interface InputFieldProps extends ComponentPropsWithoutRef<'input'> {
+  icon: ElementType;
 }
-
 
 const AuthLayout = ({ children }: AuthLayoutProps) => (
   <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
@@ -32,14 +31,14 @@ const AuthLayout = ({ children }: AuthLayoutProps) => (
   </div>
 );
 
-const InputField = ({ icon: Icon, ...props }: InputFieldProps) => (
+const InputField = ({ icon: Icon, className, ...props }: InputFieldProps) => (
   <div className="relative">
     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
       <Icon className="h-5 w-5 text-gray-400" />
     </div>
     <input
-      {...props}
-      className="block w-full pl-10 pr-3 py-2 border border-gray-800 rounded-lg bg-gray-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+    {...props}
+      className={`block w-full pl-10 pr-3 py-2 border border-gray-800 rounded-lg bg-gray-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${className ?? ''}`}
     />
   </div>
 );
@@ -53,15 +52,16 @@ export default function ResetPasswordPage() {
 
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.slice(1));
+    const paramsHash = new URLSearchParams(window.location.hash.slice(1));
+    const paramsSearch = new URLSearchParams(window.location.search);
 
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
+    const accessToken = paramsHash.get('access_token');
+    const refreshToken = paramsHash.get('refresh_token');
+    const code = paramsSearch.get('code');
 
-    const clearUrlHash = () => {
-      if (window.location.hash) {
-        window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
-      }
+    const clearUrl = () => {
+      const url = window.location.pathname;
+      window.history.replaceState({}, document.title, url);
     };
 
     if (accessToken && refreshToken) {
@@ -79,15 +79,31 @@ export default function ResetPasswordPage() {
           toast.error("Error setting session");
           navigate('/login', { replace: true });
         } finally {
-          clearUrlHash();
+          clearUrl();
+        }
+      })();
+    } else if (code) {
+      (async () => {
+        try {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            toast.error("Error exchanging code: " + error.message);
+            navigate('/login', { replace: true });
+          }
+        } catch {
+          toast.error("Error exchanging code");
+          navigate('/login', { replace: true });
+        } finally {
+          clearUrl();
         }
       })();
     } else {
       toast.error("Access denied");
       navigate('/login', { replace: true });
-      clearUrlHash();
+      clearUrl();
     }
   }, [navigate]);
+
 
 
   const handleAuth = async (e: FormEvent<HTMLFormElement>) => {
