@@ -53,7 +53,7 @@ async def mcp_endpoint(request: dict):
             tool_name = params.get("name")
             arguments = params.get("arguments", {})
             
-            if tool_name == "get_repo_info":
+            if tool_name == "get_github_supp":
                 owner = arguments.get("owner")
                 repo = arguments.get("repo")
                 
@@ -73,8 +73,8 @@ async def mcp_endpoint(request: dict):
         logger.exception("Error in MCP endpoint")
         return {"error": str(e)}
 
-@app.post("/repo_info")
-async def get_repo_info(request: RepoInfoRequest):
+@app.post("/github_support")
+async def get_github_supp(request: RepoInfoRequest):
 
     try:
         if not github_service:

@@ -24,7 +24,7 @@ class GitHubMCPClient:
         if self.session:
             await self.session.close()
     
-    async def get_repo_info(self, owner: str, repo: str) -> Dict[str, Any]:
+    async def get_github_supp(self, owner: str, repo: str) -> Dict[str, Any]:
 
         if not self.session:
             raise RuntimeError("Client not initialized. Use async context manager.")
@@ -36,7 +36,7 @@ class GitHubMCPClient:
             }
             
             async with self.session.post(
-                f"{self.mcp_server_url}/repo_info",
+                f"{self.mcp_server_url}/github_support",
                 json=payload,
                 headers={"Content-Type": "application/json"}
             ) as response:

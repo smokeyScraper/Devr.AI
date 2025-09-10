@@ -5,7 +5,7 @@ from langchain_core.messages import HumanMessage
 from app.core.config import settings
 from .prompts.intent_analysis import GITHUB_INTENT_ANALYSIS_PROMPT
 from .tools.search import handle_web_search
-from .tools.repository_query import handle_repo_query
+from .tools.github_support import handle_github_supp
 # TODO: Implement all tools
 from .tools.contributor_recommendation import handle_contributor_recommendation
 # from .tools.repository_query import handle_repo_query
@@ -33,6 +33,7 @@ class GitHubToolkit:
             "web_search",
             "contributor_recommendation",
             "repo_support",
+            "github_support",
             "issue_creation",
             "documentation_generation",
             "find_good_first_issues",
@@ -122,8 +123,10 @@ class GitHubToolkit:
 
             if classification == "contributor_recommendation":
                 result = await handle_contributor_recommendation(query)
+            elif classification == "github_support":
+                result = await handle_github_supp(query)
             elif classification == "repo_support":
-                result = await handle_repo_query(query)
+                result = "Not implemented"
                 # result = await handle_repo_query(query)
             elif classification == "issue_creation":
                 result = "Not implemented"
