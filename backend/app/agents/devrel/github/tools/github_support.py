@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+from typing import Optional
 from app.agents.devrel.github.services import github_mcp_service
 
 logger = logging.getLogger(__name__)
@@ -24,25 +25,25 @@ REPO_NAME_RE = re.compile(
 )
 
 
-async def handle_github_supp(query: str, org: str = None):
+async def handle_github_supp(query: str, org: Optional[str] = None):
     """
     Handles queries related to GitHub repositories and organization stats.
     """
     try:
         repo_name = None
+        q = query.lower()
 
-        # --- Try full URL first ---
         match = GH_URL_RE.search(query)
         if match:
             org, repo_name = match.group(1), match.group(2)
 
-        # --- Try owner/repo format ---
+        # --- owner/repo format ---
         if not repo_name:
             match = OWNER_REPO_RE.search(query)
             if match:
                 org, repo_name = match.group(1), match.group(2)
 
-        # --- Try "<name> repo" pattern ---
+        # ---"<name> repo" pattern ---
         if not repo_name:
             match = REPO_NAME_RE.search(query)
             if match:
@@ -53,7 +54,7 @@ async def handle_github_supp(query: str, org: str = None):
         org = org or DEFAULT_ORG
 
         # --- Top repos ---
-        if "top" in query and "repo" in query:
+        if "top" in q and "repo" in q:
             repos = await github_mcp_service.get_org_repositories(org)
             repos = sorted(repos, key=lambda r: r["stars"], reverse=True)[:10]
             return {
@@ -63,24 +64,20 @@ async def handle_github_supp(query: str, org: str = None):
             }
 
         # --- Issues, stars, forks, stats ---
-        if any(word in query for word in ["issue", "star", "fork", "stat"]):
+        if any(word in q for word in ["issue", "star", "fork", "stat", "stats"]):
             if repo_name:
-                if "issue" in query:
+                if "issue" in q:
                     issues = await github_mcp_service.get_repo_issues(org, repo_name)
-                    return {
-                        "status": "success",
-                        "message": f"Open issues for {org}/{repo_name}",
-                        "issues": issues,
-                    }
+                    if isinstance(issues, dict) and "error" in issues:
+                        return {"status": "error", "message": f"Failed to fetch issues for {org}/{repo_name}", "details": issues}
+                    return {"status": "success", "message": f"Open issues for {org}/{repo_name}", "issues": issues}
                 else:
                     repo = await github_mcp_service.get_repo_details(org, repo_name)
-                    return {
-                        "status": "success",
-                        "message": f"Details for {org}/{repo_name}",
-                        "repository": repo,
-                    }
+                    if isinstance(repo, dict) and "error" in repo:
+                        return {"status": "error", "message": f"Failed to fetch {org}/{repo_name}", "details": repo}
+                    return {"status": "success", "message": f"Details for {org}/{repo_name}", "repository": repo}
             else:
-                if "stat" in query:
+                if any(w in q for w in ["stat", "stats"]):
                     stats = await github_mcp_service.get_org_stats(org)
                     return {
                         "status": "success",
@@ -89,11 +86,9 @@ async def handle_github_supp(query: str, org: str = None):
                     }
                 else:
                     repos = await github_mcp_service.get_org_repositories(org)
-                    return {
-                        "status": "success",
-                        "message": f"Repositories for {org}",
-                        "repositories": repos,
-                    }
+                    if isinstance(repos, dict) and "error" in repos:
+                        return {"status": "error", "message": f"Failed to fetch repositories for {org}", "details": repos}
+                    return {"status": "success", "message": f"Repositories for {org}", "repositories": repos}
 
         # --- General repo list (fallback) ---
         repos = await github_mcp_service.get_org_repositories(org)
@@ -111,5 +106,5 @@ async def handle_github_supp(query: str, org: str = None):
         }
 
     except Exception as e:
-        logger.error(f"GitHub support error: {e}")
+        logger.exception("GitHub support error: %s", e)
         return {"status": "error", "message": str(e)}

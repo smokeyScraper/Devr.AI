@@ -1,5 +1,6 @@
 import os
 import logging
+import asyncio
 from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -30,11 +31,12 @@ try:
     github_service = GitHubMCPService(token=token)
     logger.info("GitHub service initialized successfully")
 except Exception as e:
-    logger.error(f"Failed to initialize GitHub service: {e}")
+    logger.exception("Failed to initialize GitHub service")
     github_service = None
 
 class RepoInfoRequest(BaseModel):
     repo: str 
+    owner: Optional[str] = None
 
 class RepoInfoResponse(BaseModel):
     status: str
@@ -63,24 +65,25 @@ async def list_org_repos(request: OrgInfoRequest):
         return {"status": "success", "data": result}
 
     except Exception as e:
-        logger.error(f"Error listing org repos: {e}")
+        logger.exception("Error listing org repos")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/github_support")
 async def get_github_supp(request: RepoInfoRequest):
     """Get repo details, using fixed org from env"""
     if not github_service:
-        raise HTTPException(status_code=500, detail="GitHub service not available")
-    if not GITHUB_ORG:
-        raise HTTPException(status_code=500, detail="GITHUB_ORG not configured in .env")
+        raise HTTPException(status_code=503, detail="GitHub service not available")
+    owner = request.owner or GITHUB_ORG
+    if not owner:
+        raise HTTPException(status_code=400, detail="Missing owner; provide 'owner' or set GITHUB_ORG")
 
     try:
-        result = github_service.repo_query(GITHUB_ORG, request.repo)
+        result = await asyncio.to_thread(github_service.repo_query, owner, request.repo)
         if "error" in result:
             return RepoInfoResponse(status="error", data={}, error=result["error"])
         return RepoInfoResponse(status="success", data=result)
     except Exception as e:
-        logger.error(f"Error getting repo info: {e}")
+        logger.exception("Error getting repo info")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

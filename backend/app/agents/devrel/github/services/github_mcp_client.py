@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Union
 import aiohttp
 import asyncio
 
@@ -56,13 +56,13 @@ class GitHubMCPClient:
                     return {"error": f"MCP server error: {response.status}"}
 
         except aiohttp.ClientError as e:
-            logger.error(f"Error communicating with MCP server: {e}")
+            logger.exception("Error communicating with MCP server: %s", e)
             return {"error": f"Communication error: {str(e)}"}
         except Exception as e:
-            logger.error(f"Unexpected error: {e}")
+            logger.exception("Unexpected error: %s", e)
             return {"error": f"Unexpected error: {str(e)}"}
 
-    async def list_org_repos(self, org: str) -> Dict[str, Any]:
+    async def list_org_repos(self, org: str) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         if not self.session:
             raise RuntimeError("Client not initialized. Use async context manager.")
 

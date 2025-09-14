@@ -1,9 +1,14 @@
 import os
 import requests
-from dotenv import load_dotenv
+import asyncio
+from typing import Optional
+from dotenv import load_dotenv, find_dotenv 
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', '.env')
-load_dotenv(dotenv_path=dotenv_path)
+dotenv_path = find_dotenv(usecwd=True)
+if dotenv_path:
+    load_dotenv(dotenv_path=dotenv_path)
+else:
+    load_dotenv()
 
 class GitHubMCPService:
     def __init__(self, token: str = None):
@@ -108,25 +113,40 @@ class GitHubMCPService:
         }
 
 
-_service = GitHubMCPService()
+def _get_service(token: Optional[str] = None) -> GitHubMCPService:
+    return GitHubMCPService(token=token or os.getenv("GITHUB_TOKEN"))
 
 async def get_org_repositories(org: str):
-    return _service.list_org_repos(org)
+    try:
+        svc = _get_service()
+        return await asyncio.to_thread(svc.list_org_repos, org)
+    except Exception as e:
+        return {"error": "config_or_request_failed", "message": str(e)}
 
 async def get_org_stats(org: str):
-    repos = _service.list_org_repos(org)
-    if isinstance(repos, dict) and "error" in repos:  # error case
-        return repos
-    return {
-        "repo_count": len(repos),
-        "total_stars": sum(r["stars"] for r in repos),
-        "total_forks": sum(r["forks"] for r in repos),
-    }
+    try:
+        svc = _get_service()
+        repos = await asyncio.to_thread(svc.list_org_repos, org)
+        if isinstance(repos, dict) and "error" in repos:
+            return repos
+        return {
+            "repo_count": len(repos),
+            "total_stars": sum(r.get("stars", 0) for r in repos),
+            "total_forks": sum(r.get("forks", 0) for r in repos),
+        }
+    except Exception as e:
+        return {"error": "config_or_request_failed", "message": str(e)}
 
 async def get_repo_details(org: str, repo: str):
-    service = GitHubMCPService()
-    return service.repo_query(org, repo)
+    try:
+        svc = _get_service()
+        return await asyncio.to_thread(svc.repo_query, org, repo)
+    except Exception as e:
+        return {"error": "config_or_request_failed", "message": str(e)}
 
 async def get_repo_issues(org: str, repo: str, state: str = "open"):
-    service = GitHubMCPService()
-    return service.list_repo_issues(org, repo, state)
+    try:
+        svc = _get_service()
+        return await asyncio.to_thread(svc.list_repo_issues, org, repo, state)
+    except Exception as e:
+        return {"error": "config_or_request_failed", "message": str(e)}
