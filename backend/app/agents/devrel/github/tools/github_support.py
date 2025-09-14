@@ -56,7 +56,9 @@ async def handle_github_supp(query: str, org: Optional[str] = None):
         # --- Top repos ---
         if "top" in q and "repo" in q:
             repos = await github_mcp_service.get_org_repositories(org)
-            repos = sorted(repos, key=lambda r: r["stars"], reverse=True)[:10]
+            if isinstance(repos, dict) and "error" in repos:
+                return {"status": "error", "message": f"Failed to fetch repositories for {org}", "details": repos}
+            repos = sorted(repos, key=lambda r: r.get("stars", 0), reverse=True)[:10]
             return {
                 "status": "success",
                 "message": f"Top repositories for {org}",

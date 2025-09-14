@@ -55,9 +55,9 @@ class OrgInfoRequest(BaseModel):
 async def list_org_repos(request: OrgInfoRequest):
     try:
         if not github_service:
-            raise HTTPException(status_code=500, detail="GitHub service not available")
+            raise HTTPException(status_code=503, detail="GitHub service not available")
 
-        result = github_service.list_org_repos(request.org)
+        result = await asyncio.to_thread(github_service.list_org_repos, request.org)
 
         if "error" in result:
             return {"status": "error", "data": {}, "error": result["error"]}
