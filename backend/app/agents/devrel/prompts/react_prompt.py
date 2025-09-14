@@ -13,10 +13,14 @@ TOOL RESULTS FROM PREVIOUS ACTIONS:
 {tool_results}
 
 AVAILABLE ACTIONS:
-1. web_search - Search the web for external information
+1. web_search - Search the web for external information (ONLY if you cannot find info in GitHub or FAQs)
 2. faq_handler - Answer common questions from knowledge base  
 3. onboarding - Welcome new users and guide exploration
-4. github_toolkit - Handle GitHub operations (issues, PRs, repos, docs)
+4. github_toolkit - Handle ANY GitHub-related queries such as:
+   - Listing or retrieving repository issues
+   - Creating or updating issues/PRs
+   - Checking repository details, documentation, or code
+   - Anything where the user mentions "repo", "repository", "issues", "PR", "pull request", or "GitHub"
 5. complete - Task is finished, format final response
 
 THINK: Analyze the user's request and current context. What needs to be done?

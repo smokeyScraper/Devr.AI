@@ -1,10 +1,10 @@
 GITHUB_INTENT_ANALYSIS_PROMPT = """You are an expert GitHub DevRel AI assistant. Analyze the user query and classify the intent.
 
 AVAILABLE FUNCTIONS:
-- web_search: Search the web for general information not available through GitHub API
+- github_support: Questions about repository information, structure, stats, issues, stars, forks, description, or any repository metadata
+- web_search: Search the web for general information
 - contributor_recommendation: Finding the right people to review PRs, assign issues, or collaborate
 - repo_support: Questions about codebase structure, dependencies, impact analysis, architecture
-- github_support: Questions about repository information, structure, stats, issues, stars, forks, description, or any repository metadata
 - issue_creation: Creating bug reports, feature requests, or tracking items
 - documentation_generation: Generating docs, READMEs, API docs, guides, or explanations
 - find_good_first_issues: Finding beginner-friendly issues to work on across repositories
@@ -13,7 +13,17 @@ AVAILABLE FUNCTIONS:
 USER QUERY: {user_query}
 
 Classification guidelines:
-- github_support: ANY questions about repository information, stats, issues count, stars, forks, description, URL, or repository metadata. This includes "how many issues", "what are the stars", "repository details", etc.
+- github_support: 
+  - ALWAYS classify as `github_support` if the query asks about:
+    - repository information
+    - stats (stars, forks, watchers, issues)
+    - open issues, closed issues, or "what issues"
+    - description, license, URL, metadata
+    - any question containing "<repo> repo", "repository", "repo", "issues in", "stars in", "forks in"
+  - Example queries:
+    - "What all issues are in Dev.ai repo?" → github_support
+    - "How many stars does Devr.AI repo have?" → github_support
+    - "Show me forks of Aossie-org/Dev.ai" → github_support
 - contributor_recommendation: 
   * "who should review this PR/issue?"
   * "find experts in React/Python/ML"

@@ -17,6 +17,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="GitHub MCP Server", version="1.0.0")
 
+# Load env vars
+GITHUB_ORG = os.getenv("GITHUB_ORG")
+if not GITHUB_ORG:
+    logger.warning("GITHUB_ORG not set in .env — defaulting to manual owner input")
+
 github_service: Optional[GitHubMCPService] = None
 try:
     token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
@@ -29,8 +34,7 @@ except Exception as e:
     github_service = None
 
 class RepoInfoRequest(BaseModel):
-    owner: str
-    repo: str
+    repo: str 
 
 class RepoInfoResponse(BaseModel):
     status: str
@@ -42,51 +46,39 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "github-mcp"}
 
-@app.post("/mcp")
-async def mcp_endpoint(request: dict):
-    """MCP protocol endpoint"""
-    try:
-        method = request.get("method")
-        params = request.get("params", {})
-        
-        if method == "tools/call":
-            tool_name = params.get("name")
-            arguments = params.get("arguments", {})
-            
-            if tool_name == "get_github_supp":
-                owner = arguments.get("owner")
-                repo = arguments.get("repo")
-                
-                if not owner or not repo:
-                    return {"error": "Missing owner or repo parameter"}
-                
-                if not github_service:
-                    return {"error": "GitHub service not available"}
-                result = github_service.repo_query(owner, repo)
-                return {"result": result}
-            else:
-                return {"error": f"Unknown tool: {tool_name}"}
-        else:
-            return {"error": f"Unknown method: {method}"}
-            
-    except Exception as e:
-        logger.exception("Error in MCP endpoint")
-        return {"error": str(e)}
+class OrgInfoRequest(BaseModel):
+    org: str
 
-@app.post("/github_support")
-async def get_github_supp(request: RepoInfoRequest):
-
+@app.post("/list_org_repos")
+async def list_org_repos(request: OrgInfoRequest):
     try:
         if not github_service:
             raise HTTPException(status_code=500, detail="GitHub service not available")
-        
-        result = github_service.repo_query(request.owner, request.repo)
-        
+
+        result = github_service.list_org_repos(request.org)
+
+        if "error" in result:
+            return {"status": "error", "data": {}, "error": result["error"]}
+
+        return {"status": "success", "data": result}
+
+    except Exception as e:
+        logger.error(f"Error listing org repos: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/github_support")
+async def get_github_supp(request: RepoInfoRequest):
+    """Get repo details, using fixed org from env"""
+    if not github_service:
+        raise HTTPException(status_code=500, detail="GitHub service not available")
+    if not GITHUB_ORG:
+        raise HTTPException(status_code=500, detail="GITHUB_ORG not configured in .env")
+
+    try:
+        result = github_service.repo_query(GITHUB_ORG, request.repo)
         if "error" in result:
             return RepoInfoResponse(status="error", data={}, error=result["error"])
-        
         return RepoInfoResponse(status="success", data=result)
-        
     except Exception as e:
         logger.error(f"Error getting repo info: {e}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Dict, Any
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
@@ -13,6 +14,16 @@ from .tools.contributor_recommendation import handle_contributor_recommendation
 # from .tools.documentation_generation import handle_documentation_generation
 from .tools.general_github_help import handle_general_github_help
 logger = logging.getLogger(__name__)
+
+DEFAULT_ORG = os.getenv("GITHUB_ORG")
+
+def normalize_org(org_from_user: str = None) -> str:
+    """
+    Always fallback to env org if user does not specify one.
+    """
+    if org_from_user and org_from_user.strip():
+        return org_from_user.strip()
+    return DEFAULT_ORG
 
 
 class GitHubToolkit:
@@ -124,7 +135,9 @@ class GitHubToolkit:
             if classification == "contributor_recommendation":
                 result = await handle_contributor_recommendation(query)
             elif classification == "github_support":
-                result = await handle_github_supp(query)
+                org = normalize_org()
+                result = await handle_github_supp(query, org=org)
+                result["org_used"] = org
             elif classification == "repo_support":
                 result = "Not implemented"
                 # result = await handle_repo_query(query)
