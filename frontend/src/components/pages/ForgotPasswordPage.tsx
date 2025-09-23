@@ -46,7 +46,7 @@ const InputField = ({ icon: Icon, ...props }: InputFieldProps) => (
 );
 
 
-export default function ForgotPasswrdPage() {
+export default function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mailPage, setMailPage] = useState<boolean>(false);
@@ -65,14 +65,12 @@ export default function ForgotPasswrdPage() {
       const redirectTo = new URL('/reset-password', base).toString();
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) {
-        console.error('resetPasswordForEmail failed', error);
         toast.error(error.message || 'Could not send reset email.');
         return;
       }
       toast.success('Password reset email sent.');
       setMailPage(true);
     } catch (err) {
-      console.error('resetPasswordForEmail unexpected error', err);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

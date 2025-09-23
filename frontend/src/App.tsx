@@ -16,12 +16,30 @@ import LoginPage from './components/pages/LoginPage';
 import ProfilePage from './components/pages/ProfilePage';
 import SignUpPage from './components/pages/SignUpPage';
 import { supabase } from './lib/supabaseClient';
-import ForgotPasswrdPage from './components/pages/ForgotPasswrdPage';
+import ForgotPasswordPage from './components/pages/ForgotPasswordPage';
 import ResetPasswordPage from './components/pages/ResetPasswordPage';
+
+// Define proper TypeScript interfaces
+interface RepositoryData {
+  id: string;
+  name: string;
+  full_name: string;
+  description?: string;
+  html_url: string;
+  stargazers_count: number;
+  forks_count: number;
+  language?: string;
+  created_at: string;
+  updated_at: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [repoData, setRepoData] = useState<any>(null);
+  const [repoData, setRepoData] = useState<RepositoryData | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Auto login if user has already logged in
@@ -37,7 +55,6 @@ function App() {
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log("Auth event:", event, session);
         switch (event) {
           case "SIGNED_IN":
             setIsAuthenticated(true);
@@ -54,10 +71,10 @@ function App() {
             toast("Check your email to reset your password.");
             break;
           case "TOKEN_REFRESHED":
-            console.log("Session refreshed");
+            // Session refreshed silently
             break;
           case "USER_UPDATED":
-            console.log("User updated", session?.user);
+            // User profile updated
             break;
         }
       }
@@ -126,7 +143,7 @@ function App() {
               isAuthenticated ? (
                 <Navigate to="/" replace />
               ) : (
-                <ForgotPasswrdPage />
+                <ForgotPasswordPage />
               )
             }
           />
