@@ -13,7 +13,7 @@ TOOL RESULTS FROM PREVIOUS ACTIONS:
 {tool_results}
 
 AVAILABLE ACTIONS:
-1. web_search - Search the web for external information (ONLY if you cannot find info in GitHub or FAQs)
+1. web_search - Search the web for external information
 2. faq_handler - Answer common questions from knowledge base  
 3. onboarding - Welcome new users and guide exploration
 4. github_toolkit - Handle ANY GitHub-related queries such as:

@@ -37,13 +37,13 @@ async def handle_github_supp(query: str, org: Optional[str] = None):
         if match:
             org, repo_name = match.group(1), match.group(2)
 
-        # --- owner/repo format ---
+        # owner/repo format 
         if not repo_name:
             match = OWNER_REPO_RE.search(query)
             if match:
                 org, repo_name = match.group(1), match.group(2)
 
-        # ---"<name> repo" pattern ---
+        # "<name> repo" pattern
         if not repo_name:
             match = REPO_NAME_RE.search(query)
             if match:
@@ -53,7 +53,7 @@ async def handle_github_supp(query: str, org: Optional[str] = None):
         # Fallback org if none detected
         org = org or DEFAULT_ORG
 
-        # --- Top repos ---
+        # Top repos
         if "top" in q and "repo" in q:
             repos = await github_mcp_service.get_org_repositories(org)
             if isinstance(repos, dict) and "error" in repos:
@@ -65,7 +65,7 @@ async def handle_github_supp(query: str, org: Optional[str] = None):
                 "repositories": repos,
             }
 
-        # --- Issues, stars, forks, stats ---
+        # Issues, stars, forks, stats
         if any(word in q for word in ["issue", "star", "fork", "stat", "stats"]):
             if repo_name:
                 if "issue" in q:
@@ -92,7 +92,7 @@ async def handle_github_supp(query: str, org: Optional[str] = None):
                         return {"status": "error", "message": f"Failed to fetch repositories for {org}", "details": repos}
                     return {"status": "success", "message": f"Repositories for {org}", "repositories": repos}
 
-        # --- General repo list (fallback) ---
+        # General repo list 
         repos = await github_mcp_service.get_org_repositories(org)
         if isinstance(repos, dict) and "error" in repos:
             return {

@@ -49,12 +49,8 @@ class GitHubMCPService:
         }
 
     def list_repo_issues(self, owner: str, repo: str, state: str = "open") -> list:
-        """
-        Fetch issues from a given repository.
-        :param owner: repository owner (user/org)
-        :param repo: repository name
-        :param state: 'open', 'closed', or 'all'
-        """
+        """Fetch issues from a given repository."""
+        
         url = f"{self.base_url}/repos/{owner}/{repo}/issues?state={state}&per_page=50"
         headers = self._headers()
         try:

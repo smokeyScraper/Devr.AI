@@ -7,9 +7,7 @@ import asyncio
 logger = logging.getLogger(__name__)
 
 class GitHubMCPClient:
-    """
-    Client for communicating with the GitHub MCP server.
-    """
+    """Client for communicating with the GitHub MCP server."""
 
     def __init__(self, mcp_server_url: str = "http://localhost:8001"):
         self.mcp_server_url = mcp_server_url
@@ -91,9 +89,7 @@ class GitHubMCPClient:
 
 
     async def is_server_available(self) -> bool:
-        """
-        Health check for MCP server.
-        """
+        """Health check for MCP server."""
         if not self.session:
             return False
 
