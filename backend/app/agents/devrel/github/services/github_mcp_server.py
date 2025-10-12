@@ -1,17 +1,12 @@
 import os
 import logging
 import asyncio
-from dotenv import load_dotenv, find_dotenv
+import config
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from .github_mcp_service import GitHubMCPService
 from typing import Optional
 
-dotenv_path = find_dotenv(usecwd=True)
-if dotenv_path:
-    load_dotenv(dotenv_path=dotenv_path)
-else:
-    load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -19,13 +14,13 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="GitHub MCP Server", version="1.0.0")
 
 # Load env vars
-GITHUB_ORG = os.getenv("GITHUB_ORG")
+GITHUB_ORG = config.GITHUB_ORG
 if not GITHUB_ORG:
     logger.warning("GITHUB_ORG not set in .env — defaulting to manual owner input")
 
 github_service: Optional[GitHubMCPService] = None
 try:
-    token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    token = config.GITHUB_TOKEN
     if not token:
         logger.warning("GITHUB_TOKEN/GH_TOKEN not set; GitHub API calls may be rate-limited or fail.")
     github_service = GitHubMCPService(token=token)

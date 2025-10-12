@@ -1,7 +1,7 @@
 import logging
-import os
 import json
 import re
+import config
 from typing import Dict, Any
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
@@ -14,7 +14,7 @@ from .tools.general_github_help import handle_general_github_help
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_ORG = os.getenv("GITHUB_ORG")
+DEFAULT_ORG = config.GITHUB_ORG
 
 
 def normalize_org(org_from_user: str = None) -> str:
