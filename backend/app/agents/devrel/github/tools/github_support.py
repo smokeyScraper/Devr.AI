@@ -1,4 +1,4 @@
-import os
+import config
 import re
 import logging
 from typing import Optional
@@ -6,7 +6,7 @@ from app.agents.devrel.github.services import github_mcp_service
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_ORG = os.getenv("GITHUB_ORG", "Aossie-org")
+DEFAULT_ORG = config.GITHUB_ORG
 
 GH_URL_RE = re.compile(
     r'(?:https?://|git@)github\.com[/:]'
