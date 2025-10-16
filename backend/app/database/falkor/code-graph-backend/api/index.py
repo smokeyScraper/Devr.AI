@@ -1,4 +1,5 @@
 """ Main API module for CodeGraph. """
+import logging
 import os
 from pathlib import Path
 from functools import wraps
@@ -18,7 +19,6 @@ from .auto_complete import prefix_search
 load_dotenv()
 
 # Configure the logger
-import logging
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -37,6 +37,7 @@ def token_required(f):
             return jsonify(message="Unauthorized"), 401
         return f(*args, **kwargs)
     return decorated_function
+
 
 app = Flask(__name__)
 
@@ -109,7 +110,7 @@ def get_neighbors():
     data = request.get_json()
 
     # Get query parameters
-    repo    = data.get('repo')
+    repo = data.get('repo')
     node_ids = data.get('node_ids')
 
     # Validate 'repo' parameter
@@ -298,7 +299,7 @@ def find_paths():
     paths = g.find_paths(src, dest)
 
     # Create and return a successful response
-    response = { 'status': 'success', 'paths': paths }
+    response = {'status': 'success', 'paths': paths}
 
     return jsonify(response), 200
 
@@ -323,7 +324,7 @@ def chat():
     answer = ask(repo, msg)
 
     # Create and return a successful response
-    response = { 'status': 'success', 'response': answer }
+    response = {'status': 'success', 'response': answer}
 
     return jsonify(response), 200
 
@@ -346,8 +347,8 @@ def analyze_folder():
     data = request.get_json()
 
     # Get query parameters
-    path      = data.get('path')
-    ignore    = data.get('ignore', [])
+    path = data.get('path')
+    ignore = data.get('ignore', [])
 
     # Validate input parameters
     if not path:
@@ -375,9 +376,9 @@ def analyze_folder():
 
     # Return response
     response = {
-            'status': 'success',
-            'project': proj_name
-        }
+        'status': 'success',
+        'project': proj_name
+    }
     return jsonify(response), 200
 
 @app.route('/analyze_repo', methods=['POST'])
@@ -409,9 +410,12 @@ def analyze_repo():
     proj.analyze_sources(ignore)
     proj.process_git_history(ignore)
 
-    # Create a response
+    stats = proj.graph.stats()
+
     response = {
         'status': 'success',
+        'node_count': stats.get('node_count', 0),
+        'edge_count': stats.get('edge_count', 0)
     }
 
     return jsonify(response), 200
@@ -472,7 +476,7 @@ def list_commits():
     # Validate the presence of the 'repo' parameter
     repo = data.get('repo')
     if repo is None:
-        return jsonify({'status': f'Missing mandatory parameter "repo"'}), 400
+        return jsonify({'status': 'Missing mandatory parameter "repo"'}), 400
 
     # Initialize GitGraph object to interact with the repository
     git_graph = GitGraph(git_utils.GitRepoName(repo))
