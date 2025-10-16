@@ -147,7 +147,7 @@ const IntegrationModal: React.FC<IntegrationModalProps> = ({
                 Organization Link (Optional)
               </label>
               <input
-                type="url"
+                type={platform.toLowerCase() === 'github' ? 'url' : 'text'}
                 value={formData.organization_link || ''}
                 onChange={(e) => handleChange('organization_link', e.target.value)}
                 placeholder={
@@ -171,6 +171,11 @@ const IntegrationModal: React.FC<IntegrationModalProps> = ({
                 <p className="text-sm text-blue-400 mb-2">
                   <strong>To add the bot to your Discord server:</strong>
                 </p>
+                {!import.meta.env.VITE_DISCORD_BOT_INVITE_URL ? (
+                <p className="text-sm text-yellow-400">
+                  ⚠️ Bot invite URL not configured. Please contact your administrator.
+                </p>
+              ) : (
                 <a
                   href={import.meta.env.VITE_DISCORD_BOT_INVITE_URL || '#'}
                   target="_blank"
@@ -179,6 +184,7 @@ const IntegrationModal: React.FC<IntegrationModalProps> = ({
                 >
                   Click here to invite bot to your server →
                 </a>
+                )}
                 <p className="text-xs text-gray-500 mt-2">
                   After adding the bot, register your server here.
                 </p>

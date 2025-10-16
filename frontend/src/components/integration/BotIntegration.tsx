@@ -43,6 +43,8 @@ const BotIntegration: React.FC<BotIntegrationProps> = ({
           i => i.platform === platform.toLowerCase()
         );
         setIntegration(platformIntegration || null);
+      } else {
+        setIntegration(null);
       }
     } catch (error) {
       console.error('Error loading integration status:', error);

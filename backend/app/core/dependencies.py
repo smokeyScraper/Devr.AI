@@ -47,7 +47,7 @@ async def get_current_user(authorization: str = Header(None)) -> UUID:
     try:
         supabase = get_supabase_client()
         # Verify the token and get user
-        user_response = await supabase.auth.get_user(token)
+        user_response = supabase.auth.get_user(token)
 
         if not user_response or not user_response.user:
             raise HTTPException(
@@ -61,9 +61,9 @@ async def get_current_user(authorization: str = Header(None)) -> UUID:
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Authentication error: {str(e)}")
+        logger.exception("Authentication error")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e

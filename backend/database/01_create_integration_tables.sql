@@ -51,7 +51,8 @@ CREATE POLICY "Users can create their own integrations"
 CREATE POLICY "Users can update their own integrations"
     ON organization_integrations
     FOR UPDATE
-    USING (auth.uid() = user_id);
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own integrations"
     ON organization_integrations

@@ -7,7 +7,8 @@ from app.models.integration import (
     IntegrationCreateRequest,
     IntegrationUpdateRequest,
     IntegrationResponse,
-    IntegrationStatusResponse
+    IntegrationStatusResponse,
+    NotFoundError
 )
 
 logger = logging.getLogger(__name__)
@@ -64,7 +65,7 @@ class IntegrationService:
             return IntegrationResponse(**result.data[0])
 
         except Exception as e:
-            logger.error(f"Error creating integration: {str(e)}")
+            logger.exception("Error creating integration")
             raise
 
     async def get_integrations(self, user_id: UUID) -> List[IntegrationResponse]:
@@ -78,7 +79,7 @@ class IntegrationService:
             return [IntegrationResponse(**item) for item in result.data]
 
         except Exception as e:
-            logger.error(f"Error getting integrations: {str(e)}")
+            logger.exception("Error getting integrations")
             raise
 
     async def get_integration(self, user_id: UUID, integration_id: UUID) -> Optional[IntegrationResponse]:
@@ -96,7 +97,7 @@ class IntegrationService:
             return IntegrationResponse(**result.data[0])
 
         except Exception as e:
-            logger.error(f"Error getting integration: {str(e)}")
+            logger.exception("Error getting integration")
             raise
 
     async def get_integration_by_platform(
@@ -118,7 +119,7 @@ class IntegrationService:
             return IntegrationResponse(**result.data[0])
 
         except Exception as e:
-            logger.error(f"Error getting integration by platform: {str(e)}")
+            logger.exception("Error getting integration by platform")
             raise
 
     async def update_integration(
@@ -140,12 +141,14 @@ class IntegrationService:
             if request.config is not None:
                 update_data["config"] = request.config
 
+            existing = await self.get_integration(user_id, integration_id)
+            if not existing:
+                raise NotFoundError("Integration not found")
+
             if request.organization_link is not None:
-                if "config" not in update_data:
-                    # Get existing config first
-                    existing = await self.get_integration(user_id, integration_id)
-                    update_data["config"] = existing.config or {}
-                update_data["config"]["organization_link"] = request.organization_link
+                base_config = (update_data.get("config") or existing.config or {}).copy()
+                base_config["organization_link"] = request.organization_link
+                update_data["config"] = base_config
 
             result = await self.supabase.table("organization_integrations")\
                 .update(update_data)\
@@ -161,7 +164,7 @@ class IntegrationService:
             return IntegrationResponse(**result.data[0])
 
         except Exception as e:
-            logger.error(f"Error updating integration: {str(e)}")
+            logger.exception("Error updating integration")
             raise
 
     async def delete_integration(self, user_id: UUID, integration_id: UUID) -> bool:
@@ -178,7 +181,7 @@ class IntegrationService:
             return True
 
         except Exception as e:
-            logger.error(f"Error deleting integration: {str(e)}")
+            logger.exception("Error deleting integration")
             raise
 
     async def get_integration_status(
@@ -204,7 +207,7 @@ class IntegrationService:
             )
 
         except Exception as e:
-            logger.error(f"Error getting integration status: {str(e)}")
+            logger.exception("Error getting integration status")
             raise
 
     async def get_all_integrations_for_platform(self, platform: str) -> List[IntegrationResponse]:
@@ -219,7 +222,7 @@ class IntegrationService:
             return [IntegrationResponse(**item) for item in result.data]
 
         except Exception as e:
-            logger.error(f"Error getting all integrations for platform: {str(e)}")
+            logger.exception("Error getting all integrations for platform")
             raise
 
 
