@@ -108,6 +108,7 @@ def run_onboarding_flow(
         if is_verified:
             onboarding_state["stage"] = OnboardingStage.VERIFIED_CAPABILITIES.value
             onboarding_state["verified_acknowledged"] = True
+            onboarding_state["reminders_sent"] = 0
             intro = messages.build_verified_capabilities_intro(github_username)
             return (
                 OnboardingFlowResult(
@@ -145,6 +146,7 @@ def run_onboarding_flow(
         if is_verified or intent == "confirm_verified":
             onboarding_state["stage"] = OnboardingStage.VERIFIED_CAPABILITIES.value
             onboarding_state["verified_acknowledged"] = True
+            onboarding_state["reminders_sent"] = 0
             intro = messages.build_verified_capabilities_intro(github_username)
             return (
                 OnboardingFlowResult(
@@ -203,6 +205,7 @@ def run_onboarding_flow(
         if is_verified or intent == "confirm_verified":
             onboarding_state["stage"] = OnboardingStage.VERIFIED_CAPABILITIES.value
             onboarding_state["verified_acknowledged"] = True
+            onboarding_state["reminders_sent"] = 0
             intro = messages.build_verified_capabilities_intro(github_username)
             return (
                 OnboardingFlowResult(
@@ -241,6 +244,7 @@ def run_onboarding_flow(
 
     if stage_enum is OnboardingStage.VERIFIED_CAPABILITIES:
         onboarding_state["stage"] = OnboardingStage.COMPLETED.value
+        onboarding_state["reminders_sent"] = 0
         return (
             OnboardingFlowResult(
                 stage=OnboardingStage.COMPLETED,

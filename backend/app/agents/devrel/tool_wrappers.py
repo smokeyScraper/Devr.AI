@@ -35,11 +35,13 @@ async def onboarding_tool_node(state: AgentState) -> Dict[str, Any]:
     if "onboarding_state" in handler_result:
         state_update["onboarding_state"] = handler_result["onboarding_state"]
 
+    context = dict(state_update.get("context", {}))
     next_tool = tool_result.get("next_tool")
     if next_tool:
-        context = dict(state_update.get("context", {}))
         context["force_next_tool"] = next_tool
-        state_update["context"] = context
+        if tool_result.get("stage") in {"verified_capabilities", "completed"}:
+            context["complete_after_forced_tool"] = next_tool
+    state_update["context"] = context
 
     return state_update
 
@@ -65,4 +67,12 @@ async def github_toolkit_tool_node(state: AgentState, github_toolkit) -> Dict[st
             "status": "error"
         }
 
-    return add_tool_result(state, "github_toolkit", tool_result)
+    state_update = add_tool_result(state, "github_toolkit", tool_result)
+
+    context = dict(state_update.get("context", {}))
+    if context.get("complete_after_forced_tool") == "github_toolkit":
+        context.pop("complete_after_forced_tool", None)
+        context["force_complete"] = True
+    state_update["context"] = context
+
+    return state_update
