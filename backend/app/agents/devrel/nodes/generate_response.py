@@ -119,7 +119,9 @@ async def _store_interaction_to_db(state: AgentState, final_response: str) -> No
 
         # Extract classification data
         classification = state.context.get("classification", {})
-        intent = classification.get("intent")
+        # TODO: intent key not present in classification schema (contains: needs_devrel, priority, reasoning)
+        # Modify prompt to include intent key
+        intent = classification.get("reasoning")  # Fallback to reasoning for intent
 
         # Store the interaction
         await store_interaction(

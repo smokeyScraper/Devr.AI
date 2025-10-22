@@ -139,19 +139,18 @@ async def store_interaction(
         if response.data:
             logger.info(f"Interaction stored successfully for user {user_uuid}")
 
-            # Increment user's total_interactions_count
-            # First get the current count
-            user_response = await supabase.table("users").select("total_interactions_count").eq("id", user_uuid).limit(1).execute()
-            if user_response.data:
-                current_count = user_response.data[0].get("total_interactions_count", 0)
-                await supabase.table("users").update({
-                    "total_interactions_count": current_count + 1
-                }).eq("id", user_uuid).execute()
+            # Atomically increment user's total_interactions_count
+            try:
+                rpc_response = await supabase.rpc("increment_user_interaction_count", {"user_uuid": user_uuid}).execute()
+                if rpc_response.data is not None:
+                    logger.debug(f"Updated interaction count for user {user_uuid}: {rpc_response.data}")
+                else:
+                    logger.warning(f"User {user_uuid} not found when incrementing interaction count")
+            except Exception as e:
+                logger.exception("Error incrementing user interaction count")
 
+            # Not failing the entire operation if incrementing the interaction count fails
             return True
-        else:
-            logger.error(f"Failed to store interaction: {response}")
-            return False
 
     except Exception as e:
         logger.error(f"Error storing interaction: {str(e)}")
