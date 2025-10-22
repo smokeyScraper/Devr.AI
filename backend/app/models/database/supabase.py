@@ -187,7 +187,6 @@ class ConversationContext(BaseModel):
 
     created_at: datetime = Field(default_factory=datetime.now)
 
-
 class OrganizationIntegration(BaseModel):
     """
     Represents a registered organization (just metadata, no credentials).
@@ -210,3 +209,21 @@ class OrganizationIntegration(BaseModel):
     created_at: datetime
     updated_at: datetime
     config: Optional[dict] = None
+
+class IndexedRepository(BaseModel):
+    """Model for FalkorDB indexed repositories"""
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+    repository_full_name: str
+    graph_name: str
+    indexing_status: str  # 'pending', 'completed', 'failed'
+    indexed_at: Optional[datetime] = None
+    indexed_by_discord_id: str
+    is_deleted: bool = False
+    node_count: int = 0
+    edge_count: int = 0
+    last_error: Optional[str] = None
+
+    class Config:
+        orm_mode = True

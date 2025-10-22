@@ -2,17 +2,11 @@ import os
 import requests
 import asyncio
 from typing import Optional
-from dotenv import load_dotenv, find_dotenv 
-
-dotenv_path = find_dotenv(usecwd=True)
-if dotenv_path:
-    load_dotenv(dotenv_path=dotenv_path)
-else:
-    load_dotenv()
+import config
 
 class GitHubMCPService:
     def __init__(self, token: str = None):
-        self.token = token or os.getenv("GITHUB_TOKEN")
+        self.token = token or config.GITHUB_TOKEN
         if not self.token:
             raise ValueError("GitHub token required; export as GITHUB_TOKEN or place in backend/.env file")
         self.base_url = "https://api.github.com"
@@ -110,7 +104,7 @@ class GitHubMCPService:
 
 
 def _get_service(token: Optional[str] = None) -> GitHubMCPService:
-    return GitHubMCPService(token=token or os.getenv("GITHUB_TOKEN"))
+    return GitHubMCPService(token=token or config.GITHUB_TOKEN)
 
 async def get_org_repositories(org: str):
     try:
