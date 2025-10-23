@@ -437,7 +437,7 @@ class OnboardingCog(commands.Cog):
             "session_unavailable": "Sent fallback DMs (session unavailable).",
             "auth_unavailable": "Sent fallback DMs (no auth URL).",
             "onboarding_sent": "Sent onboarding DM to you.",
-            "dm_forbidden": "I can’t DM you (DMs disabled).",
+            "dm_forbidden": "I can't DM you (DMs disabled).", ,
             "error": "Hit an error while sending onboarding DM.",
         }
         await interaction.followup.send(messages.get(status, "Completed."), ephemeral=True)
@@ -473,8 +473,10 @@ class OnboardingCog(commands.Cog):
                     await user.send(build_verified_welcome(profile.github_username))
                     await user.send(build_verified_capabilities_intro(profile.github_username))
                     await user.send(embed=build_final_handoff_embed())
-                except Exception:
-                    pass
+                except discord.Forbidden:
+                    logger.warning(f"Cannot DM verified user {user.id} (DMs disabled)")
+                except Exception as e:
+                    logger.exception(f"Failed to send verified welcome DM to user {user.id}: {e}")
                 return "verified"
 
             # Determine whether to show OAuth button
@@ -489,8 +491,10 @@ class OnboardingCog(commands.Cog):
                         await user.send("I couldn't start verification right now. You can use /verify_github anytime.")
                         await user.send(build_encourage_verification_message(reminder_count=1))
                         await user.send(embed=build_final_handoff_embed())
-                    except Exception:
-                        pass
+                    except discord.Forbidden:
+                        logger.warning(f"Cannot DM user {user.id} after session failure (DMs disabled)")
+                    except Exception as e:
+                        logger.exception(f"Failed to send session failure fallback DM to user {user.id}: {e}")
                     return "session_unavailable"
 
                 # Generate GitHub OAuth URL via Supabase
@@ -502,8 +506,10 @@ class OnboardingCog(commands.Cog):
                         await user.send("Couldn't generate a verification link. Please use /verify_github.")
                         await user.send(build_encourage_verification_message(reminder_count=1))
                         await user.send(embed=build_final_handoff_embed())
-                    except Exception:
-                        pass
+                    except discord.Forbidden:
+                        logger.warning(f"Cannot DM user {user.id} after auth URL failure (DMs disabled)")
+                    except Exception as e:
+                        logger.exception(f"Failed to send auth failure fallback DM to user {user.id}: {e}")
                     return "auth_unavailable"
 
             # Send welcome DM with actions (auth_url may be None when button disabled)
@@ -513,10 +519,12 @@ class OnboardingCog(commands.Cog):
         except discord.Forbidden:
             return "dm_forbidden"
         except Exception as e:
-            logger.error(f"onboarding flow error: {e}")
+            logger.exception(f"onboarding flow error: {e}")
             try:
                 await user.send("I hit an error. You can still run /verify_github and /help.")
                 await user.send(build_encourage_verification_message(reminder_count=1))
-            except Exception:
-                pass
+            except discord.Forbidden:
+                logger.warning(f"Cannot DM user {user.id} after onboarding error (DMs disabled)")
+            except Exception as send_error:
+                logger.exception(f"Failed to send error fallback DM to user {user.id}: {send_error}")
             return "error"

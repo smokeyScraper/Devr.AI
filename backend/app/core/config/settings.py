@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
-from pydantic import field_validator,ConfigDict
+from pydantic import field_validator, ConfigDict
 from typing import Optional
 
 load_dotenv()
@@ -42,10 +42,6 @@ class Settings(BaseSettings):
     # Onboarding UX toggles
     onboarding_show_oauth_button: bool = True
 
-    # MCP configuration
-    mcp_server_url: Optional[str] = None
-    mcp_api_key: Optional[str] = None
-
     @field_validator("supabase_url", "supabase_key", mode="before")
     @classmethod
     def _not_empty(cls, v, field):
@@ -53,10 +49,10 @@ class Settings(BaseSettings):
             raise ValueError(f"{field.name} must be set")
         return v
 
-    model_config =  ConfigDict(
-        env_file = ".env",
-        extra = "ignore" 
-    ) # to prevent errors from extra env variables
+    model_config = ConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )  # to prevent errors from extra env variables
 
 
 settings = Settings()
