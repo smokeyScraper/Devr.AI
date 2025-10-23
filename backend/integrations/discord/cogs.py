@@ -437,7 +437,7 @@ class OnboardingCog(commands.Cog):
             "session_unavailable": "Sent fallback DMs (session unavailable).",
             "auth_unavailable": "Sent fallback DMs (no auth URL).",
             "onboarding_sent": "Sent onboarding DM to you.",
-            "dm_forbidden": "I can't DM you (DMs disabled).", ,
+            "dm_forbidden": "I can't DM you (DMs disabled).",
             "error": "Hit an error while sending onboarding DM.",
         }
         await interaction.followup.send(messages.get(status, "Completed."), ephemeral=True)
