@@ -1,7 +1,7 @@
 import logging
-import os
 import json
 import re
+import config
 from typing import Dict, Any
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
@@ -11,10 +11,11 @@ from .tools.search import handle_web_search
 from .tools.github_support import handle_github_supp
 from .tools.contributor_recommendation import handle_contributor_recommendation
 from .tools.general_github_help import handle_general_github_help
+from .tools.repo_support import handle_repo_support
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_ORG = os.getenv("GITHUB_ORG")
+DEFAULT_ORG = config.GITHUB_ORG
 
 
 def normalize_org(org_from_user: str = None) -> str:
@@ -114,7 +115,7 @@ class GitHubToolkit:
                 result = await handle_github_supp(query, org=org)
                 result["org_used"] = org
             elif classification == "repo_support":
-                result = "Not implemented"
+                result = await handle_repo_support(query)
             elif classification == "issue_creation":
                 result = "Not implemented"
             elif classification == "documentation_generation":

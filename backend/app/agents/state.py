@@ -1,5 +1,5 @@
 from typing import Dict, Any, List, Optional, Annotated
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from operator import add
 
@@ -72,5 +72,6 @@ class AgentState(BaseModel):
     # Response
     final_response: Optional[str] = None
 
-    class Config:
+    model_config = ConfigDict(
         arbitrary_types_allowed = True
+    )

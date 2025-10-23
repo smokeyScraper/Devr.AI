@@ -1,8 +1,8 @@
 import logging
-import os
 from typing import Dict, Any, Optional, List, Union
 import aiohttp
 import asyncio
+import config
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class GitHubMCPClient:
         self.mcp_server_url = mcp_server_url
         self.session: Optional[aiohttp.ClientSession] = None
         # Default org pulled from environment
-        self.org = os.getenv("GITHUB_ORG", "Aossie-org")
+        self.org = config.GITHUB_ORG
 
     async def __aenter__(self):
         # Async context manager entry
