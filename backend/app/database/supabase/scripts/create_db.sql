@@ -193,3 +193,26 @@ CREATE TRIGGER update_conversation_context_updated_at
 BEFORE UPDATE ON conversation_context
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+-- Migration: Add atomic increment function for user interaction count
+-- This function safely increments the total_interactions_count for a user
+
+CREATE OR REPLACE FUNCTION increment_user_interaction_count(user_uuid UUID)
+RETURNS INTEGER AS $$
+DECLARE
+    new_count INTEGER;
+BEGIN
+    -- Atomically increment the counter and return the new value
+    UPDATE users
+    SET total_interactions_count = total_interactions_count + 1
+    WHERE id = user_uuid
+    RETURNING total_interactions_count INTO new_count;
+    
+    -- Return the new count (NULL if user not found)
+    RETURN new_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Optional: Add a comment for documentation
+COMMENT ON FUNCTION increment_user_interaction_count(UUID) IS 
+'Atomically increments the total_interactions_count for a user. Returns the new count or NULL if user not found.';
