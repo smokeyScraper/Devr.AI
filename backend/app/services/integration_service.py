@@ -7,8 +7,7 @@ from app.models.integration import (
     IntegrationCreateRequest,
     IntegrationUpdateRequest,
     IntegrationResponse,
-    IntegrationStatusResponse,
-    NotFoundError
+    IntegrationStatusResponse
 )
 
 logger = logging.getLogger(__name__)
@@ -143,7 +142,7 @@ class IntegrationService:
 
             existing = await self.get_integration(user_id, integration_id)
             if not existing:
-                raise NotFoundError("Integration not found")
+                raise ValueError("Integration not found")
 
             if request.organization_link is not None:
                 base_config = (update_data.get("config") or existing.config or {}).copy()
