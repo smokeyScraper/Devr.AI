@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from uuid import UUID
 from typing import Optional, List
 from datetime import datetime
@@ -225,5 +225,4 @@ class IndexedRepository(BaseModel):
     edge_count: int = 0
     last_error: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
