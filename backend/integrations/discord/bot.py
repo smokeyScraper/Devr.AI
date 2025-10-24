@@ -20,6 +20,7 @@ class DiscordBot(commands.Bot):
         super().__init__(
             command_prefix=None,
             intents=intents,
+            heartbeat_timeout=60.0,
             **kwargs
         )
 

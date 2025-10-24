@@ -11,14 +11,14 @@ if __name__ == "__main__":
     try:
         from app.agents.devrel.github.services.github_mcp_server import app
         import uvicorn
-        
+
         print("Starting GitHub MCP Server...")
         print("Server will be available at: http://localhost:8001")
         print("Health check: http://localhost:8001/health")
         print("Press Ctrl+C to stop the server")
-        
-        uvicorn.run(app, host="0.0.0.0", port=8001)
-        
+
+        uvicorn.run(app, host="0.0.0.0", port=8001, ws_ping_interval=20, ws_ping_timeout=20)
+
     except ImportError as e:
         print(f"Import error: {e}")
         print("Make sure you're running this from the backend directory")
