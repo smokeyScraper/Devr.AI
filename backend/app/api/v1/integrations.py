@@ -7,7 +7,7 @@ from app.models.integration import (
     IntegrationListResponse,
     IntegrationStatusResponse
 )
-from app.services.integration_service import integration_service
+from app.services.integration_service import integration_service, IntegrationNotFoundError
 from app.core.dependencies import get_current_user
 
 router = APIRouter()
@@ -76,8 +76,10 @@ async def update_integration(
     """Update an existing integration."""
     try:
         return await integration_service.update_integration(user_id, integration_id, request)
-    except ValueError as e:
+    except IntegrationNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except HTTPException:
         raise
     except Exception as e:
@@ -94,8 +96,10 @@ async def delete_integration(
     """Delete an integration."""
     try:
         await integration_service.delete_integration(user_id, integration_id)
-    except ValueError as e:
+    except IntegrationNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except HTTPException:
         raise
     except Exception as e:

@@ -13,6 +13,11 @@ from app.models.integration import (
 logger = logging.getLogger(__name__)
 
 
+class IntegrationNotFoundError(Exception):
+    """Raised when an integration is not found."""
+    pass
+
+
 class IntegrationService:
     """Service for registering organizations (stores org info only)."""
 
@@ -142,7 +147,7 @@ class IntegrationService:
 
             existing = await self.get_integration(user_id, integration_id)
             if not existing:
-                raise ValueError("Integration not found")
+                raise IntegrationNotFoundError("Integration not found")
 
             if request.organization_link is not None:
                 base_config = (update_data.get("config") or existing.config or {}).copy()
@@ -169,6 +174,11 @@ class IntegrationService:
     async def delete_integration(self, user_id: UUID, integration_id: UUID) -> bool:
         """Delete an integration."""
         try:
+            # Check if integration exists before deleting
+            existing = await self.get_integration(user_id, integration_id)
+            if not existing:
+                raise IntegrationNotFoundError("Integration not found")
+
             await self.supabase.table("organization_integrations")\
                 .delete()\
                 .eq("id", str(integration_id))\
